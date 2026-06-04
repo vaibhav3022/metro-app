@@ -1,0 +1,223 @@
+const Merchant = require('../models/Merchant');
+const Shop = require('../models/Shop');
+const TokenTransaction = require('../models/TokenTransaction');
+const User = require('../models/User');
+const Notification = require('../models/Notification');
+
+const getStatus = async (req, res) => {
+  try {
+    const merchant = await Merchant.findOne({ userId: req.user._id });
+    if (!merchant) return res.status(404).json({ success: false, message: 'Not found' });
+    res.status(200).json({ success: true, status: merchant.status, rejectionReason: merchant.rejectionReason });
+  } catch (err) { res.status(500).json({ success: false }); }
+};
+
+const getDashboard = async (req, res) => {
+  try {
+    const merchant = req.merchant;
+    const shop = await Shop.findOne({ merchantId: merchant._id });
+    
+    // 1. Calculate Token Transactions (Redemptions)
+    const tokenAgg = await TokenTransaction.aggregate([
+      { $match: { merchantId: merchant._id, type: 'redemption', status: 'success' } },
+      { $group: { _id: null, total: { $sum: '$amount' }, count: { $sum: 1 } } }
+    ]);
+    const tokensAccepted = tokenAgg[0]?.total || 0;
+    const tokenOrders = tokenAgg[0]?.count || 0;
+    const tokenUsers = await TokenTransaction.distinct('userId', { merchantId: merchant._id, type: 'redemption', status: 'success' });
+
+    // 2. Calculate Shop Transactions (Wallet/Razorpay)
+    let shopSales = 0;
+    let shopOrders = 0;
+    let shopUsers = [];
+    
+    // In Shop model, merchantId refers to Merchant._id
+    const merchantShop = await require('../models/Shop').findOne({ merchantId: merchant._id });
+    if (merchantShop) {
+      const shopAgg = await require('../models/ShopTransaction').aggregate([
+        { $match: { shopId: merchantShop._id, status: 'SUCCESS' } },
+        { $group: { _id: null, total: { $sum: '$amount' }, count: { $sum: 1 } } }
+      ]);
+      shopSales = shopAgg[0]?.total || 0;
+      shopOrders = shopAgg[0]?.count || 0;
+      shopUsers = await require('../models/ShopTransaction').distinct('userId', { shopId: merchantShop._id, status: 'SUCCESS' });
+    }
+
+    // Combine stats
+    const totalSales = tokensAccepted + shopSales;
+    const totalOrders = tokenOrders + shopOrders;
+    
+    // Merge distinct users
+    const uniqueUserIds = new Set([...tokenUsers.map(id => id.toString()), ...shopUsers.map(id => id.toString())]);
+    const totalCustomers = uniqueUserIds.size;
+
+    merchant.totalTokensAccepted = tokensAccepted;
+    merchant.totalOrders = totalOrders;
+    merchant.totalEarnings = totalSales; 
+    await merchant.save();
+
+    res.status(200).json({
+      success: true,
+      merchantId: merchant._id,
+      shopId: merchantShop ? merchantShop._id : null,
+      businessName: merchant.businessName,
+      stats: {
+        totalSales,
+        totalOrders,
+        totalCustomers,
+        tokensAccepted,
+        cashbackRedeemed: tokensAccepted
+      },
+      chartData: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], data: [0, 0, 0, tokensAccepted, 0, 0, 0] }
+    });
+  } catch (err) { res.status(500).json({ success: false }); }
+};
+
+const getTransactions = async (req, res) => {
+  try {
+    const { page = 1, limit = 50 } = req.query;
+    
+    const tokenTxsRaw = await TokenTransaction.find({ merchantId: req.merchant._id })
+      .populate('userId', 'name')
+      .sort({ createdAt: -1 })
+      .limit(parseInt(limit));
+      
+    let shopTxsRaw = [];
+    const shops = await require('../models/Shop').find({ merchantId: req.merchant._id });
+    if (shops.length > 0) {
+      const shopIds = shops.map(s => s._id);
+      shopTxsRaw = await require('../models/ShopTransaction').find({ shopId: { $in: shopIds } })
+        .populate('userId', 'name')
+        .sort({ timestamp: -1 })
+        .limit(parseInt(limit));
+    }
+
+    const formattedTokenTxs = tokenTxsRaw.map(tx => ({
+      ...tx.toObject(),
+      paymentMethod: 'Token',
+      createdAt: tx.createdAt
+    }));
+
+    const formattedShopTxs = shopTxsRaw.map(tx => ({
+      ...tx.toObject(),
+      type: 'purchase',
+      paymentMethod: 'Wallet/Razorpay',
+      createdAt: tx.timestamp
+    }));
+
+    const allTxs = [...formattedTokenTxs, ...formattedShopTxs]
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice((page - 1) * parseInt(limit), page * parseInt(limit));
+      
+    res.status(200).json({ success: true, data: allTxs });
+  } catch (err) { 
+    console.log(err);
+    res.status(500).json({ success: false }); 
+  }
+};
+
+const scanToken = async (req, res) => {
+  try {
+    const { customerId, amount } = req.body;
+    if (!amount || amount <= 0) return res.status(400).json({ success: false, message: 'Invalid amount' });
+
+    const user = await User.findById(customerId);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    if (user.tokenBalance < amount) return res.status(400).json({ success: false, message: 'Insufficient token balance' });
+
+    user.tokenBalance -= amount;
+    await user.save();
+
+    const merchant = req.merchant;
+    merchant.totalEarnings += amount;
+    merchant.totalTokensAccepted += amount;
+    merchant.totalOrders += 1;
+    await merchant.save();
+
+    const tx = await TokenTransaction.create({
+      userId: user._id,
+      merchantId: merchant._id,
+      type: 'redemption',
+      amount,
+      status: 'success'
+    });
+
+    await Notification.create({
+      recipientId: user._id, recipientRole: 'user',
+      title: 'Tokens Spent', message: `You spent ${amount} tokens at ${merchant.businessName}.`, type: 'info'
+    });
+
+    res.status(200).json({ success: true, message: 'Tokens accepted', transaction: tx });
+  } catch (err) { res.status(500).json({ success: false }); }
+};
+
+const getShop = async (req, res) => {
+  try {
+    const shop = await Shop.findOne({ merchantId: req.merchant._id });
+    res.status(200).json({ success: true, shop });
+  } catch (err) { res.status(500).json({ success: false }); }
+};
+
+const updateShop = async (req, res) => {
+  try {
+    const shop = await Shop.findOneAndUpdate({ merchantId: req.merchant._id }, req.body, { new: true });
+    res.status(200).json({ success: true, shop });
+  } catch (err) { res.status(500).json({ success: false }); }
+};
+
+const addProduct = async (req, res) => {
+  try {
+    const shop = await Shop.findOne({ merchantId: req.merchant._id });
+    shop.products.push(req.body);
+    await shop.save();
+    res.status(200).json({ success: true, shop });
+  } catch (err) { res.status(500).json({ success: false }); }
+};
+
+const editProduct = async (req, res) => {
+  try {
+    const shop = await Shop.findOne({ merchantId: req.merchant._id });
+    const pIndex = shop.products.findIndex(p => p._id.toString() === req.params.id);
+    if (pIndex > -1) {
+      shop.products[pIndex] = { ...shop.products[pIndex].toObject(), ...req.body };
+      await shop.save();
+    }
+    res.status(200).json({ success: true, shop });
+  } catch (err) { res.status(500).json({ success: false }); }
+};
+
+const deleteProduct = async (req, res) => {
+  try {
+    const shop = await Shop.findOne({ merchantId: req.merchant._id });
+    shop.products = shop.products.filter(p => p._id.toString() !== req.params.id);
+    await shop.save();
+    res.status(200).json({ success: true, shop });
+  } catch (err) { res.status(500).json({ success: false }); }
+};
+
+const addOffer = async (req, res) => {
+  try {
+    const shop = await Shop.findOne({ merchantId: req.merchant._id });
+    shop.offers.push(req.body);
+    await shop.save();
+    res.status(200).json({ success: true, shop });
+  } catch (err) { res.status(500).json({ success: false }); }
+};
+
+const getNotifications = async (req, res) => {
+  try {
+    const notifs = await Notification.find({ recipientRole: 'merchant', recipientId: req.user._id }).sort({ createdAt: -1 });
+    res.status(200).json({ success: true, data: notifs });
+  } catch (err) { res.status(500).json({ success: false }); }
+};
+
+const markNotificationRead = async (req, res) => {
+  try {
+    await Notification.findByIdAndUpdate(req.params.id, { isRead: true });
+    res.status(200).json({ success: true });
+  } catch (err) { res.status(500).json({ success: false }); }
+};
+
+module.exports = {
+  getStatus, getDashboard, getTransactions, scanToken, getShop, updateShop, addProduct, editProduct, deleteProduct, addOffer, getNotifications, markNotificationRead
+};

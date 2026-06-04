@@ -1,0 +1,146 @@
+const User = require('../models/User');
+const Merchant = require('../models/Merchant');
+const Shop = require('../models/Shop');
+const Notification = require('../models/Notification');
+const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
+const { generateAccessToken, generateRefreshToken } = require('../utils/generateToken');
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: { user: process.env.GMAIL_USER || 'dhotrev384@gmail.com', pass: process.env.GMAIL_APP_PASSWORD || 'uqvjsavnkzrxreen' }
+});
+
+const sendOTP = async (req, res) => {
+  const { email, isRegister } = req.body;
+  if (!email) return res.status(400).json({ success: false, message: 'Valid email required' });
+  const normalizedEmail = email.toLowerCase().trim();
+
+  try {
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
+    let user = await User.findOne({ email: normalizedEmail });
+
+    if (isRegister) {
+      if (user && user.isVerified) return res.status(400).json({ success: false, message: 'Email already registered.' });
+      if (!user) user = new User({ email: normalizedEmail });
+    } else {
+      if (!user) return res.status(400).json({ success: false, message: 'Account not found.' });
+    }
+
+    user.otp = otp; user.otpExpiry = otpExpiry;
+    await user.save();
+
+    await transporter.sendMail({
+      from: `"Pune Metro" <${process.env.GMAIL_USER || 'dhotrev384@gmail.com'}>`,
+      to: normalizedEmail,
+      subject: 'Pune Metro OTP',
+      html: `<h2>OTP: ${otp}</h2><p>Valid for 5 minutes.</p>`
+    });
+    console.log(`[OTP] ${normalizedEmail}: ${otp}`);
+
+    res.status(200).json({ success: true, message: 'OTP sent' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to send OTP' });
+  }
+};
+
+const verifyOTP = async (req, res) => {
+  const { email, otp, name, phone, role, password, shopName, upiId, address, category } = req.body;
+  const normalizedEmail = email.toLowerCase().trim();
+  const normalizedOtp = otp ? String(otp).trim() : '';
+
+  try {
+    const user = await User.findOne({ email: normalizedEmail }).select('+password');
+    if (!user || user.otp !== normalizedOtp || user.otpExpiry < new Date()) {
+      return res.status(400).json({ success: false, message: 'Invalid or expired OTP.' });
+    }
+
+    user.isVerified = true;
+    user.otp = null; user.otpExpiry = null;
+    if (name) user.name = name;
+    if (phone) user.phone = phone;
+    if (role) user.role = role;
+    if (password) {
+      const bcrypt = require('bcryptjs');
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(password, salt);
+    }
+    await user.save();
+
+    // Create Merchant/Shop records if it's a new merchant
+    if (role === 'merchant' && shopName) {
+      const existingMerchant = await Merchant.findOne({ userId: user._id });
+      if (!existingMerchant) {
+        user.merchantStatus = 'pending';
+        await user.save();
+
+        const newMerchant = await Merchant.create({
+          userId: user._id,
+          businessName: shopName,
+          address: address || '',
+          phone: phone,
+          status: 'pending'
+        });
+
+        await Shop.create({
+          merchantId: newMerchant._id,
+          shopName: shopName,
+          category: category || 'Retail',
+        });
+
+        // Notify Admins
+        const admins = await User.find({ role: 'admin' });
+        for (let admin of admins) {
+          await Notification.create({
+            recipientId: admin._id,
+            recipientRole: 'admin',
+            title: 'New Merchant Request',
+            message: `${shopName} has requested to join as a merchant.`,
+            type: 'info'
+          });
+        }
+      }
+    }
+
+    const token = generateAccessToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
+
+    user.password = undefined;
+    res.status(200).json({ success: true, user, token, refreshToken });
+  } catch (error) {
+    console.error('OTP Verification Error:', error);
+    res.status(500).json({ success: false, message: 'OTP verification failed' });
+  }
+};
+
+const loginPassword = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.findOne({ email: email.toLowerCase().trim() }).select('+password');
+    if (!user) return res.status(401).json({ success: false, message: 'Invalid credentials' });
+
+    const bcrypt = require('bcryptjs');
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(401).json({ success: false, message: 'Invalid credentials' });
+
+    const token = generateAccessToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
+    user.password = undefined;
+
+    res.status(200).json({ success: true, user, token, refreshToken });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+const getMe = async (req, res) => {
+  res.status(200).json({ success: true, user: req.user });
+};
+
+// Aliases for explicit routing as requested in prompt
+const register = verifyOTP;
+const merchantRegister = verifyOTP;
+const login = loginPassword;
+
+module.exports = { sendOTP, verifyOTP, loginPassword, getMe, register, merchantRegister, login };

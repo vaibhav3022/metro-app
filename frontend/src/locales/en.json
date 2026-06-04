@@ -1,0 +1,27 @@
+{
+  "home": {
+    "quickActions": "Quick Actions",
+    "bookTicket": "Book Ticket",
+    "metroMap": "Metro Map",
+    "myTickets": "My Tickets",
+    "metroWallet": "Metro Wallet",
+    "fareCalculator": "Fare Calculator",
+    "smartCard": "Smart Card",
+    "feederServices": "Feeder Services",
+    "stationInfo": "Station Info",
+    "helpSupport": "Help & Support",
+    "activePass": "Active Transit Pass",
+    "noActiveTickets": "No Active Tickets",
+    "noActiveTicketsSub": "You don't have any active digital tickets for today. Book a ticket to start your journey.",
+    "bookNow": "Book Ticket Now",
+    "safetyTitle": "Safety & Security Guidelines",
+    "safetySub": "Stand behind the yellow line. Ensure your QR ticket is kept ready prior to approaching entry barriers."
+  },
+  "common": {
+    "from": "FROM",
+    "to": "TO",
+    "passengers": "PASSENGERS",
+    "date": "DATE & TIME",
+    "amount": "TOTAL AMOUNT"
+  }
+}
