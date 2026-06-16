@@ -138,9 +138,31 @@ const getMe = async (req, res) => {
   res.status(200).json({ success: true, user: req.user });
 };
 
+const updateProfile = async (req, res) => {
+  try {
+    const { name, email, phone } = req.body;
+    
+    // Find the user and update the fields
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: { name, email, phone } },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    res.status(200).json({ success: true, user: updatedUser });
+  } catch (err) {
+    console.error('Error updating profile:', err);
+    res.status(500).json({ success: false, message: 'Failed to update profile' });
+  }
+};
+
 // Aliases for explicit routing as requested in prompt
 const register = verifyOTP;
 const merchantRegister = verifyOTP;
 const login = loginPassword;
 
-module.exports = { sendOTP, verifyOTP, loginPassword, getMe, register, merchantRegister, login };
+module.exports = { sendOTP, verifyOTP, loginPassword, getMe, register, merchantRegister, login, updateProfile };

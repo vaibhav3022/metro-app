@@ -101,7 +101,13 @@ async function seedMassive() {
       const dayTickets = Math.floor(Math.random() * 10000) + 5000;
       const dayTokens = Math.floor(Math.random() * 5000) + 1000;
       await Revenue.create({
-        date: date, totalRevenue: dayTickets + dayTokens, platformCommission: (dayTickets + dayTokens) * 0.1, tokenSalesRevenue: dayTokens, merchantPayouts: dayTokens * 0.8, createdAt: date
+        date: date,
+        netRevenue: dayTickets + dayTokens,
+        totalTicketSales: dayTickets,
+        totalTokenSales: dayTokens,
+        platformCommission: (dayTickets + dayTokens) * 0.1,
+        merchantPayouts: dayTokens * 0.8,
+        createdAt: date
       });
     }
 

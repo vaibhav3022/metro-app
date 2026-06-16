@@ -38,42 +38,59 @@ export default function TokenEconomyScreen({ navigation }) {
   const showToast = (message, type) => setToast({ visible: true, message, type });
 
   const handleBuyTokens = async () => {
-    const amount = parseInt(buyAmount);
-    if (!amount || amount < 10) return showToast('Enter amount min ₹10', 'error');
+    const baseAmount = parseInt(buyAmount);
+    if (!baseAmount || baseAmount < 10) return showToast('Enter amount min ₹10', 'error');
 
-    try {
-      const orderRes = await api.post('/tokens/create-order', { amount });
-      const { orderId } = orderRes.data;
+    // GST Calculation (18%) — same as web app
+    const gstAmount   = Math.ceil(baseAmount * 0.18);
+    const totalPayable = baseAmount + gstAmount;
 
-      var options = {
-        description: 'Buy Metro Tokens',
-        image: 'https://pune-metro-logo.com/logo.png',
-        currency: 'INR',
-        key: 'rzp_test_St6f7LZjydxbQ0', // Keep existing Razorpay ID
-        amount: amount * 100,
-        name: 'Pune Metro',
-        order_id: orderId,
-        theme: { color: COLORS.primary }
-      };
+    // Show GST breakdown before payment
+    Alert.alert(
+      'Payment Breakdown',
+      `Tokens Value : ₹${baseAmount}\nGST (18%)     : ₹${gstAmount}\n─────────────────\nTotal Payable : ₹${totalPayable}\n\nA GST invoice will be generated automatically.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: `Pay ₹${totalPayable}`,
+          onPress: async () => {
+            try {
+              const orderRes = await api.post('/tokens/create-order', { amount: baseAmount });
+              const { orderId, amount: orderAmount } = orderRes.data;
 
-      RazorpayCheckout.open(options).then(async (data) => {
-        const verifyRes = await api.post('/tokens/verify-payment', {
-          amount,
-          paymentId: data.razorpay_payment_id,
-          orderId: data.razorpay_order_id,
-          signature: data.razorpay_signature
-        });
-        if (verifyRes.data.success) {
-          showToast('Tokens added successfully!', 'success');
-          setBuyAmount('');
-          fetchData();
+              var options = {
+                description: `Buy ${baseAmount} Metro Tokens (GST incl.)`,
+                image: 'https://pune-metro-logo.com/logo.png',
+                currency: 'INR',
+                key: 'rzp_test_St6f7LZjydxbQ0',
+                amount: orderAmount || totalPayable * 100, // backend returns GST-included paise
+                name: 'Pune Metro',
+                order_id: orderId,
+                theme: { color: COLORS.primary }
+              };
+
+              RazorpayCheckout.open(options).then(async (data) => {
+                const verifyRes = await api.post('/tokens/verify-payment', {
+                  amount: baseAmount,
+                  paymentId: data.razorpay_payment_id,
+                  orderId: data.razorpay_order_id,
+                  signature: data.razorpay_signature
+                });
+                if (verifyRes.data.success) {
+                  showToast(`${baseAmount} Tokens added! (GST ₹${gstAmount} paid)`, 'success');
+                  setBuyAmount('');
+                  fetchData();
+                }
+              }).catch(() => {
+                showToast('Payment Cancelled', 'error');
+              });
+            } catch (err) {
+              showToast('Failed to create order', 'error');
+            }
+          }
         }
-      }).catch((error) => {
-        showToast('Payment Cancelled', 'error');
-      });
-    } catch (err) {
-      showToast('Failed to create order', 'error');
-    }
+      ]
+    );
   };
 
   const handleSpendTokens = async () => {
@@ -121,11 +138,33 @@ export default function TokenEconomyScreen({ navigation }) {
           <Text style={styles.inputLabel}>Enter Amount (₹)</Text>
           <TextInput
             style={styles.input}
-            placeholder="e.g. 50 (min ₹10)"
+            placeholder="e.g. 100 (min ₹10)"
             keyboardType="numeric"
             value={buyAmount}
             onChangeText={setBuyAmount}
           />
+
+          {/* GST Breakdown — same as web app */}
+          {parseInt(buyAmount) >= 10 && (
+            <View style={styles.gstBox}>
+              <View style={styles.gstRow}>
+                <Text style={styles.gstLabel}>Tokens Value</Text>
+                <Text style={styles.gstValue}>₹{parseInt(buyAmount)}</Text>
+              </View>
+              <View style={styles.gstRow}>
+                <Text style={styles.gstLabel}>GST (18%)</Text>
+                <Text style={[styles.gstValue, { color: '#F39C12' }]}>+ ₹{Math.ceil(parseInt(buyAmount) * 0.18)}</Text>
+              </View>
+              <View style={[styles.gstRow, styles.gstTotal]}>
+                <Text style={[styles.gstLabel, { fontWeight: '800', color: '#fff' }]}>Total Payable</Text>
+                <Text style={[styles.gstValue, { color: '#00C9A7', fontWeight: '800', fontSize: 16 }]}>
+                  ₹{parseInt(buyAmount) + Math.ceil(parseInt(buyAmount) * 0.18)}
+                </Text>
+              </View>
+              <Text style={styles.gstNote}>GST Invoice auto-generated via Webhook</Text>
+            </View>
+          )}
+
           <TouchableOpacity style={styles.primaryBtn} onPress={handleBuyTokens}>
             <Text style={styles.primaryBtnText}>Proceed to Pay</Text>
           </TouchableOpacity>
@@ -212,5 +251,12 @@ const styles = StyleSheet.create({
   txDetails: { marginLeft: 12 },
   txType: { fontSize: 16, fontWeight: '600', color: COLORS.text },
   txDate: { fontSize: 12, color: COLORS.textLight, marginTop: 2 },
-  txAmount: { fontSize: 16, fontWeight: 'bold' }
+  txAmount: { fontSize: 16, fontWeight: 'bold' },
+  // GST Breakdown styles
+  gstBox: { backgroundColor: '#1a1a2e', borderRadius: 10, padding: 14, marginTop: 12, marginBottom: 4 },
+  gstRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
+  gstTotal: { borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.15)', paddingTop: 10, marginTop: 4 },
+  gstLabel: { fontSize: 13, color: 'rgba(255,255,255,0.6)' },
+  gstValue: { fontSize: 13, color: '#fff', fontWeight: '600' },
+  gstNote: { fontSize: 11, color: 'rgba(255,255,255,0.35)', textAlign: 'center', marginTop: 10, fontStyle: 'italic' }
 });

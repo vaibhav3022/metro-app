@@ -19,6 +19,15 @@ const TokenTransactionSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  baseAmount: {
+    type: Number
+  },
+  gstAmount: {
+    type: Number
+  },
+  totalAmountPaid: {
+    type: Number
+  },
   balanceBefore: {
     type: Number
   },

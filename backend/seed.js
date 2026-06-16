@@ -4,6 +4,7 @@ require('dotenv').config();
 const User = require('./models/User');
 const Merchant = require('./models/Merchant');
 const Shop = require('./models/Shop');
+const ShopTransaction = require('./models/ShopTransaction');
 const Station = require('./models/Station');
 const Ticket = require('./models/Ticket');
 const TokenTransaction = require('./models/TokenTransaction');
@@ -19,9 +20,18 @@ async function seed() {
     await mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
     console.log('Connected to MongoDB for seeding...');
 
-    // Clear DB
-    await mongoose.connection.db.dropDatabase();
-    console.log('Dropped existing database to clear stale indexes.');
+    // Clear all collections individually (Atlas doesn't allow dropDatabase)
+    await User.deleteMany({});
+    await Merchant.deleteMany({});
+    await Shop.deleteMany({});
+    await ShopTransaction.deleteMany({});
+    await Station.deleteMany({});
+    await Ticket.deleteMany({});
+    await TokenTransaction.deleteMany({});
+    await Revenue.deleteMany({});
+    await AuditLog.deleteMany({});
+    await Notification.deleteMany({});
+    console.log('Cleared all collections.');
 
     const futureDate = new Date();
     futureDate.setFullYear(futureDate.getFullYear() + 10);
@@ -59,6 +69,7 @@ async function seed() {
 
     // Create 10 Merchants
     const merchants = [];
+    const createdShops = [];
     for (let i = 1; i <= 10; i++) {
       const status = i <= 6 ? 'approved' : i <= 8 ? 'pending' : 'suspended';
       const mUser = await User.create({
@@ -84,7 +95,7 @@ async function seed() {
       });
       merchants.push(merchant);
 
-      await Shop.create({
+      const shop = await Shop.create({
         merchantId: merchant._id,
         shopName: `Metro Cafe ${i}`,
         category: i % 2 === 0 ? 'Food' : 'Retail',
@@ -96,6 +107,7 @@ async function seed() {
           { title: '10% Off', discount: '10%', validUntil: futureDate }
         ]
       });
+      createdShops.push(shop);
     }
 
     // Create 10 Stations
@@ -145,9 +157,10 @@ async function seed() {
     // Create Revenue
     await Revenue.create({
       date: new Date(),
-      totalRevenue: 50000,
+      netRevenue: 50000,
       platformCommission: 5000,
-      tokenSalesRevenue: 20000,
+      totalTokenSales: 20000,
+      totalTicketSales: 30000,
       merchantPayouts: 15000
     });
 
@@ -166,6 +179,19 @@ async function seed() {
         title: 'Welcome!',
         message: `Welcome to Pune Metro App user ${i}`,
         type: 'info'
+      });
+    }
+
+    // Create Shop Transactions
+    for (let i = 0; i < 10; i++) {
+      await ShopTransaction.create({
+        shopId: createdShops[i]._id,
+        userId: users[i]._id,
+        amount: Math.floor(Math.random() * 200) + 50,
+        paymentId: `MOCK-SHOP-PAY-${Date.now()}-${i}`,
+        paymentMethod: i % 2 === 0 ? 'wallet' : 'razorpay',
+        status: 'SUCCESS',
+        timestamp: new Date()
       });
     }
 

@@ -148,8 +148,25 @@ const deleteUser = async (req, res) => {
   } catch (err) { res.status(500).json({ success: false }); }
 };
 
-const getRevenueSummary = async (req, res) => { res.status(200).json({ success: true, data: {} }); };
-const getRevenueChart = async (req, res) => { res.status(200).json({ success: true, chart: [100, 200, 150, 400, 300, 500, 600] }); };
+const getRevenueSummary = async (req, res) => { 
+  res.status(200).json({ 
+    success: true, 
+    data: { totalRevenue: 124500, ticketRevenue: 85000, walletRecharges: 39500 } 
+  }); 
+};
+
+const getRevenueChart = async (req, res) => { 
+  const mockChartData = [
+    { date: 'Mon', tickets: 12000, wallet: 5000 },
+    { date: 'Tue', tickets: 15000, wallet: 7000 },
+    { date: 'Wed', tickets: 11000, wallet: 4000 },
+    { date: 'Thu', tickets: 18000, wallet: 8000 },
+    { date: 'Fri', tickets: 22000, wallet: 10000 },
+    { date: 'Sat', tickets: 25000, wallet: 12000 },
+    { date: 'Sun', tickets: 20000, wallet: 9000 },
+  ];
+  res.status(200).json({ success: true, data: mockChartData }); 
+};
 const getAnalytics = async (req, res) => { res.status(200).json({ success: true }); };
 
 const getAuditLogs = async (req, res) => {

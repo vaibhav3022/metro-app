@@ -17,8 +17,8 @@ const TicketSchema = new mongoose.Schema({
   totalAmount: { type: Number },
   isReturn: { type: Boolean, default: false },
   paymentStatus: { type: String, enum: ['pending', 'success', 'failed'], default: 'pending' },
-  ticketStatus: { type: String, enum: ['active', 'used', 'expired', 'valid'], default: 'active' },
-  status: { type: String, enum: ['active', 'used', 'expired', 'valid'], default: 'active' },
+  ticketStatus: { type: String, enum: ['active', 'entered', 'used', 'expired', 'valid'], default: 'active' },
+  status: { type: String, enum: ['active', 'entered', 'used', 'expired', 'valid'], default: 'active' },
   travelDate: { type: Date },
   qrData: { type: String },
   qrCode: { type: String },
@@ -27,6 +27,8 @@ const TicketSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
+  entryTime: { type: Date },
+  exitTime: { type: Date },
   usedAt: {
     type: Date
   }

@@ -16,6 +16,7 @@ const merchantRoutes = require('./routes/merchantRoutes');
 const tokenRoutes = require('./routes/tokenRoutes');
 const revenueRoutes = require('./routes/revenueRoutes');
 const stationRoutes = require('./routes/stationRoutes');
+const webhookRoutes = require('./routes/webhookRoutes');
 
 // Connect to Database
 connectDB();
@@ -48,6 +49,7 @@ app.use('/api/merchant', merchantRoutes);
 app.use('/api/tokens', tokenRoutes);
 app.use('/api/revenue', revenueRoutes);
 app.use('/api/stations', stationRoutes);
+app.use('/api/webhooks', webhookRoutes);
 // Fallback error catcher
 app.use(errorHandler);
 

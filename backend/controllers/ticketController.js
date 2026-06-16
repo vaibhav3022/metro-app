@@ -295,8 +295,8 @@ const verifyTicket = async (req, res) => {
   try {
     // 1. Decrypt QR String
     const qrPayload = decryptQR(qrData);
-    if (!qrPayload) {
-      return res.status(400).json({ message: 'Gate Denied: Encrypted transit data signature invalid.' });
+    if (!qrPayload || !qrPayload.ticketId) {
+      return res.status(400).json({ message: 'Gate Denied: Encrypted transit data signature invalid or missing ticket ID.' });
     }
 
     const { ticketId, validUntil } = qrPayload;
@@ -319,7 +319,7 @@ const verifyTicket = async (req, res) => {
       return res.status(400).json({ message: 'Gate Denied: This QR ticket has already been used for exit.' });
     }
 
-    if (ticket.ticketStatus === 'expired' || new Date(validUntil) < new Date()) {
+    if (ticket.ticketStatus === 'expired' || (validUntil && new Date(validUntil) < new Date())) {
       ticket.ticketStatus = 'expired';
       await ticket.save();
       return res.status(400).json({ message: 'Gate Denied: Ticket validity period expired.' });
@@ -361,12 +361,12 @@ const verifyTicket = async (req, res) => {
       }
 
       const ninetyMins = 90 * 60 * 1000;
-      if (currentTime - new Date(ticket.entryTime).getTime() > ninetyMins) {
+      if (ticket.entryTime && currentTime - new Date(ticket.entryTime).getTime() > ninetyMins) {
         return res.status(400).json({ message: 'Gate Denied: Time limit of 90 minutes exceeded. Extra charge applicable. Please contact customer care.' });
       }
 
       // Check destination if provided
-      if (currentStation && currentStation.toLowerCase() !== ticket.destination.toLowerCase()) {
+      if (currentStation && ticket.destination && currentStation.toLowerCase() !== ticket.destination.toLowerCase()) {
          return res.status(400).json({ message: `Gate Denied: Wrong destination. Your ticket is for ${ticket.destination}. Extra charge applicable.` });
       }
 
@@ -389,7 +389,7 @@ const verifyTicket = async (req, res) => {
     return res.status(400).json({ message: 'Invalid scan type.' });
   } catch (error) {
     console.error('Verify Ticket Error:', error);
-    res.status(500).json({ message: 'Server error during QR barrier verification.' });
+    res.status(500).json({ message: 'Server error during QR barrier verification.', error: error.message || String(error) });
   }
 };
 
