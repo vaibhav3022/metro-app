@@ -212,7 +212,7 @@ export default function AdminDashboard() {
                       </div>
                       <div style={{ flex: 1 }}>
                         <div style={{ fontSize: '15px', fontWeight: '800', color: '#fff' }}>{bk.userId?.name || 'Unknown User'}</div>
-                        <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>{bk.sourceStation} &rarr; {bk.destinationStation}</div>
+                        <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>{(bk.source || bk.sourceStation)} &rarr; {(bk.destination || bk.destinationStation)}</div>
                       </div>
                       <div style={{ fontSize: '16px', fontWeight: '900', color: '#fff' }}>₹{bk.fare}</div>
                     </div>
@@ -385,7 +385,7 @@ export default function AdminDashboard() {
                   {[
                     ['User', selectedItem.data.userId?.name || 'Unknown'],
                     ['Email', selectedItem.data.userId?.email || 'N/A'],
-                    ['Route', `${selectedItem.data.sourceStation} \u2192 ${selectedItem.data.destinationStation}`],
+                    ['Route', `${selectedItem.data.source || selectedItem.data.sourceStation} \u2192 ${selectedItem.data.destination || selectedItem.data.destinationStation}`],
                     ['Fare', `\u20B9${selectedItem.data.fare}`],
                     ['Status', selectedItem.data.status?.toUpperCase()],
                     ['Date', new Date(selectedItem.data.createdAt).toLocaleString()]

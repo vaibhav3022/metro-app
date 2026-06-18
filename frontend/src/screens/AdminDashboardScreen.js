@@ -149,7 +149,7 @@ export default function AdminDashboardScreen() {
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.listItemTitle}>{bk.userId?.name || 'Unknown User'}</Text>
-                  <Text style={styles.listItemSub}>{bk.sourceStation} → {bk.destinationStation}</Text>
+                  <Text style={styles.listItemSub}>{(bk.source || bk.sourceStation)} → {(bk.destination || bk.destinationStation)}</Text>
                 </View>
                 <Text style={styles.listItemAmount}>₹{bk.fare}</Text>
               </TouchableOpacity>
@@ -194,7 +194,7 @@ export default function AdminDashboardScreen() {
                     {[
                       ['User', selectedItem.data.userId?.name || 'Unknown'],
                       ['Email', selectedItem.data.userId?.email || 'N/A'],
-                      ['Route', `${selectedItem.data.sourceStation} → ${selectedItem.data.destinationStation}`],
+                      ['Route', `${selectedItem.data.source || selectedItem.data.sourceStation} → ${selectedItem.data.destination || selectedItem.data.destinationStation}`],
                       ['Fare', `₹${selectedItem.data.fare}`],
                       ['Status', selectedItem.data.status?.toUpperCase()],
                       ['Date', new Date(selectedItem.data.createdAt).toLocaleString()],
