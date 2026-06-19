@@ -10,7 +10,8 @@ export default function FeederServices() {
       description: 'Frequent bus services available from major metro stations including Civil Court, Shivaji Nagar, and Swargate. Connect directly to IT parks and hubs.',
       buttonLabel: 'View Bus Routes',
       gradient: 'linear-gradient(90deg, #db2777, #be185d)',
-      btnStyle: { border: '1px solid rgba(219,39,119,0.5)' }
+      btnStyle: { border: '1px solid rgba(219,39,119,0.5)' },
+      playStoreUrl: 'https://play.google.com/store/apps/details?id=in.chartr.pmpml'
     },
     {
       icon: <Bike size={28} color="#22c55e" />,
@@ -19,7 +20,8 @@ export default function FeederServices() {
       description: 'Rent an E-bike from outside any metro station. Scan and unlock using partner apps to easily reach home or office.',
       buttonLabel: 'Find E-Bikes',
       gradient: 'linear-gradient(90deg, #22c55e, #16a34a)',
-      btnStyle: { border: '1px solid rgba(34,197,94,0.5)' }
+      btnStyle: { border: '1px solid rgba(34,197,94,0.5)' },
+      playStoreUrl: 'https://play.google.com/store/apps/details?id=app.yulu.bike'
     },
     {
       icon: <Car size={28} color="#ea580c" />,
@@ -28,7 +30,8 @@ export default function FeederServices() {
       description: 'Prepaid and app-based autos and cabs are stationed directly at designated pick-up zones outside busy stations.',
       buttonLabel: 'Book a Ride',
       gradient: 'linear-gradient(90deg, #ea580c, #c2410c)',
-      btnStyle: { border: '1px solid rgba(234,88,12,0.5)' }
+      btnStyle: { border: '1px solid rgba(234,88,12,0.5)' },
+      playStoreUrl: 'https://play.google.com/store/apps/details?id=com.ubercab'
     },
   ];
 
@@ -68,7 +71,7 @@ export default function FeederServices() {
                 fontWeight: '800', fontSize: '14px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px',
                 cursor: 'pointer'
               }}
-              onClick={() => alert(`${s.buttonLabel} - Coming soon!`)}
+              onClick={() => window.open(s.playStoreUrl, '_blank')}
             >
               {s.buttonLabel} <ArrowRight size={16} />
             </button>

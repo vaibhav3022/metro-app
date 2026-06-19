@@ -15,7 +15,7 @@ export default function Shops() {
         const res = await api.get('/shops');
         if (res.data.success) {
           const themes = [
-            { name: 'Starbucks Transit', cat: 'Cafe', img: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=500&q=80', desc: 'Premium coffee and quick bites for your journey.', products: [{name: 'Caramel Macchiato', price: 280}, {name: 'Butter Croissant', price: 150}] },
+            { name: 'Oasis Tea Cafe', cat: 'Cafe', img: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=500&q=80', desc: 'Premium coffee and quick bites for your journey.', products: [{name: 'Caramel Macchiato', price: 280}, {name: 'Butter Croissant', price: 150}] },
             { name: 'Subway Station', cat: 'Fast Food', img: 'https://images.unsplash.com/photo-1550503088-34860b2ebce2?w=500&q=80', desc: 'Fresh subs and healthy salads on the go.', products: [{name: 'Veggie Delite Sub', price: 160}, {name: 'Oatmeal Cookie', price: 50}] },
             { name: 'Relay Convenience', cat: 'Retail', img: 'https://images.unsplash.com/photo-1534723452862-4c874018d66d?w=500&q=80', desc: 'Magazines, snacks, and travel essentials.', products: [{name: 'Mineral Water', price: 20}, {name: 'Travel Neck Pillow', price: 450}] },
             { name: 'Haldirams Express', cat: 'Dining', img: 'https://images.unsplash.com/photo-1589301760014-d929f39ce9b0?w=500&q=80', desc: 'Authentic Indian snacks and sweets.', products: [{name: 'Raj Kachori', price: 110}, {name: 'Masala Dosa', price: 140}] },

@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView,
-  Alert, SafeAreaView, StatusBar, Platform
+  Alert, SafeAreaView, StatusBar, Platform, Linking
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -18,7 +18,8 @@ export default function FeederServicesScreen() {
       title: 'PMPML Metro Shuttle',
       description: 'Frequent bus services available from major metro stations including Civil Court, Shivaji Nagar, and Swargate. Connect directly to IT parks and hubs.',
       buttonLabel: 'View Bus Routes',
-      gradient: ['#db2777', '#be185d']
+      gradient: ['#db2777', '#be185d'],
+      playStoreUrl: 'https://play.google.com/store/apps/details?id=in.chartr.pmpml'
     },
     {
       icon: 'bicycle',
@@ -27,7 +28,8 @@ export default function FeederServicesScreen() {
       title: 'E-Bike Rentals',
       description: 'Rent an E-bike from outside any metro station. Scan and unlock using partner apps to easily reach home or office.',
       buttonLabel: 'Find E-Bikes',
-      gradient: ['#22c55e', '#16a34a']
+      gradient: ['#22c55e', '#16a34a'],
+      playStoreUrl: 'https://play.google.com/store/apps/details?id=app.yulu.bike'
     },
     {
       icon: 'map-marker',
@@ -36,7 +38,8 @@ export default function FeederServicesScreen() {
       title: 'Partner Cabs/Autos',
       description: 'Prepaid and app-based autos and cabs are stationed directly at designated pick-up zones outside busy stations.',
       buttonLabel: 'Book a Ride',
-      gradient: ['#ea580c', '#c2410c']
+      gradient: ['#ea580c', '#c2410c'],
+      playStoreUrl: 'https://play.google.com/store/apps/details?id=com.ubercab'
     },
   ];
 
@@ -77,7 +80,7 @@ export default function FeederServicesScreen() {
               <Text style={styles.serviceDesc}>{s.description}</Text>
               <TouchableOpacity
                 style={styles.serviceButtonWrap}
-                onPress={() => Alert.alert(s.title, `${s.buttonLabel} - Coming soon!`)}
+                onPress={() => Linking.openURL(s.playStoreUrl).catch(err => console.error("Couldn't open URL", err))}
               >
                 <LinearGradient colors={s.gradient} style={styles.serviceButtonGrad} start={{x:0, y:0}} end={{x:1, y:0}}>
                   <Text style={styles.serviceButtonText}>{s.buttonLabel}</Text>
