@@ -1,5 +1,6 @@
 // MerchantPendingScreen.js – Shown when a merchant's account is pending approval
 import React from 'react';
+import COLORS from '../constants/colors';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { logout } from '../redux/slices/authSlice';
@@ -34,13 +35,13 @@ const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   card: {
     width: width * 0.85,
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: COLORS.cardBg,
     backdropFilter: 'blur(10px)',
     borderRadius: 16,
     padding: 24,
     alignItems: 'center'
   },
-  title: { fontSize: 24, fontWeight: 'bold', color: '#fff', marginBottom: 12 },
+  title: { fontSize: 24, fontWeight: 'bold', color: COLORS.text, marginBottom: 12 },
   message: { fontSize: 16, color: '#e0e0e0', textAlign: 'center', marginBottom: 24 },
   logoutBtn: {
     backgroundColor: '#ff4d4d',

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import COLORS from '../../constants/colors';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, RefreshControl, TextInput, ActivityIndicator, Alert, Modal, StatusBar, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -84,7 +85,7 @@ export default function MerchantManagementScreen({ route, navigation }) {
   };
 
   return (
-    <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.container}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         {toast.visible && <ToastMessage message={toast.message} type={toast.type} onHide={() => setToast({ ...toast, visible: false })} />}
@@ -143,7 +144,7 @@ export default function MerchantManagementScreen({ route, navigation }) {
                 </View>
 
                 <View style={styles.actionRow}>
-                  <TouchableOpacity style={[styles.actionBtn, { backgroundColor: 'rgba(255,255,255,0.1)' }]} onPress={() => setSelectedMerchantDetails(m)}>
+                  <TouchableOpacity style={[styles.actionBtn, { backgroundColor: COLORS.cardBg }]} onPress={() => setSelectedMerchantDetails(m)}>
                     <Text style={styles.actionText}>Details</Text>
                   </TouchableOpacity>
 
@@ -269,24 +270,24 @@ export default function MerchantManagementScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 20 : 10, paddingBottom: 16 },
-  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  headerTitle: { fontSize: 20, fontWeight: '900', color: '#fff', letterSpacing: 0.5 },
+  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
+  headerTitle: { fontSize: 20, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
   
-  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.2)', marginHorizontal: 20, marginVertical: 10, paddingHorizontal: 16, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, marginHorizontal: 20, marginVertical: 10, paddingHorizontal: 16, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border },
   searchInput: { flex: 1, paddingVertical: 14, marginLeft: 10, fontSize: 16, color: '#fff' },
   
   filterTabs: { paddingVertical: 10, marginBottom: 5 },
-  tab: { paddingHorizontal: 20, paddingVertical: 10, borderRadius: 20, marginHorizontal: 6, backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  tab: { paddingHorizontal: 20, paddingVertical: 10, borderRadius: 20, marginHorizontal: 6, backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.border },
   activeTab: { backgroundColor: 'rgba(0,201,167,0.15)', borderColor: '#00C9A7' },
-  tabText: { fontSize: 14, fontWeight: '700', color: 'rgba(255,255,255,0.5)' },
+  tabText: { fontSize: 14, fontWeight: '700', color: COLORS.textLight },
   activeTabText: { color: '#00C9A7' },
   
   scrollContent: { padding: 20, paddingBottom: 50 },
   
-  merchantCard: { backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 24, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  merchantCard: { backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: COLORS.border },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   businessName: { fontSize: 18, fontWeight: '800', color: '#fff', marginBottom: 6 },
-  ownerName: { fontSize: 14, color: 'rgba(255,255,255,0.6)', fontWeight: '500' },
+  ownerName: { fontSize: 14, color: COLORS.textLight, fontWeight: '500' },
   
   badge: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, borderWidth: 1, alignSelf: 'flex-start' },
   badgeText: { fontSize: 12, fontWeight: '800', textTransform: 'uppercase' },
@@ -296,18 +297,18 @@ const styles = StyleSheet.create({
   actionText: { color: '#fff', fontWeight: '800', fontSize: 14 },
   
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'center', alignItems: 'center', padding: 20 },
-  modalContent: { backgroundColor: '#141432', width: '100%', borderRadius: 24, padding: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  modalContent: { backgroundColor: COLORS.cardBg, width: '100%', borderRadius: 24, padding: 24, borderWidth: 1, borderColor: COLORS.border },
   modalHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
   modalTitle: { fontSize: 20, fontWeight: '900', color: '#fff' },
-  closeBtn: { padding: 4, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 20 },
+  closeBtn: { padding: 4, backgroundColor: COLORS.cardBg, borderRadius: 20 },
   
   detailRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)', alignItems: 'center' },
-  detailLabel: { fontSize: 14, color: 'rgba(255,255,255,0.6)', fontWeight: '600', flex: 1 },
+  detailLabel: { fontSize: 14, color: COLORS.textLight, fontWeight: '600', flex: 1 },
   detailValue: { fontSize: 15, color: '#fff', fontWeight: '800', flex: 1.5, textAlign: 'right' },
   
-  modalInput: { backgroundColor: 'rgba(0,0,0,0.3)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', borderRadius: 16, padding: 16, height: 120, textAlignVertical: 'top', color: '#fff', fontSize: 16, marginBottom: 24, marginTop: 16 },
+  modalInput: { backgroundColor: 'rgba(0,0,0,0.3)', borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, padding: 16, height: 120, textAlignVertical: 'top', color: '#fff', fontSize: 16, marginBottom: 24, marginTop: 16 },
   modalActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 12 },
-  modalCancel: { paddingVertical: 12, paddingHorizontal: 20, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.1)' },
+  modalCancel: { paddingVertical: 12, paddingHorizontal: 20, borderRadius: 12, backgroundColor: COLORS.cardBg },
   modalCancelText: { color: '#fff', fontWeight: '700' },
   modalSubmit: { backgroundColor: '#EF4444', paddingVertical: 12, paddingHorizontal: 20, borderRadius: 12 },
   modalSubmitText: { color: '#fff', fontWeight: '800' },
@@ -315,5 +316,5 @@ const styles = StyleSheet.create({
   emptyContainer: { alignItems: 'center', justifyContent: 'center', marginTop: 40 },
   iconCircle: { width: 100, height: 100, borderRadius: 50, backgroundColor: 'rgba(0,201,167,0.1)', alignItems: 'center', justifyContent: 'center', marginBottom: 20, borderWidth: 1, borderColor: 'rgba(0,201,167,0.3)' },
   emptyTitle: { fontSize: 22, fontWeight: '900', color: '#fff', marginBottom: 8 },
-  emptySubtitle: { fontSize: 15, color: 'rgba(255,255,255,0.5)', textAlign: 'center' }
+  emptySubtitle: { fontSize: 15, color: COLORS.textLight, textAlign: 'center' }
 });

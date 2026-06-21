@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
   balanceHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
   balanceLabel: { color: COLORS.white, fontSize: 18, marginLeft: 10 },
   balanceValue: { color: COLORS.white, fontSize: 40, fontWeight: 'bold' },
-  balanceSubtitle: { color: 'rgba(255,255,255,0.8)', fontSize: 14, marginTop: 5 },
+  balanceSubtitle: { color: COLORS.textLight, fontSize: 14, marginTop: 5 },
   section: { backgroundColor: COLORS.white, padding: 15, borderRadius: 12, marginBottom: 20, elevation: 2 },
   sectionTitle: { fontSize: 18, fontWeight: 'bold', color: COLORS.text, marginBottom: 15 },
   inputLabel: { fontSize: 14, fontWeight: 'bold', color: COLORS.text, marginBottom: 5 },
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
   gstBox: { backgroundColor: '#1a1a2e', borderRadius: 10, padding: 14, marginTop: 12, marginBottom: 4 },
   gstRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
   gstTotal: { borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.15)', paddingTop: 10, marginTop: 4 },
-  gstLabel: { fontSize: 13, color: 'rgba(255,255,255,0.6)' },
+  gstLabel: { fontSize: 13, color: COLORS.textLight },
   gstValue: { fontSize: 13, color: '#fff', fontWeight: '600' },
   gstNote: { fontSize: 11, color: 'rgba(255,255,255,0.35)', textAlign: 'center', marginTop: 10, fontStyle: 'italic' }
 });

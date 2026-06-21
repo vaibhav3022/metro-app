@@ -70,7 +70,7 @@ export default function MerchantDashboardScreen({ navigation }) {
   const handleLogout = async () => { await require('../../utils/storage').storage.clearAll(); dispatch(logout()); };
 
   const renderStatusScreen = (icon, title, message, color) => (
-    <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.container}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.header}>
@@ -86,7 +86,7 @@ export default function MerchantDashboardScreen({ navigation }) {
           <Text style={[styles.statusTitle, { color }]}>{title}</Text>
           <Text style={styles.statusMessage}>{message}</Text>
           <TouchableOpacity onPress={fetchData}>
-            <LinearGradient colors={['#00C9A7', '#009980']} style={styles.refreshBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+            <LinearGradient colors={[COLORS.secondary, COLORS.secondary]} style={styles.refreshBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
               <Text style={styles.refreshBtnText}>Refresh Status</Text>
             </LinearGradient>
           </TouchableOpacity>
@@ -97,7 +97,7 @@ export default function MerchantDashboardScreen({ navigation }) {
 
   if (loading) {
     return (
-      <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+      <LinearGradient colors={[COLORS.background, COLORS.background]} style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
         <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
         <ActivityIndicator size="large" color="#00C9A7" />
       </LinearGradient>
@@ -114,7 +114,7 @@ export default function MerchantDashboardScreen({ navigation }) {
 
   // Approved Dashboard
   return (
-    <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.container}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.header}>
@@ -256,51 +256,51 @@ export default function MerchantDashboardScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 20 : 10, paddingBottom: 20 },
-  headerTitle: { fontSize: 24, fontWeight: '900', color: '#fff', letterSpacing: 0.5 },
+  headerTitle: { fontSize: 24, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
   headerActions: { flexDirection: 'row', gap: 10 },
-  iconBtn: { padding: 10, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 12, position: 'relative', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  iconBtn: { padding: 10, backgroundColor: COLORS.cardBg, borderRadius: 12, position: 'relative', borderWidth: 1, borderColor: COLORS.border },
   badge: { position: 'absolute', top: -6, right: -6, backgroundColor: '#EF4444', borderRadius: 10, width: 20, height: 20, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#141432' },
   badgeText: { color: '#fff', fontSize: 10, fontWeight: 'bold' },
   scrollContent: { padding: 20, paddingBottom: 50 },
   
   statsRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 },
-  statCard: { flex: 1, marginHorizontal: 6, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 24, padding: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', alignItems: 'flex-start' },
+  statCard: { flex: 1, marginHorizontal: 6, backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 20, borderWidth: 1, borderColor: COLORS.border, alignItems: 'flex-start' },
   statIconWrap: { width: 50, height: 50, borderRadius: 16, justifyContent: 'center', alignItems: 'center', marginBottom: 16 },
   statValue: { fontSize: 24, fontWeight: '900', color: '#fff', marginBottom: 4 },
-  statTitle: { fontSize: 13, color: 'rgba(255,255,255,0.6)', fontWeight: '600' },
+  statTitle: { fontSize: 13, color: COLORS.textLight, fontWeight: '600' },
   
   statusContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 },
   statusTitle: { fontSize: 26, fontWeight: '900', marginBottom: 16, letterSpacing: 0.5 },
-  statusMessage: { fontSize: 16, color: 'rgba(255,255,255,0.6)', textAlign: 'center', lineHeight: 26, marginBottom: 36 },
+  statusMessage: { fontSize: 16, color: COLORS.textLight, textAlign: 'center', lineHeight: 26, marginBottom: 36 },
   refreshBtn: { paddingHorizontal: 32, paddingVertical: 16, borderRadius: 20 },
   refreshBtnText: { color: '#fff', fontWeight: '800', fontSize: 16, letterSpacing: 1 },
   
-  section: { backgroundColor: 'rgba(255,255,255,0.06)', padding: 22, borderRadius: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', marginBottom: 20 },
-  sectionTitle: { fontSize: 18, fontWeight: '900', color: '#fff', marginBottom: 20 },
+  section: { backgroundColor: COLORS.cardBg, padding: 22, borderRadius: 24, borderWidth: 1, borderColor: COLORS.border, marginBottom: 20 },
+  sectionTitle: { fontSize: 18, fontWeight: '900', color: COLORS.text, marginBottom: 20 },
   chartWrapper: { alignItems: 'center', marginLeft: -20 },
   
   txCard: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)' },
   txLeft: { flexDirection: 'row', alignItems: 'center', flex: 1 },
   txDetails: { marginLeft: 14, flex: 1 },
   txType: { fontSize: 15, fontWeight: '800', color: '#fff', marginBottom: 2 },
-  txDate: { fontSize: 12, color: 'rgba(255,255,255,0.5)' },
+  txDate: { fontSize: 12, color: COLORS.textLight },
   txAmount: { fontSize: 16, fontWeight: '900', color: '#00C9A7' },
   
-  qrContainer: { backgroundColor: 'rgba(255,255,255,0.06)', padding: 24, borderRadius: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', alignItems: 'center', marginBottom: 20, marginTop: 10 },
+  qrContainer: { backgroundColor: COLORS.cardBg, padding: 24, borderRadius: 24, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center', marginBottom: 20, marginTop: 10 },
   qrTitle: { fontSize: 20, fontWeight: '900', color: '#fff', marginBottom: 6 },
-  qrSubtitle: { fontSize: 14, color: 'rgba(255,255,255,0.5)', marginBottom: 24, textAlign: 'center' },
+  qrSubtitle: { fontSize: 14, color: COLORS.textLight, marginBottom: 24, textAlign: 'center' },
   qrWrapper: { padding: 16, backgroundColor: '#fff', borderRadius: 20, elevation: 8 },
   
   emptyBox: { alignItems: 'center', paddingVertical: 30 },
   emptyBoxTitle: { fontSize: 16, fontWeight: '800', color: '#fff', marginBottom: 4 },
-  emptyBoxText: { fontSize: 13, color: 'rgba(255,255,255,0.5)', textAlign: 'center' },
+  emptyBoxText: { fontSize: 13, color: COLORS.textLight, textAlign: 'center' },
   
-  viewAllBtn: { marginTop: 16, paddingVertical: 12, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 16, alignItems: 'center' },
+  viewAllBtn: { marginTop: 16, paddingVertical: 12, backgroundColor: COLORS.cardBg, borderRadius: 16, alignItems: 'center' },
   viewAllText: { color: '#00C9A7', fontWeight: '800', fontSize: 14 },
   
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'flex-end' },
-  modalContent: { backgroundColor: '#141432', width: '100%', height: '80%', borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  modalContent: { backgroundColor: COLORS.cardBg, width: '100%', height: '80%', borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, borderWidth: 1, borderColor: COLORS.border },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)' },
   modalTitle: { fontSize: 22, fontWeight: '900', color: '#fff' },
-  modalCloseBtn: { backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 16, padding: 8 }
+  modalCloseBtn: { backgroundColor: COLORS.cardBg, borderRadius: 16, padding: 8 }
 });

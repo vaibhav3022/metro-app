@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import COLORS from '../constants/colors';
 import {
   StyleSheet, Text, View, TouchableOpacity, SafeAreaView,
   TextInput, ActivityIndicator, Alert, StatusBar, Platform
@@ -65,7 +66,7 @@ export default function PaymentGatewayScreen({ route, navigation }) {
   };
 
   return (
-    <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.container}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.header}>
@@ -114,7 +115,7 @@ export default function PaymentGatewayScreen({ route, navigation }) {
               </TouchableOpacity>
 
               <TouchableOpacity onPress={() => handleProcessPayment('success')} style={{ flex: 1, borderRadius: 12, overflow: 'hidden' }}>
-                <LinearGradient colors={['#00C9A7', '#009980']} style={styles.successBtnGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                <LinearGradient colors={[COLORS.secondary, COLORS.secondary]} style={styles.successBtnGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
                   <Text style={[styles.btnText, { color: '#fff' }]}>Simulate Success</Text>
                 </LinearGradient>
               </TouchableOpacity>
@@ -129,18 +130,18 @@ export default function PaymentGatewayScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 40 : 10, paddingBottom: 16 },
-  backBtn: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  headerTitle: { fontSize: 20, fontWeight: '800', color: '#fff', letterSpacing: 0.5 },
+  backBtn: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
+  headerTitle: { fontSize: 20, fontWeight: '800', color: COLORS.text, letterSpacing: 0.5 },
   
-  card: { backgroundColor: 'rgba(255,255,255,0.06)', margin: 20, borderRadius: 28, padding: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  card: { backgroundColor: COLORS.cardBg, margin: 20, borderRadius: 28, padding: 24, borderWidth: 1, borderColor: COLORS.border },
   merchantInfo: { alignItems: 'center', marginBottom: 24, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)', paddingBottom: 24 },
   iconCircle: { width: 70, height: 70, borderRadius: 35, backgroundColor: 'rgba(0,201,167,0.15)', alignItems: 'center', justifyContent: 'center', marginBottom: 16, borderWidth: 1, borderColor: 'rgba(0,201,167,0.3)' },
-  merchantName: { fontSize: 16, fontWeight: '700', color: 'rgba(255,255,255,0.6)' },
+  merchantName: { fontSize: 16, fontWeight: '700', color: COLORS.textLight },
   amountText: { fontSize: 36, fontWeight: '900', color: '#fff', marginTop: 8 },
   
-  instruction: { fontSize: 14, color: 'rgba(255,255,255,0.6)', textAlign: 'center', lineHeight: 22, marginBottom: 24, paddingHorizontal: 10 },
+  instruction: { fontSize: 14, color: COLORS.textLight, textAlign: 'center', lineHeight: 22, marginBottom: 24, paddingHorizontal: 10 },
   inputContainer: { marginBottom: 32 },
-  otpInput: { borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.15)', borderRadius: 16, height: 60, fontSize: 24, textAlign: 'center', letterSpacing: 8, backgroundColor: 'rgba(0,0,0,0.2)', color: '#00C9A7', fontWeight: '900' },
+  otpInput: { borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.15)', borderRadius: 16, height: 60, fontSize: 24, textAlign: 'center', letterSpacing: 8, backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, color: '#00C9A7', fontWeight: '900' },
   
   actions: { flexDirection: 'row', justifyContent: 'space-between', gap: 12 },
   btn: { flex: 1, height: 56, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },

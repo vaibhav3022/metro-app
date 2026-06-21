@@ -221,7 +221,7 @@ export default function Wallet() {
                   <div style={{ 
                     fontWeight: '800', 
                     fontSize: '16px',
-                    color: tx.type === 'credit' ? 'var(--accent-teal)' : '#fff'
+                    color: tx.type === 'credit' ? 'var(--accent-teal)' : 'var(--text-primary)'
                   }}>
                     {tx.type === 'credit' ? '+' : '-'} ₹{tx.amount}
                   </div>

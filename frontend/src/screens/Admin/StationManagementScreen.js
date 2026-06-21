@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import COLORS from '../../constants/colors';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, RefreshControl, TextInput, ActivityIndicator, Alert, Modal, StatusBar, Switch, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -88,7 +89,7 @@ export default function StationManagementScreen({ navigation }) {
   });
 
   return (
-    <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.container}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         {toast.visible && <ToastMessage message={toast.message} type={toast.type} onHide={() => setToast({ ...toast, visible: false })} />}
@@ -139,7 +140,7 @@ export default function StationManagementScreen({ navigation }) {
             filteredStations.map((s) => (
               <View key={s._id} style={styles.card}>
                 <View style={styles.cardInfo}>
-                  <Text style={styles.stationName}>{s.name} <Text style={{color:'rgba(255,255,255,0.4)', fontSize:14}}>({s.code})</Text></Text>
+                  <Text style={styles.stationName}>{s.name} <Text style={{color: COLORS.textLight, fontSize:14}}>({s.code})</Text></Text>
                   <View style={styles.badges}>
                     <View style={[styles.badge, { backgroundColor: 'rgba(155,89,182,0.2)', borderColor: '#9B59B6' }]}>
                       <Text style={[styles.badgeText, { color: '#9B59B6' }]}>{s.metroLine}</Text>
@@ -210,22 +211,22 @@ export default function StationManagementScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 20 : 10, paddingBottom: 16 },
-  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  headerTitle: { fontSize: 20, fontWeight: '900', color: '#fff', letterSpacing: 0.5 },
+  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
+  headerTitle: { fontSize: 20, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
   addBtn: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,201,167,0.15)', borderRadius: 22, borderWidth: 1, borderColor: 'rgba(0,201,167,0.3)' },
   
-  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.2)', marginHorizontal: 20, marginVertical: 10, paddingHorizontal: 16, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, marginHorizontal: 20, marginVertical: 10, paddingHorizontal: 16, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border },
   searchInput: { flex: 1, paddingVertical: 14, marginLeft: 10, fontSize: 16, color: '#fff' },
   
   filterTabs: { paddingVertical: 10, marginBottom: 5 },
-  tab: { paddingHorizontal: 20, paddingVertical: 10, borderRadius: 20, marginHorizontal: 6, backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  tab: { paddingHorizontal: 20, paddingVertical: 10, borderRadius: 20, marginHorizontal: 6, backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.border },
   activeTab: { backgroundColor: 'rgba(0,201,167,0.15)', borderColor: '#00C9A7' },
-  tabText: { fontSize: 14, fontWeight: '700', color: 'rgba(255,255,255,0.5)' },
+  tabText: { fontSize: 14, fontWeight: '700', color: COLORS.textLight },
   activeTabText: { color: '#00C9A7' },
   
   scrollContent: { padding: 20, paddingBottom: 50 },
   
-  card: { backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 24, padding: 20, marginBottom: 16, elevation: 2, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  card: { backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 20, marginBottom: 16, elevation: 2, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderWidth: 1, borderColor: COLORS.border },
   cardInfo: { flex: 1 },
   stationName: { fontSize: 18, fontWeight: '800', color: '#fff', marginBottom: 10 },
   badges: { flexDirection: 'row', gap: 10 },
@@ -233,24 +234,24 @@ const styles = StyleSheet.create({
   badgeText: { fontSize: 11, fontWeight: '800', textTransform: 'uppercase' },
   
   cardActions: { flexDirection: 'row', gap: 12 },
-  iconBtn: { padding: 8, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  iconBtn: { padding: 8, backgroundColor: COLORS.cardBg, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border },
   
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'center', alignItems: 'center', padding: 20 },
-  modalContent: { backgroundColor: '#141432', width: '100%', maxHeight: '85%', borderRadius: 28, padding: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  modalContent: { backgroundColor: COLORS.cardBg, width: '100%', maxHeight: '85%', borderRadius: 28, padding: 24, borderWidth: 1, borderColor: COLORS.border },
   modalTitle: { fontSize: 22, fontWeight: '900', color: '#fff', marginBottom: 20 },
-  modalInput: { backgroundColor: 'rgba(0,0,0,0.3)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', borderRadius: 16, padding: 16, marginBottom: 16, fontSize: 16, color: '#fff' },
+  modalInput: { backgroundColor: 'rgba(0,0,0,0.3)', borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, padding: 16, marginBottom: 16, fontSize: 16, color: '#fff' },
   
   lineSelector: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16, gap: 8 },
-  lineOption: { flex: 1, paddingVertical: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', alignItems: 'center', borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.05)' },
+  lineOption: { flex: 1, paddingVertical: 14, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center', borderRadius: 14, backgroundColor: COLORS.cardBg },
   lineOptionActive: { backgroundColor: 'rgba(155,89,182,0.2)', borderColor: '#9B59B6' },
-  lineOptionText: { color: 'rgba(255,255,255,0.5)', fontWeight: '700' },
+  lineOptionText: { color: COLORS.textLight, fontWeight: '700' },
   lineOptionTextActive: { color: '#9B59B6', fontWeight: '800' },
   
-  switchRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 12, backgroundColor: 'rgba(0,0,0,0.2)', padding: 16, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  switchRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 12, backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, padding: 16, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border },
   switchLabel: { fontSize: 16, color: '#fff', fontWeight: '700' },
   
   modalActions: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 24, gap: 12 },
-  modalCancel: { paddingVertical: 14, paddingHorizontal: 20, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 14 },
+  modalCancel: { paddingVertical: 14, paddingHorizontal: 20, backgroundColor: COLORS.cardBg, borderRadius: 14 },
   modalCancelText: { color: '#fff', fontWeight: '700', fontSize: 16 },
   modalSubmit: { backgroundColor: '#00C9A7', paddingVertical: 14, paddingHorizontal: 24, borderRadius: 14 },
   modalSubmitText: { color: '#fff', fontWeight: '800', fontSize: 16 },
@@ -258,5 +259,5 @@ const styles = StyleSheet.create({
   emptyContainer: { alignItems: 'center', justifyContent: 'center', marginTop: 40 },
   iconCircle: { width: 100, height: 100, borderRadius: 50, backgroundColor: 'rgba(0,201,167,0.1)', alignItems: 'center', justifyContent: 'center', marginBottom: 20, borderWidth: 1, borderColor: 'rgba(0,201,167,0.3)' },
   emptyTitle: { fontSize: 22, fontWeight: '900', color: '#fff', marginBottom: 8 },
-  emptySubtitle: { fontSize: 15, color: 'rgba(255,255,255,0.5)', textAlign: 'center' }
+  emptySubtitle: { fontSize: 15, color: COLORS.textLight, textAlign: 'center' }
 });

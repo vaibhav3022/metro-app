@@ -45,11 +45,11 @@ export default function FeederServices() {
       </p>
 
       <div style={{ 
-        background: 'linear-gradient(135deg, rgba(0,201,167,0.15), rgba(0,153,128,0.1))', 
+        background: 'rgba(0,137,123,0.08)', 
         borderRadius: '24px', padding: '32px', textAlign: 'center', marginBottom: '32px',
-        border: '1px solid rgba(0,201,167,0.3)'
+        border: '1px solid rgba(0,137,123,0.15)'
       }}>
-        <h2 style={{ fontSize: '24px', fontWeight: '900', color: '#fff', marginBottom: '12px' }}>Last Mile Connectivity</h2>
+        <h2 style={{ fontSize: '24px', fontWeight: '900', color: 'var(--text-primary)', marginBottom: '12px' }}>Last Mile Connectivity</h2>
         <p style={{ color: 'var(--text-secondary)', fontSize: '15px', maxWidth: '500px', margin: '0 auto' }}>
           Pune Metro provides seamless feeder services to help you reach your final destination easily. Choose from shuttle buses, e-bikes, or partner cabs.
         </p>
@@ -61,7 +61,7 @@ export default function FeederServices() {
             <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: s.iconBg, display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '16px' }}>
               {s.icon}
             </div>
-            <h3 style={{ fontSize: '18px', fontWeight: '800', marginBottom: '12px', color: '#fff' }}>{s.title}</h3>
+            <h3 style={{ fontSize: '18px', fontWeight: '800', marginBottom: '12px', color: 'var(--text-primary)' }}>{s.title}</h3>
             <p style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: '1.6', marginBottom: '24px', flex: 1 }}>
               {s.description}
             </p>

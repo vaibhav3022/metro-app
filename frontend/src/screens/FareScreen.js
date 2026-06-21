@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import COLORS from '../constants/colors';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView,
   ActivityIndicator, Alert, StatusBar, Platform
@@ -23,13 +24,13 @@ export default function FareScreen() {
 
   if (!bookingDetails) {
     return (
-      <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.gradient}>
+      <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.gradient}>
         <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
         <View style={styles.centered}>
           <Icon name="ticket-outline" size={60} color="rgba(255,255,255,0.2)" />
           <Text style={styles.emptyText}>No booking details found.</Text>
           <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: 20 }}>
-            <LinearGradient colors={['#00C9A7', '#009980']} style={styles.goBackBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+            <LinearGradient colors={[COLORS.secondary, COLORS.secondary]} style={styles.goBackBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
               <Text style={styles.goBackBtnText}>Go Back</Text>
             </LinearGradient>
           </TouchableOpacity>
@@ -103,7 +104,7 @@ export default function FareScreen() {
   };
 
   return (
-    <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.gradient}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.gradient}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       {loading && (
         <View style={styles.loadingOverlay}>
@@ -163,7 +164,7 @@ export default function FareScreen() {
             <Text style={styles.fareItemLabel}>Total Passengers</Text>
             <Text style={styles.fareItemValue}>{passengers}</Text>
           </View>
-          <View style={[styles.fareRow, { borderBottomWidth: 0, marginTop: 12, paddingTop: 16, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)' }]}>
+          <View style={[styles.fareRow, { borderBottomWidth: 0, marginTop: 12, paddingTop: 16, borderTopWidth: 1, borderTopColor: COLORS.border }]}>
             <Text style={styles.totalLabel}>Total Payable</Text>
             <Text style={styles.totalValue}>₹{totalAmount}</Text>
           </View>
@@ -172,7 +173,7 @@ export default function FareScreen() {
         {/* Payment Actions */}
         <View style={styles.paymentActions}>
           <TouchableOpacity onPress={handleRazorpayPayment} disabled={loading} style={styles.payBtnContainer}>
-            <LinearGradient colors={['#9B59B6', '#8E44AD']} style={styles.payBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+            <LinearGradient colors={[COLORS.primary, COLORS.primary]} style={styles.payBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
               <Icon name="credit-card-outline" size={22} color="#fff" />
               <Text style={styles.payBtnText}>Pay Now</Text>
             </LinearGradient>
@@ -187,7 +188,7 @@ const styles = StyleSheet.create({
   gradient: { flex: 1 },
   container: { padding: 20, paddingBottom: 50, paddingTop: Platform.OS === 'android' ? 50 : 20 },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
-  emptyText: { color: 'rgba(255,255,255,0.6)', marginTop: 16, fontSize: 16, fontWeight: '600' },
+  emptyText: { color: COLORS.textLight, marginTop: 16, fontSize: 16, fontWeight: '600' },
   goBackBtn: { paddingHorizontal: 30, paddingVertical: 14, borderRadius: 16, justifyContent: 'center', alignItems: 'center' },
   goBackBtnText: { color: '#fff', fontWeight: '800', fontSize: 15 },
   
@@ -195,16 +196,16 @@ const styles = StyleSheet.create({
   loadingMsg: { fontSize: 16, fontWeight: '700', color: '#fff', letterSpacing: 0.5 },
   
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 },
-  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  headerTitle: { fontSize: 22, fontWeight: '900', color: '#fff', letterSpacing: 0.5 },
+  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
+  headerTitle: { fontSize: 22, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
   
-  card: { backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 28, padding: 24, marginBottom: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  sectionLabel: { fontSize: 12, fontWeight: '800', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 20 },
+  card: { backgroundColor: COLORS.cardBg, borderRadius: 28, padding: 24, marginBottom: 16, borderWidth: 1, borderColor: COLORS.border },
+  sectionLabel: { fontSize: 12, fontWeight: '800', color: COLORS.textLight, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 20 },
   
   journeyRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   stationInfo: { flex: 1 },
   dot: { width: 14, height: 14, borderRadius: 7, backgroundColor: '#00C9A7', marginBottom: 8, borderWidth: 2, borderColor: '#fff' },
-  stationLabel: { fontSize: 12, fontWeight: '700', color: 'rgba(255,255,255,0.5)', marginBottom: 4 },
+  stationLabel: { fontSize: 12, fontWeight: '700', color: COLORS.textLight, marginBottom: 4 },
   stationName: { fontSize: 16, fontWeight: '800', color: '#fff' },
   
   distanceWrap: { alignItems: 'center', paddingHorizontal: 12, gap: 4 },
@@ -212,7 +213,7 @@ const styles = StyleSheet.create({
   distanceLine: { height: 2, width: 40, backgroundColor: 'rgba(0,201,167,0.3)', borderRadius: 1 },
   
   fareRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)' },
-  fareItemLabel: { fontSize: 15, color: 'rgba(255,255,255,0.6)', fontWeight: '600' },
+  fareItemLabel: { fontSize: 15, color: COLORS.textLight, fontWeight: '600' },
   fareItemValue: { fontSize: 15, fontWeight: '800', color: '#fff' },
   
   totalLabel: { fontSize: 18, fontWeight: '800', color: '#fff' },

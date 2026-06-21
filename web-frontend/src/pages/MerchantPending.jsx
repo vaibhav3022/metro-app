@@ -20,7 +20,7 @@ export default function MerchantPending() {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)',
+        background: 'radial-gradient(circle at 50% 0%, var(--bg-tertiary) 0%, var(--bg-primary) 70%)',
         padding: '24px',
         fontFamily: "'Inter', 'Segoe UI', sans-serif",
       }}
@@ -34,7 +34,7 @@ export default function MerchantPending() {
           width: '320px',
           height: '320px',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(155,89,182,0.15) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(106, 27, 154, 0.12) 0%, transparent 70%)',
           pointerEvents: 'none',
         }}
       />
@@ -46,7 +46,7 @@ export default function MerchantPending() {
           width: '400px',
           height: '400px',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(0,201,167,0.1) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(0, 137, 123, 0.08) 0%, transparent 70%)',
           pointerEvents: 'none',
         }}
       />
@@ -56,15 +56,13 @@ export default function MerchantPending() {
         style={{
           width: '100%',
           maxWidth: '480px',
-          background: 'rgba(255, 255, 255, 0.07)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--glass-border)',
           borderRadius: '28px',
           padding: '48px 40px',
           textAlign: 'center',
-          color: '#ffffff',
-          boxShadow: '0 24px 60px rgba(0,0,0,0.4)',
+          color: 'var(--text-primary)',
+          boxShadow: '0 16px 40px rgba(0,0,0,0.06)',
           position: 'relative',
           zIndex: 1,
         }}
@@ -75,8 +73,8 @@ export default function MerchantPending() {
             width: '100px',
             height: '100px',
             borderRadius: '50%',
-            background: 'rgba(155, 89, 182, 0.15)',
-            border: '2px solid rgba(155, 89, 182, 0.3)',
+            background: 'rgba(106, 27, 154, 0.12)',
+            border: '2px solid rgba(106, 27, 154, 0.2)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -84,7 +82,7 @@ export default function MerchantPending() {
             animation: 'pulse 2s ease-in-out infinite',
           }}
         >
-          <Clock size={48} color="#9B59B6" strokeWidth={1.5} />
+          <Clock size={48} color="var(--accent-purple)" strokeWidth={1.5} />
         </div>
 
         <h1
@@ -93,7 +91,7 @@ export default function MerchantPending() {
             fontWeight: '800',
             marginBottom: '14px',
             letterSpacing: '-0.3px',
-            background: 'linear-gradient(90deg, #c084fc, #e879f9)',
+            background: 'linear-gradient(90deg, var(--accent-purple), var(--accent-teal))',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
           }}
@@ -104,7 +102,7 @@ export default function MerchantPending() {
         <p
           style={{
             fontSize: '15px',
-            color: 'rgba(255,255,255,0.65)',
+            color: 'var(--text-secondary)',
             lineHeight: '1.7',
             marginBottom: '32px',
           }}
@@ -120,8 +118,8 @@ export default function MerchantPending() {
             display: 'flex',
             alignItems: 'center',
             gap: '10px',
-            background: 'rgba(155, 89, 182, 0.1)',
-            border: '1px solid rgba(155, 89, 182, 0.25)',
+            background: 'rgba(106, 27, 154, 0.08)',
+            border: '1px solid rgba(106, 27, 154, 0.15)',
             borderRadius: '14px',
             padding: '14px 20px',
             marginBottom: '32px',
@@ -129,11 +127,11 @@ export default function MerchantPending() {
         >
           <RefreshCw
             size={18}
-            color="#9B59B6"
+            color="var(--accent-purple)"
             style={{ animation: 'spin 3s linear infinite', flexShrink: 0 }}
           />
-          <span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.75)', fontWeight: '600' }}>
-            Status: <span style={{ color: '#c084fc' }}>Pending Approval</span>
+          <span style={{ fontSize: '14px', color: 'var(--text-secondary)', fontWeight: '600' }}>
+            Status: <span style={{ color: 'var(--accent-purple)' }}>Pending Approval</span>
           </span>
         </div>
 
@@ -151,8 +149,8 @@ export default function MerchantPending() {
               display: 'flex',
               alignItems: 'center',
               gap: '14px',
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
+              background: 'var(--bg-primary)',
+              border: '1px solid var(--glass-border)',
               borderRadius: '12px',
               padding: '14px 16px',
               textAlign: 'left',
@@ -163,20 +161,20 @@ export default function MerchantPending() {
                 width: '36px',
                 height: '36px',
                 borderRadius: '10px',
-                background: 'rgba(0,201,167,0.12)',
+                background: 'rgba(0, 137, 123, 0.12)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
               }}
             >
-              <ShieldCheck size={18} color="#00C9A7" />
+              <ShieldCheck size={18} color="var(--accent-teal)" />
             </div>
             <div>
-              <div style={{ fontSize: '13px', fontWeight: '700', color: '#fff' }}>
+              <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-primary)' }}>
                 Admin Verification
               </div>
-              <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginTop: '2px' }}>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>
                 Your documents are being reviewed by our team
               </div>
             </div>
@@ -187,8 +185,8 @@ export default function MerchantPending() {
               display: 'flex',
               alignItems: 'center',
               gap: '14px',
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
+              background: 'var(--bg-primary)',
+              border: '1px solid var(--glass-border)',
               borderRadius: '12px',
               padding: '14px 16px',
               textAlign: 'left',
@@ -199,22 +197,22 @@ export default function MerchantPending() {
                 width: '36px',
                 height: '36px',
                 borderRadius: '10px',
-                background: 'rgba(155,89,182,0.12)',
+                background: 'rgba(106, 27, 154, 0.12)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
               }}
             >
-              <Mail size={18} color="#9B59B6" />
+              <Mail size={18} color="var(--accent-purple)" />
             </div>
             <div>
-              <div style={{ fontSize: '13px', fontWeight: '700', color: '#fff' }}>
+              <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-primary)' }}>
                 Email Notification
               </div>
-              <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginTop: '2px' }}>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>
                 You'll be notified at{' '}
-                <span style={{ color: '#c084fc' }}>{user?.email || 'your email'}</span>
+                <span style={{ color: 'var(--accent-purple)' }}>{user?.email || 'your email'}</span>
               </div>
             </div>
           </div>
@@ -226,8 +224,8 @@ export default function MerchantPending() {
           style={{
             width: '100%',
             height: '52px',
-            background: 'rgba(239, 68, 68, 0.1)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
+            background: 'rgba(239, 68, 68, 0.08)',
+            border: '1px solid rgba(239, 68, 68, 0.2)',
             borderRadius: '14px',
             color: '#EF4444',
             fontSize: '15px',
@@ -240,12 +238,12 @@ export default function MerchantPending() {
             transition: 'all 0.2s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)';
-            e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.5)';
+            e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)';
+            e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.4)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)';
-            e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+            e.currentTarget.style.background = 'rgba(239, 68, 68, 0.08)';
+            e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.2)';
           }}
         >
           <LogOut size={18} />
@@ -258,14 +256,14 @@ export default function MerchantPending() {
         style={{
           marginTop: '24px',
           fontSize: '13px',
-          color: 'rgba(255,255,255,0.35)',
+          color: 'var(--text-muted)',
           zIndex: 1,
         }}
       >
         Need help? Contact{' '}
         <a
           href="mailto:support@punemetro.in"
-          style={{ color: 'rgba(155,89,182,0.8)', textDecoration: 'none' }}
+          style={{ color: 'var(--accent-purple)', textDecoration: 'none' }}
         >
           support@punemetro.in
         </a>
@@ -274,8 +272,8 @@ export default function MerchantPending() {
       {/* Keyframe styles */}
       <style>{`
         @keyframes pulse {
-          0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(155,89,182,0.3); }
-          50% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(155,89,182,0); }
+          0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(106,27,154,0.3); }
+          50% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(106,27,154,0); }
         }
         @keyframes spin {
           from { transform: rotate(0deg); }

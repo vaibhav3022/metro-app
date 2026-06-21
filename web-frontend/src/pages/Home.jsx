@@ -88,7 +88,7 @@ export default function Home() {
         </div>
         
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <Link to="/notifications" style={{ position: 'relative', width: '44px', height: '44px', borderRadius: '22px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'var(--text-primary)' }}>
+          <Link to="/notifications" style={{ position: 'relative', width: '44px', height: '44px', borderRadius: '22px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'var(--text-primary)' }}>
             <BellRing size={20} />
             <span style={{ position: 'absolute', top: 10, right: 12, width: '8px', height: '8px', background: 'var(--accent-red)', borderRadius: '4px' }}></span>
           </Link>
@@ -97,16 +97,16 @@ export default function Home() {
             {user?.name?.[0]?.toUpperCase() || 'P'}
           </Link>
 
-          <button onClick={logout} className="btn" style={{ padding: '10px', background: 'rgba(239,68,68,0.2)', borderRadius: '12px', border: '1px solid rgba(239,68,68,0.3)', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', transition: 'all 0.2s' }} title="Logout">
+          <button onClick={logout} className="btn" style={{ padding: '10px', background: 'rgba(239,68,68,0.1)', borderRadius: '12px', border: '1px solid rgba(239,68,68,0.2)', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', transition: 'all 0.2s' }} title="Logout">
             <LogOut size={20} color="#EF4444" />
           </button>
         </div>
       </div>
 
       {/* Slider */}
-      <div style={{ width: '100%', height: '220px', borderRadius: '20px', overflow: 'hidden', position: 'relative', marginBottom: '32px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)' }}>
+      <div style={{ width: '100%', height: '220px', borderRadius: '20px', overflow: 'hidden', position: 'relative', marginBottom: '32px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}>
         {sliderImages.map((img, i) => (
-          <div key={img.id} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: currentSlide === i ? 1 : 0, transition: 'opacity 0.5s ease', background: '#0e0f22' }}>
+          <div key={img.id} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: currentSlide === i ? 1 : 0, transition: 'opacity 0.5s ease', background: 'var(--bg-primary)' }}>
             <img src={img.source} alt={img.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '24px', background: 'linear-gradient(transparent, rgba(0,0,0,0.85))' }}>
               <h3 style={{ color: '#fff', fontSize: '22px', fontWeight: '800', letterSpacing: '0.5px' }}>{img.title}</h3>
@@ -213,7 +213,7 @@ export default function Home() {
               </div>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justify: 'center', padding: '40px 20px', background: 'rgba(255,255,255,0.01)', border: '2px dashed var(--glass-border)', borderRadius: '16px', gap: '16px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justify: 'center', padding: '40px 20px', background: 'var(--bg-secondary)', border: '2px dashed var(--glass-border)', borderRadius: '16px', gap: '16px' }}>
               <p style={{ color: 'var(--text-secondary)' }}>You don't have any active tickets.</p>
               <Link to="/book" className="btn btn-primary">
                 Book Ticket Now
@@ -239,13 +239,13 @@ export default function Home() {
           <div className="glass-panel" style={{ padding: '30px', display: 'flex', flexDirection: 'column', gap: '16px', flex: 1 }}>
             <h3 style={{ fontSize: '20px', fontWeight: '700' }}>Safety Instructions</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px', color: 'var(--text-secondary)' }}>
-              <div style={{ padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', borderLeft: '3px solid var(--accent-orange)' }}>
+              <div style={{ padding: '12px', background: 'var(--bg-primary)', borderRadius: '8px', borderLeft: '3px solid var(--accent-orange)' }}>
                 ⚠️ Ticket validity: Entry must be scanned within 20 minutes of ticket generation.
               </div>
-              <div style={{ padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', borderLeft: '3px solid var(--accent-orange)' }}>
+              <div style={{ padding: '12px', background: 'var(--bg-primary)', borderRadius: '8px', borderLeft: '3px solid var(--accent-orange)' }}>
                 ⏱️ Journey duration: Exit must be completed within 90 minutes of entry.
               </div>
-              <div style={{ padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', borderLeft: '3px solid var(--accent-blue)' }}>
+              <div style={{ padding: '12px', background: 'var(--bg-primary)', borderRadius: '8px', borderLeft: '3px solid var(--accent-blue)' }}>
                 💰 Earn 5% Cashback on ticket purchases exceeding ₹100!
               </div>
             </div>

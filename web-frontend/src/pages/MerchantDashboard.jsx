@@ -92,11 +92,11 @@ export default function MerchantDashboard() {
           <button 
             className="btn" 
             onClick={() => navigate('/merchant/notifications')} 
-            style={{ padding: '10px', background: 'rgba(255,255,255,0.08)', position: 'relative' }}
+            style={{ padding: '10px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', position: 'relative' }}
           >
-            <BellRing size={20} color="#fff" />
+            <BellRing size={20} color="var(--text-primary)" />
             {unreadCount > 0 && (
-              <span style={{ position: 'absolute', top: -6, right: -6, background: '#EF4444', color: '#fff', fontSize: '10px', fontWeight: 'bold', width: '20px', height: '20px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #141432' }}>
+              <span style={{ position: 'absolute', top: -6, right: -6, background: 'var(--accent-red)', color: '#fff', fontSize: '10px', fontWeight: 'bold', width: '20px', height: '20px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--bg-secondary)' }}>
                 {unreadCount}
               </span>
             )}
@@ -104,7 +104,7 @@ export default function MerchantDashboard() {
           <button 
             className="btn" 
             onClick={handleLogout} 
-            style={{ padding: '10px', background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', color: '#EF4444' }}
+            style={{ padding: '10px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red)' }}
           >
             <LogOut size={20} />
           </button>
@@ -151,7 +151,7 @@ export default function MerchantDashboard() {
       <div className="glass-panel" style={{ padding: '30px', display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '24px' }}>
         <h3 style={{ fontSize: '22px', fontWeight: '900', marginBottom: '6px' }}>Official Merchant QR</h3>
         <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>Customers can scan this to pay you directly</p>
-        <div style={{ padding: '20px', background: '#fff', borderRadius: '20px', boxShadow: '0 8px 30px rgba(0,0,0,0.5)' }}>
+        <div style={{ padding: '20px', background: '#fff', borderRadius: '20px', boxShadow: 'var(--box-shadow)' }}>
           {dashboardData?.shopId ? (
             <QRCodeSVG 
               value={JSON.stringify({ 
@@ -178,14 +178,15 @@ export default function MerchantDashboard() {
         <div style={{ height: '300px', width: '100%' }}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={rechartsData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-              <XAxis dataKey="name" stroke="rgba(255,255,255,0.5)" tick={{fill: 'rgba(255,255,255,0.6)'}} axisLine={false} tickLine={false} />
-              <YAxis stroke="rgba(255,255,255,0.5)" tick={{fill: 'rgba(255,255,255,0.6)'}} axisLine={false} tickLine={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" vertical={false} />
+              <XAxis dataKey="name" stroke="var(--text-secondary)" tick={{fill: 'var(--text-secondary)'}} axisLine={false} tickLine={false} />
+              <YAxis stroke="var(--text-secondary)" tick={{fill: 'var(--text-secondary)'}} axisLine={false} tickLine={false} />
               <Tooltip 
-                contentStyle={{ backgroundColor: '#1A0A3E', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
-                itemStyle={{ color: '#00C9A7', fontWeight: 'bold' }}
+                contentStyle={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: '12px', color: 'var(--text-primary)' }}
+                itemStyle={{ color: 'var(--accent-teal)', fontWeight: 'bold' }}
+                labelStyle={{ color: 'var(--text-primary)' }}
               />
-              <Line type="monotone" dataKey="sales" stroke="#00C9A7" strokeWidth={3} dot={{ r: 4, strokeWidth: 2, fill: '#141432', stroke: '#00C9A7' }} activeDot={{ r: 6 }} />
+              <Line type="monotone" dataKey="sales" stroke="var(--accent-teal)" strokeWidth={3} dot={{ r: 4, strokeWidth: 2, fill: 'var(--bg-secondary)', stroke: 'var(--accent-teal)' }} activeDot={{ r: 6 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -196,24 +197,24 @@ export default function MerchantDashboard() {
         <h3 style={{ fontSize: '20px', fontWeight: '900', marginBottom: '20px' }}>Recent Transactions</h3>
         {transactions.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            <History size={48} color="rgba(255,255,255,0.15)" style={{ marginBottom: '16px' }} />
+            <History size={48} color="var(--text-muted)" style={{ marginBottom: '16px', opacity: 0.5 }} />
             <h4 style={{ fontSize: '16px', fontWeight: '800', marginBottom: '8px' }}>No Transactions</h4>
             <p style={{ color: 'var(--text-muted)' }}>You haven't received any orders yet.</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {transactions.slice(0, 5).map((tx, idx) => (
-              <div key={tx._id || idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 0', borderBottom: idx < transactions.slice(0, 5).length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}>
+              <div key={tx._id || idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 0', borderBottom: idx < transactions.slice(0, 5).length - 1 ? '1px solid var(--glass-border)' : 'none' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                   <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: 'rgba(0,201,167,0.15)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <ArrowDownLeft size={24} color="#00C9A7" />
+                    <ArrowDownLeft size={24} color="var(--accent-teal)" />
                   </div>
                   <div>
-                    <div style={{ fontSize: '15px', fontWeight: '800', marginBottom: '4px' }}>{tx.userId?.name || 'Customer'}</div>
+                    <div style={{ fontSize: '15px', fontWeight: '800', marginBottom: '4px', color: 'var(--text-primary)' }}>{tx.userId?.name || 'Customer'}</div>
                     <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{new Date(tx.createdAt).toLocaleDateString()} • {tx.paymentMethod}</div>
                   </div>
                 </div>
-                <div style={{ fontSize: '16px', fontWeight: '900', color: '#00C9A7' }}>
+                <div style={{ fontSize: '16px', fontWeight: '900', color: 'var(--accent-teal)' }}>
                   +{tx.paymentMethod === 'Token' ? `Rs. ${tx.amount}` : `₹${tx.amount}`}
                 </div>
               </div>
@@ -221,8 +222,8 @@ export default function MerchantDashboard() {
             {transactions.length > 5 && (
               <button 
                 onClick={() => setTxModalVisible(true)}
-                className="btn" 
-                style={{ marginTop: '20px', padding: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '16px', color: '#00C9A7', fontWeight: '800', width: '100%' }}
+                className="btn btn-secondary" 
+                style={{ marginTop: '20px', padding: '16px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: '16px', color: 'var(--accent-teal)', fontWeight: '800', width: '100%' }}
               >
                 View All Transactions
               </button>
@@ -233,36 +234,36 @@ export default function MerchantDashboard() {
 
       {/* Transactions Modal Overlay */}
       {txModalVisible && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.85)', zIndex: 1000, display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
-          <div style={{ background: '#141432', width: '100%', maxWidth: '600px', height: '80vh', borderTopLeftRadius: '32px', borderTopRightRadius: '32px', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '24px 32px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-              <h2 style={{ fontSize: '22px', fontWeight: '900' }}>All Transactions</h2>
-              <button onClick={() => setTxModalVisible(false)} className="btn" style={{ background: 'rgba(255,255,255,0.1)', padding: '8px', borderRadius: '16px' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
+          <div style={{ background: 'var(--bg-secondary)', width: '100%', maxWidth: '600px', height: '80vh', borderTopLeftRadius: '32px', borderTopRightRadius: '32px', borderTop: '1px solid var(--glass-border)', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '24px 32px', borderBottom: '1px solid var(--glass-border)' }}>
+              <h2 style={{ fontSize: '22px', fontWeight: '900', color: 'var(--text-primary)' }}>All Transactions</h2>
+              <button onClick={() => setTxModalVisible(false)} className="btn" style={{ background: 'var(--bg-tertiary)', padding: '8px', borderRadius: '16px', color: 'var(--text-primary)' }}>
                 <X size={24} />
               </button>
             </div>
             <div style={{ flex: 1, overflowY: 'auto', padding: '24px 32px' }}>
               {transactions.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '40px 0' }}>
-                  <History size={48} color="rgba(255,255,255,0.15)" style={{ marginBottom: '16px' }} />
+                  <History size={48} color="var(--text-muted)" style={{ marginBottom: '16px', opacity: 0.5 }} />
                   <h4 style={{ fontSize: '16px', fontWeight: '800', marginBottom: '8px' }}>No Transactions</h4>
                   <p style={{ color: 'var(--text-muted)' }}>You haven't received any orders yet.</p>
                 </div>
               ) : (
                 transactions.map((tx, idx) => (
-                  <div key={tx._id || idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                  <div key={tx._id || idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 0', borderBottom: '1px solid var(--glass-border)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                       <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: 'rgba(0,201,167,0.15)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <ArrowDownLeft size={24} color="#00C9A7" />
+                        <ArrowDownLeft size={24} color="var(--accent-teal)" />
                       </div>
                       <div>
-                        <div style={{ fontSize: '15px', fontWeight: '800', marginBottom: '4px' }}>{tx.userId?.name || 'Customer'}</div>
+                        <div style={{ fontSize: '15px', fontWeight: '800', marginBottom: '4px', color: 'var(--text-primary)' }}>{tx.userId?.name || 'Customer'}</div>
                         <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
                           {new Date(tx.createdAt).toLocaleDateString()} {new Date(tx.createdAt).toLocaleTimeString()} • {tx.paymentMethod}
                         </div>
                       </div>
                     </div>
-                    <div style={{ fontSize: '16px', fontWeight: '900', color: '#00C9A7' }}>
+                    <div style={{ fontSize: '16px', fontWeight: '900', color: 'var(--accent-teal)' }}>
                       +{tx.paymentMethod === 'Token' ? `Rs. ${tx.amount}` : `₹${tx.amount}`}
                     </div>
                   </div>

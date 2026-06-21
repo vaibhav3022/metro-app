@@ -72,8 +72,8 @@ export default function MetroMap() {
             { label: '−', fn: () => setScale(p => Math.max(p-0.2, 0.4)) },
           ].map((b,i) => (
             <button key={i} onClick={b.fn} className="btn" style={{
-              background:'rgba(255,255,255,0.1)', width:40, height:40, borderRadius:12,
-              border:'1px solid rgba(255,255,255,0.15)', color:'#fff', fontSize:18, fontWeight:700,
+              background:'var(--bg-secondary)', width:40, height:40, borderRadius:12,
+              border:'1px solid var(--glass-border)', color:'var(--text-primary)', fontSize:18, fontWeight:700,
               display:'flex', alignItems:'center', justifyContent:'center'
             }}>{b.label}</button>
           ))}
@@ -83,18 +83,19 @@ export default function MetroMap() {
         {tip && (
           <div style={{
             position:'absolute', top:16, left:16, zIndex:30,
-            background:'rgba(6,7,24,0.97)', border:'1px solid rgba(255,255,255,0.12)',
-            borderRadius:14, padding:'12px 18px', pointerEvents:'none'
+            background:'var(--bg-secondary)', border:'1px solid var(--glass-border)',
+            borderRadius:14, padding:'12px 18px', pointerEvents:'none',
+            boxShadow: 'var(--box-shadow)'
           }}>
-            <div style={{ fontWeight:800, fontSize:14, color:'#fff' }}>{tip.name}</div>
-            <div style={{ fontSize:11, color:'rgba(255,255,255,0.5)', marginTop:3 }}>{tip.line}</div>
-            {isXchg(tip.name) && <div style={{ fontSize:11, color:'#FFD700', marginTop:4, fontWeight:700 }}>⇄ Interchange</div>}
+            <div style={{ fontWeight:800, fontSize:14, color:'var(--text-primary)' }}>{tip.name}</div>
+            <div style={{ fontSize:11, color:'var(--text-secondary)', marginTop:3 }}>{tip.line}</div>
+            {isXchg(tip.name) && <div style={{ fontSize:11, color:'#F57C00', marginTop:4, fontWeight:700 }}>⇄ Interchange</div>}
           </div>
         )}
 
         {/* Map */}
         <div style={{ width:'100%', height:660, overflow:'auto',
-          background:'linear-gradient(145deg,#06071a 0%,#0b0c2a 100%)', cursor:'grab' }}>
+          background:'var(--bg-primary)', cursor:'grab' }}>
           <div style={{ transform:`scale(${scale})`, transformOrigin:'0 0',
             width:SVG_W, height:SVG_H, transition:'transform 0.2s' }}>
             <svg width={SVG_W} height={SVG_H}>
@@ -134,10 +135,10 @@ export default function MetroMap() {
                     onMouseEnter={() => setTip({ name, line:'Line 1 — Purple  (PCMC ↔ Swargate)' })}
                     onMouseLeave={() => setTip(null)}>
                     {/* dot */}
-                    <circle cx={x} cy={y} r={8} fill="#06071a" stroke="#800080" strokeWidth={3}/>
+                    <circle cx={x} cy={y} r={8} fill="var(--bg-secondary)" stroke="#800080" strokeWidth={3}/>
                     <circle cx={x} cy={y} r={3} fill="#800080"/>
                     {/* label right */}
-                    <text x={x+18} y={y+5} fill="#ddc8ff" fontSize={13} fontWeight="500">{name}</text>
+                    <text x={x+18} y={y+5} fill="var(--text-primary)" fontSize={13} fontWeight="500">{name}</text>
                   </g>
                 );
               })}
@@ -151,13 +152,13 @@ export default function MetroMap() {
                   <g key={`a${i}`} style={{ cursor:'pointer' }}
                     onMouseEnter={() => setTip({ name, line:'Line 2 — Aqua  (Vanaz ↔ Ramwadi)' })}
                     onMouseLeave={() => setTip(null)}>
-                    <circle cx={x} cy={y} r={8} fill="#06071a" stroke="#00A3E0" strokeWidth={3}/>
+                    <circle cx={x} cy={y} r={8} fill="var(--bg-secondary)" stroke="#00A3E0" strokeWidth={3}/>
                     <circle cx={x} cy={y} r={3} fill="#00A3E0"/>
                     {/* tick */}
                     <line x1={x} y1={y} x2={x} y2={above ? y-22 : y+22}
                       stroke="#00A3E0" strokeWidth={1.5} strokeOpacity={0.4}/>
                     <text x={x} y={above ? y-29 : y+36}
-                      fill="#c0f0ff" fontSize={11} fontWeight="500" textAnchor="middle">{name}</text>
+                      fill="var(--text-primary)" fontSize={11} fontWeight="500" textAnchor="middle">{name}</text>
                   </g>
                 );
               })}
@@ -171,13 +172,13 @@ export default function MetroMap() {
                   <g key={`r${i}`} style={{ cursor:'pointer' }}
                     onMouseEnter={() => setTip({ name, line:'Line 3 — Red  (Megapolis Circle ↔ Civil Court)' })}
                     onMouseLeave={() => setTip(null)}>
-                    <circle cx={x} cy={y} r={8} fill="#06071a" stroke="#EE2A24" strokeWidth={3}/>
+                    <circle cx={x} cy={y} r={8} fill="var(--bg-secondary)" stroke="#EE2A24" strokeWidth={3}/>
                     <circle cx={x} cy={y} r={3} fill="#EE2A24"/>
                     {/* tick upper-left */}
                     <line x1={x} y1={y} x2={x-10} y2={y-14}
                       stroke="#EE2A24" strokeWidth={1.5} strokeOpacity={0.5}/>
                     <text x={x-14} y={y-18}
-                      fill="#ffd0cc" fontSize={12} fontWeight="600" textAnchor="end">{name}</text>
+                      fill="var(--text-primary)" fontSize={12} fontWeight="600" textAnchor="end">{name}</text>
                   </g>
                 );
               })}
@@ -197,8 +198,8 @@ export default function MetroMap() {
                   <circle cx={x} cy={y} r={14} fill="#FFD700"
                     style={{ filter:'drop-shadow(0 0 8px #FFD700)' }}/>
                   {/* label */}
-                  <text x={x+30} y={y-4}  fill="#FFD700" fontSize={14} fontWeight="900">{name}</text>
-                  <text x={x+30} y={y+12} fill="rgba(255,215,0,0.6)" fontSize={10}>{sub}</text>
+                  <text x={x+30} y={y-4}  fill="var(--text-primary)" fontSize={14} fontWeight="900">{name}</text>
+                  <text x={x+30} y={y+12} fill="var(--text-secondary)" fontSize={10}>{sub}</text>
                 </g>
               ))}
 
@@ -207,8 +208,8 @@ export default function MetroMap() {
         </div>
 
         {/* ═══ LEGEND ═════════════════════════════════════════════════════════ */}
-        <div style={{ padding:'18px 28px', background:'rgba(0,0,0,0.6)',
-          borderTop:'1px solid rgba(255,255,255,0.07)' }}>
+        <div style={{ padding:'18px 28px', background:'var(--bg-secondary)',
+          borderTop:'1px solid var(--glass-border)' }}>
           <div style={{ display:'flex', gap:24, flexWrap:'wrap' }}>
             {[
               { color:'#800080', label:'Line 1 — Purple', sub:'PCMC ↔ Swargate  •  14 Stations' },
@@ -220,8 +221,8 @@ export default function MetroMap() {
                 <div style={{ width:14, height:14, borderRadius:'50%', flexShrink:0,
                   background:item.color, boxShadow:`0 0 8px ${item.color}` }}/>
                 <div>
-                  <div style={{ fontSize:13, fontWeight:700, color:'#fff' }}>{item.label}</div>
-                  <div style={{ fontSize:11, color:'rgba(255,255,255,0.4)', marginTop:1 }}>{item.sub}</div>
+                  <div style={{ fontSize:13, fontWeight:700, color:'var(--text-primary)' }}>{item.label}</div>
+                  <div style={{ fontSize:11, color:'var(--text-secondary)', marginTop:1 }}>{item.sub}</div>
                 </div>
               </div>
             ))}

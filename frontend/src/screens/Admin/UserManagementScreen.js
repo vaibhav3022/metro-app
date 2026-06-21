@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import COLORS from '../../constants/colors';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, RefreshControl, TextInput, ActivityIndicator, Alert, StatusBar, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -68,7 +69,7 @@ export default function UserManagementScreen({ navigation }) {
   });
 
   return (
-    <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.container}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         {toast.visible && <ToastMessage message={toast.message} type={toast.type} onHide={() => setToast({ ...toast, visible: false })} />}
@@ -150,37 +151,37 @@ export default function UserManagementScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 20 : 10, paddingBottom: 16 },
-  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  headerTitle: { fontSize: 20, fontWeight: '900', color: '#fff', letterSpacing: 0.5 },
+  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
+  headerTitle: { fontSize: 20, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
   
-  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.2)', marginHorizontal: 20, marginVertical: 10, paddingHorizontal: 16, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, marginHorizontal: 20, marginVertical: 10, paddingHorizontal: 16, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border },
   searchInput: { flex: 1, paddingVertical: 14, marginLeft: 10, fontSize: 16, color: '#fff' },
   
   scrollContent: { padding: 20, paddingBottom: 50 },
   
-  userCard: { backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 24, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  userCard: { backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: COLORS.border },
   cardHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
   avatar: { width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(0,201,167,0.15)', justifyContent: 'center', alignItems: 'center', marginRight: 16, borderWidth: 1, borderColor: 'rgba(0,201,167,0.3)' },
   avatarText: { color: '#00C9A7', fontSize: 20, fontWeight: '900' },
   userInfo: { flex: 1 },
-  userName: { fontSize: 16, fontWeight: '800', color: '#fff', marginBottom: 4 },
-  userContact: { fontSize: 13, color: 'rgba(255,255,255,0.5)', fontWeight: '600' },
+  userName: { fontSize: 16, fontWeight: '800', color: COLORS.text, marginBottom: 4 },
+  userContact: { fontSize: 13, color: COLORS.textLight, fontWeight: '600' },
   
   deleteBtn: { padding: 10, backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(239, 68, 68, 0.3)' },
   
-  balancesContainer: { flexDirection: 'row', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: 16, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  balancesContainer: { flexDirection: 'row', backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: COLORS.border },
   balanceBox: { flex: 1, alignItems: 'center' },
-  divider: { width: 1, backgroundColor: 'rgba(255,255,255,0.1)' },
-  balanceLabel: { fontSize: 12, color: 'rgba(255,255,255,0.5)', marginBottom: 6, fontWeight: '600' },
+  divider: { width: 1, backgroundColor: COLORS.cardBg },
+  balanceLabel: { fontSize: 12, color: COLORS.textLight, marginBottom: 6, fontWeight: '600' },
   balanceValue: { fontSize: 18, fontWeight: '900', color: '#00C9A7' },
   
-  joinDate: { fontSize: 12, color: 'rgba(255,255,255,0.4)', textAlign: 'right', fontWeight: '600' },
+  joinDate: { fontSize: 12, color: COLORS.textLight, textAlign: 'right', fontWeight: '600' },
   
-  loadMoreBtn: { paddingVertical: 16, alignItems: 'center', marginVertical: 10, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  loadMoreBtn: { paddingVertical: 16, alignItems: 'center', marginVertical: 10, backgroundColor: COLORS.cardBg, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border },
   loadMoreText: { color: '#00C9A7', fontWeight: '800', fontSize: 16 },
 
   emptyContainer: { alignItems: 'center', justifyContent: 'center', marginTop: 40 },
   iconCircle: { width: 100, height: 100, borderRadius: 50, backgroundColor: 'rgba(0,201,167,0.1)', alignItems: 'center', justifyContent: 'center', marginBottom: 20, borderWidth: 1, borderColor: 'rgba(0,201,167,0.3)' },
   emptyTitle: { fontSize: 22, fontWeight: '900', color: '#fff', marginBottom: 8 },
-  emptySubtitle: { fontSize: 15, color: 'rgba(255,255,255,0.5)', textAlign: 'center' }
+  emptySubtitle: { fontSize: 15, color: COLORS.textLight, textAlign: 'center' }
 });

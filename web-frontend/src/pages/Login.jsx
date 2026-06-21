@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Train, Mail, Lock, Key, ArrowRight, User, Store, Shield } from 'lucide-react';
+import ThemeToggle from '../components/ThemeToggle';
 
 export default function Login() {
   const { loginWithPassword, sendOTP, verifyOTP } = useAuth();
@@ -68,7 +69,10 @@ export default function Login() {
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', padding: '20px' }}>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', padding: '20px', position: 'relative' }}>
+      <div style={{ position: 'absolute', top: '20px', right: '20px', zIndex: 100 }}>
+        <ThemeToggle />
+      </div>
       <div className="glass-panel" style={{ width: '100%', maxWidth: '480px', padding: '40px', textAlign: 'center' }}>
         
         {/* Logo */}
@@ -79,12 +83,12 @@ export default function Login() {
         <p style={{ color: 'var(--text-secondary)', marginBottom: '30px' }}>आली आपली मेट्रो 🚇</p>
 
         {/* Role Selector Tabs */}
-        <div style={{ display: 'flex', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '12px', padding: '4px', marginBottom: '24px', border: '1px solid var(--glass-border)' }}>
+        <div style={{ display: 'flex', background: 'rgba(0,0,0,0.05)', borderRadius: '12px', padding: '4px', marginBottom: '24px', border: '1px solid var(--glass-border)' }}>
           <button 
             type="button"
             className="btn" 
             onClick={() => { setRole('user'); setStep(1); setError(''); }} 
-            style={{ flex: 1, background: role === 'user' ? 'rgba(0, 201, 167, 0.15)' : 'transparent', color: role === 'user' ? 'var(--accent-teal)' : 'var(--text-secondary)', padding: '10px' }}
+            style={{ flex: 1, background: role === 'user' ? 'rgba(0, 137, 123, 0.12)' : 'transparent', color: role === 'user' ? 'var(--accent-teal)' : 'var(--text-secondary)', padding: '10px' }}
           >
             <User size={16} /> Passenger
           </button>
@@ -92,7 +96,7 @@ export default function Login() {
             type="button"
             className="btn" 
             onClick={() => { setRole('merchant'); setStep(1); setError(''); }} 
-            style={{ flex: 1, background: role === 'merchant' ? 'rgba(52, 152, 219, 0.15)' : 'transparent', color: role === 'merchant' ? 'var(--accent-blue)' : 'var(--text-secondary)', padding: '10px' }}
+            style={{ flex: 1, background: role === 'merchant' ? 'rgba(25, 118, 210, 0.12)' : 'transparent', color: role === 'merchant' ? 'var(--accent-blue)' : 'var(--text-secondary)', padding: '10px' }}
           >
             <Store size={16} /> Merchant
           </button>
@@ -100,20 +104,20 @@ export default function Login() {
             type="button"
             className="btn" 
             onClick={() => { setRole('admin'); setStep(1); setError(''); }} 
-            style={{ flex: 1, background: role === 'admin' ? 'rgba(155, 89, 182, 0.15)' : 'transparent', color: role === 'admin' ? 'var(--accent-purple)' : 'var(--text-secondary)', padding: '10px' }}
+            style={{ flex: 1, background: role === 'admin' ? 'rgba(106, 27, 154, 0.12)' : 'transparent', color: role === 'admin' ? 'var(--accent-purple)' : 'var(--text-secondary)', padding: '10px' }}
           >
             <Shield size={16} /> Admin
           </button>
         </div>
 
         {error && (
-          <div style={{ padding: '12px', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.15)', color: 'var(--accent-red)', border: '1px solid rgba(239, 68, 68, 0.3)', marginBottom: '20px', fontSize: '14px', fontWeight: '600' }}>
+          <div style={{ padding: '12px', borderRadius: '8px', background: 'rgba(211, 47, 47, 0.12)', color: 'var(--accent-red)', border: '1px solid rgba(211, 47, 47, 0.2)', marginBottom: '20px', fontSize: '14px', fontWeight: '600' }}>
             {error}
           </div>
         )}
 
         {message && (
-          <div style={{ padding: '12px', borderRadius: '8px', background: 'rgba(0, 201, 167, 0.15)', color: 'var(--accent-teal)', border: '1px solid rgba(0, 201, 167, 0.3)', marginBottom: '20px', fontSize: '14px', fontWeight: '600' }}>
+          <div style={{ padding: '12px', borderRadius: '8px', background: 'rgba(46, 125, 50, 0.12)', color: 'var(--success-color)', border: '1px solid rgba(46, 125, 50, 0.2)', marginBottom: '20px', fontSize: '14px', fontWeight: '600' }}>
             {message}
           </div>
         )}

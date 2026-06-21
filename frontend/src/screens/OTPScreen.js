@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import COLORS from '../constants/colors';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, StatusBar } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { authStart, authSuccess, authFailure, clearError } from '../redux/slices/authSlice';
@@ -48,7 +49,7 @@ export default function OTPScreen({ route, navigation }) {
   };
 
   return (
-    <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.container}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
         <View style={styles.header}>
@@ -58,7 +59,7 @@ export default function OTPScreen({ route, navigation }) {
         </View>
         
         <View style={styles.content}>
-          <LinearGradient colors={['#00C9A7', '#9B59B6']} style={styles.iconContainer} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+          <LinearGradient colors={[COLORS.secondary, COLORS.primary]} style={styles.iconContainer} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
             <Icon name="message-processing-outline" size={50} color="#fff" />
           </LinearGradient>
           <Text style={styles.title}>Verify Email</Text>
@@ -81,7 +82,7 @@ export default function OTPScreen({ route, navigation }) {
             </View>
 
             <TouchableOpacity style={styles.primaryButton} onPress={handleVerify} disabled={loading}>
-              <LinearGradient colors={['#00C9A7', '#009980']} style={styles.primaryButtonGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+              <LinearGradient colors={[COLORS.secondary, COLORS.secondary]} style={styles.primaryButtonGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
                 {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Verify OTP</Text>}
               </LinearGradient>
             </TouchableOpacity>
@@ -95,15 +96,15 @@ export default function OTPScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { padding: 20, paddingTop: 50 },
-  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
   content: { flex: 1, paddingHorizontal: 24, alignItems: 'center', paddingTop: 20 },
   iconContainer: { width: 90, height: 90, borderRadius: 45, justifyContent: 'center', alignItems: 'center', marginBottom: 20, elevation: 8 },
-  title: { fontSize: 28, fontWeight: '900', color: '#fff', marginBottom: 10, letterSpacing: 0.5 },
-  subtitle: { fontSize: 16, color: 'rgba(255,255,255,0.55)', textAlign: 'center', fontWeight: '500' },
+  title: { fontSize: 28, fontWeight: '900', color: COLORS.text, marginBottom: 10, letterSpacing: 0.5 },
+  subtitle: { fontSize: 16, color: COLORS.textLight, textAlign: 'center', fontWeight: '500' },
   emailText: { fontSize: 16, fontWeight: '800', color: '#00C9A7', marginBottom: 30, marginTop: 5 },
-  formContainer: { width: '100%', backgroundColor: 'rgba(255,255,255,0.06)', padding: 24, borderRadius: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  label: { fontSize: 14, fontWeight: '600', color: 'rgba(255,255,255,0.7)', marginBottom: 12, textAlign: 'center' },
-  inputContainer: { backgroundColor: 'rgba(0,0,0,0.2)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', borderRadius: 16, height: 70, justifyContent: 'center' },
+  formContainer: { width: '100%', backgroundColor: COLORS.cardBg, padding: 24, borderRadius: 24, borderWidth: 1, borderColor: COLORS.border },
+  label: { fontSize: 14, fontWeight: '600', color: COLORS.textLight, marginBottom: 12, textAlign: 'center' },
+  inputContainer: { backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, height: 70, justifyContent: 'center' },
   input: { fontSize: 32, letterSpacing: 12, color: '#fff', fontWeight: '900' },
   primaryButton: { marginTop: 24, borderRadius: 16, overflow: 'hidden' },
   primaryButtonGrad: { height: 55, justifyContent: 'center', alignItems: 'center' },

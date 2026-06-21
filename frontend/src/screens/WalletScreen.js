@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import COLORS from '../constants/colors';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StatusBar } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchWallet, addMoney } from '../redux/slices/walletSlice';
@@ -79,7 +80,7 @@ export default function WalletScreen({ navigation }) {
   const predefinedAmounts = ['100', '200', '500', '1000'];
 
   return (
-    <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.container}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
         <View style={styles.header}>
@@ -92,7 +93,7 @@ export default function WalletScreen({ navigation }) {
 
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           {/* Balance Card */}
-          <LinearGradient colors={['#00C9A7', '#009980']} style={styles.balanceCard} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+          <LinearGradient colors={[COLORS.secondary, COLORS.secondary]} style={styles.balanceCard} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
             <View style={styles.balanceTop}>
               <Icon name="wallet" size={24} color="rgba(255,255,255,0.8)" />
               <Text style={styles.balanceTitle}>Pune Metro Wallet</Text>
@@ -134,7 +135,7 @@ export default function WalletScreen({ navigation }) {
               onPress={handleAddMoney}
               disabled={isProcessing}
             >
-              <LinearGradient colors={isProcessing ? ['#555', '#444'] : ['#00C9A7', '#009980']} style={styles.primaryButtonGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+              <LinearGradient colors={isProcessing ? ['#555', '#444'] : [COLORS.secondary, COLORS.secondary]} style={styles.primaryButtonGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
                 {isProcessing ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Proceed to Pay</Text>}
               </LinearGradient>
             </TouchableOpacity>
@@ -173,33 +174,33 @@ export default function WalletScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 50, paddingBottom: 16 },
-  backButton: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
-  headerTitle: { fontSize: 20, fontWeight: '800', color: '#fff' },
+  backButton: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 20, borderWidth: 1, borderColor: COLORS.border },
+  headerTitle: { fontSize: 20, fontWeight: '800', color: COLORS.text },
   scrollContent: { padding: 20, paddingBottom: 40 },
   balanceCard: { padding: 24, borderRadius: 24, elevation: 8, marginBottom: 24 },
   balanceTop: { flexDirection: 'row', alignItems: 'center', marginBottom: 12, gap: 8 },
   balanceTitle: { color: 'rgba(255,255,255,0.8)', fontSize: 14, fontWeight: '600' },
-  balanceLabel: { color: 'rgba(255,255,255,0.6)', fontSize: 13, marginBottom: 4 },
+  balanceLabel: { color: COLORS.textLight, fontSize: 13, marginBottom: 4 },
   balanceAmount: { color: '#fff', fontSize: 40, fontWeight: '900', letterSpacing: 1 },
   
-  addMoneySection: { backgroundColor: 'rgba(255,255,255,0.06)', padding: 22, borderRadius: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', marginBottom: 24 },
-  sectionTitle: { fontSize: 18, fontWeight: '800', color: '#fff', marginBottom: 16 },
-  inputContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', borderRadius: 16, paddingHorizontal: 16, height: 60, marginBottom: 16 },
+  addMoneySection: { backgroundColor: COLORS.cardBg, padding: 22, borderRadius: 24, borderWidth: 1, borderColor: COLORS.border, marginBottom: 24 },
+  sectionTitle: { fontSize: 18, fontWeight: '800', color: COLORS.text, marginBottom: 16 },
+  inputContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, paddingHorizontal: 16, height: 60, marginBottom: 16 },
   currencySymbol: { fontSize: 24, color: '#00C9A7', fontWeight: '800', marginRight: 10 },
   amountInput: { flex: 1, fontSize: 24, color: '#fff', fontWeight: 'bold' },
   chipContainer: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 22 },
-  chip: { backgroundColor: 'rgba(255,255,255,0.1)', paddingVertical: 10, paddingHorizontal: 16, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
+  chip: { backgroundColor: COLORS.cardBg, paddingVertical: 10, paddingHorizontal: 16, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
   chipText: { color: '#fff', fontWeight: '700', fontSize: 14 },
   primaryButton: { borderRadius: 16, overflow: 'hidden' },
   primaryButtonGrad: { height: 54, justifyContent: 'center', alignItems: 'center' },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: '700', letterSpacing: 0.5 },
   
-  transactionsSection: { backgroundColor: 'rgba(255,255,255,0.06)', padding: 22, borderRadius: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  transactionsSection: { backgroundColor: COLORS.cardBg, padding: 22, borderRadius: 24, borderWidth: 1, borderColor: COLORS.border },
   transactionItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)' },
   txLeft: { flexDirection: 'row', alignItems: 'center', flex: 1 },
   txIconBox: { width: 44, height: 44, borderRadius: 14, justifyContent: 'center', alignItems: 'center', marginRight: 14 },
   txTitle: { fontSize: 15, fontWeight: '700', color: '#fff', marginBottom: 2 },
-  txDate: { fontSize: 12, color: 'rgba(255,255,255,0.45)' },
+  txDate: { fontSize: 12, color: COLORS.textLight },
   txAmount: { fontSize: 16, fontWeight: '800' },
-  noTransactionsText: { color: 'rgba(255,255,255,0.4)', fontStyle: 'italic', marginTop: 10, textAlign: 'center' }
+  noTransactionsText: { color: COLORS.textLight, fontStyle: 'italic', marginTop: 10, textAlign: 'center' }
 });

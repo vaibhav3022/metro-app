@@ -3,17 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../context/AuthContext';
 import { Ticket, ArrowRight, ArrowLeftRight, Users, RefreshCw, Milestone, Landmark } from 'lucide-react';
 
-const ALL_STATIONS = [
-  // Purple Line
+const PURPLE_LINE_STATIONS = [
   'PCMC', 'Sant Tukaram Nagar', 'Bhosari', 'Kasarwadi', 'Phugewadi', 
   'Dapodi', 'Bopodi', 'Khadki', 'Range Hills', 'Shivajinagar', 
-  'Civil Court', 'Budhwar Peth', 'Mandai', 'Swargate',
-  // Aqua Line
+  'Civil Court', 'Budhwar Peth', 'Mandai', 'Swargate'
+];
+
+const AQUA_LINE_STATIONS = [
   'Vanaz', 'Anand Nagar', 'Ideal Colony', 'Nal Stop', 'Garware College', 
   'Deccan Gymkhana', 'Chhatrapati Sambhaji Udyan', 'PMC', 'Mangalwar Peth', 
   'Pune Railway Station', 'Ruby Hall Clinic', 'Bund Garden', 'Yerawada', 
   'Kalyani Nagar', 'Ramwadi'
-].filter((v, i, a) => a.indexOf(v) === i); // Remove duplicates (like Civil Court)
+];
+
+const ALL_STATIONS = [...PURPLE_LINE_STATIONS, ...AQUA_LINE_STATIONS].filter((v, i, a) => a.indexOf(v) === i);
 
 export default function BookTicket() {
   const navigate = useNavigate();
@@ -21,7 +24,7 @@ export default function BookTicket() {
   const [source, setSource] = useState('');
   const [destination, setDestination] = useState('');
   const [passengers, setPassengers] = useState(1);
-  const [isReturn, setIsReturn] = useState(false);
+  const isReturn = false; // Locked to false as Return journey option is removed
   
   const [loading, setLoading] = useState(false);
   const [fareInfo, setFareInfo] = useState(null);
@@ -89,7 +92,7 @@ export default function BookTicket() {
         Book Metro Ticket
       </h1>
       <p style={{ color: 'var(--text-secondary)', marginBottom: '32px' }}>
-        Select your stations and book single or return journey tickets instantly.
+        Select your stations and book single journey tickets instantly.
       </p>
 
       {error && (
@@ -109,12 +112,19 @@ export default function BookTicket() {
               className="input-field" 
               value={source} 
               onChange={(e) => { setSource(e.target.value); setFareInfo(null); }}
-              style={{ background: '#0e0f22' }}
+              style={{ appearance: 'auto' }}
             >
               <option value="">Select Origin Station</option>
-              {ALL_STATIONS.map(s => (
-                <option key={s} value={s}>{s}</option>
-              ))}
+              <optgroup label="Purple Line" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                {PURPLE_LINE_STATIONS.map(s => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Aqua Line" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                {AQUA_LINE_STATIONS.map(s => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </optgroup>
             </select>
           </div>
 
@@ -135,12 +145,19 @@ export default function BookTicket() {
               className="input-field" 
               value={destination} 
               onChange={(e) => { setDestination(e.target.value); setFareInfo(null); }}
-              style={{ background: '#0e0f22' }}
+              style={{ appearance: 'auto' }}
             >
               <option value="">Select Destination Station</option>
-              {ALL_STATIONS.filter(s => s !== source).map(s => (
-                <option key={s} value={s}>{s}</option>
-              ))}
+              <optgroup label="Purple Line" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                {PURPLE_LINE_STATIONS.filter(s => s !== source).map(s => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Aqua Line" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                {AQUA_LINE_STATIONS.filter(s => s !== source).map(s => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </optgroup>
             </select>
           </div>
 
@@ -153,22 +170,22 @@ export default function BookTicket() {
               <div style={{ fontWeight: '700', fontSize: '15px' }}>Number of Passengers</div>
               <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Max 6 per booking</div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', border: '1px solid var(--glass-border)', padding: '4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-primary)', borderRadius: '12px', border: '1px solid var(--glass-border)', padding: '4px' }}>
               <button 
                 type="button"
-                className="btn btn-secondary" 
+                className="btn" 
                 onClick={() => { setPassengers(Math.max(1, passengers - 1)); setFareInfo(null); }}
-                style={{ width: '36px', height: '36px', padding: 0, minWidth: '36px', borderRadius: '8px' }}
+                style={{ width: '36px', height: '36px', padding: 0, minWidth: '36px', borderRadius: '8px', background: 'var(--accent-teal)', color: '#fff' }}
                 disabled={passengers <= 1}
               >
                 -
               </button>
-              <span style={{ width: '40px', textAlign: 'center', fontWeight: 'bold', fontSize: '16px' }}>{passengers}</span>
+              <span style={{ width: '40px', textAlign: 'center', fontWeight: 'bold', fontSize: '16px', color: 'var(--text-primary)' }}>{passengers}</span>
               <button 
                 type="button"
-                className="btn btn-secondary" 
+                className="btn" 
                 onClick={() => { setPassengers(Math.min(6, passengers + 1)); setFareInfo(null); }}
-                style={{ width: '36px', height: '36px', padding: 0, minWidth: '36px', borderRadius: '8px' }}
+                style={{ width: '36px', height: '36px', padding: 0, minWidth: '36px', borderRadius: '8px', background: 'var(--accent-teal)', color: '#fff' }}
                 disabled={passengers >= 6}
               >
                 +
@@ -176,31 +193,6 @@ export default function BookTicket() {
             </div>
           </div>
 
-          {/* Journey Type */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px' }}>
-            <div>
-              <div style={{ fontWeight: '700', fontSize: '15px' }}>Journey Type</div>
-              <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>One-way or Return trip</div>
-            </div>
-            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', padding: '4px', border: '1px solid var(--glass-border)' }}>
-              <button 
-                type="button" 
-                onClick={() => { setIsReturn(false); setFareInfo(null); }}
-                className="btn" 
-                style={{ padding: '8px 16px', background: !isReturn ? 'rgba(0, 201, 167, 0.15)' : 'transparent', color: !isReturn ? 'var(--accent-teal)' : 'var(--text-secondary)', fontSize: '13px' }}
-              >
-                One-Way
-              </button>
-              <button 
-                type="button" 
-                onClick={() => { setIsReturn(true); setFareInfo(null); }}
-                className="btn" 
-                style={{ padding: '8px 16px', background: isReturn ? 'rgba(0, 201, 167, 0.15)' : 'transparent', color: isReturn ? 'var(--accent-teal)' : 'var(--text-secondary)', fontSize: '13px' }}
-              >
-                Return
-              </button>
-            </div>
-          </div>
 
           <button 
             type="button" 

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import COLORS from '../constants/colors';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet,
   StatusBar, ActivityIndicator, Dimensions, Image, FlatList
@@ -83,7 +84,7 @@ export default function HomeScreen({ navigation }) {
   ];
 
   return (
-    <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.container}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
 
       {/* ── STICKY TOP: Header + Slider ── */}
@@ -95,7 +96,7 @@ export default function HomeScreen({ navigation }) {
             <Text style={styles.userName}>{user?.name || 'Passenger'} 👋</Text>
           </View>
           <TouchableOpacity onPress={() => navigation.navigate('ProfileTab')} style={styles.avatarWrap}>
-            <LinearGradient colors={['#00C9A7', '#9B59B6']} style={styles.avatar}>
+            <LinearGradient colors={[COLORS.secondary, COLORS.primary]} style={styles.avatar}>
               <Text style={styles.avatarText}>{(user?.name || 'P')[0].toUpperCase()}</Text>
             </LinearGradient>
           </TouchableOpacity>
@@ -184,7 +185,7 @@ export default function HomeScreen({ navigation }) {
             <Icon name="ticket-confirmation-outline" size={44} color="rgba(255,255,255,0.2)" />
             <Text style={styles.emptyText}>No active tickets found</Text>
             <TouchableOpacity style={styles.bookBtn} onPress={() => navigation.navigate('RouteSelection')}>
-              <LinearGradient colors={['#00C9A7', '#009980']} style={styles.bookBtnGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+              <LinearGradient colors={[COLORS.secondary, COLORS.secondary]} style={styles.bookBtnGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
                 <Text style={styles.bookBtnText}>Book Now</Text>
               </LinearGradient>
             </TouchableOpacity>
@@ -212,18 +213,18 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   stickyTop: {
     paddingTop: 50,
-    backgroundColor: '#0A0A1A',
+    backgroundColor: COLORS.background,
     zIndex: 10,
   },
   scroll: { paddingTop: 10, paddingBottom: 30 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 22, marginBottom: 22 },
-  greeting: { fontSize: 14, color: 'rgba(255,255,255,0.55)' },
-  userName: { fontSize: 22, fontWeight: '800', color: '#fff', marginTop: 2 },
+  greeting: { fontSize: 14, color: COLORS.textLight },
+  userName: { fontSize: 22, fontWeight: '800', color: COLORS.text, marginTop: 2 },
   avatarWrap: { borderRadius: 28, overflow: 'hidden' },
   avatar: { width: 50, height: 50, borderRadius: 25, justifyContent: 'center', alignItems: 'center' },
   avatarText: { fontSize: 20, fontWeight: '800', color: '#fff' },
 
-  sliderContainer: { width: '100%', height: 190, marginBottom: 20, overflow: 'hidden', backgroundColor: 'rgba(255,255,255,0.05)' },
+  sliderContainer: { width: '100%', height: 190, marginBottom: 20, overflow: 'hidden', backgroundColor: COLORS.cardBg },
   slideWrap: { height: 190 },
   slideImage: { width: '100%', height: '100%', resizeMode: 'cover' },
   slideOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 80, justifyContent: 'flex-end', padding: 16 },
@@ -232,32 +233,32 @@ const styles = StyleSheet.create({
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.4)' },
   activeDot: { width: 18, backgroundColor: '#00C9A7' },
 
-  sectionTitle: { fontSize: 17, fontWeight: '800', color: '#fff', marginHorizontal: 22, marginBottom: 14 },
+  sectionTitle: { fontSize: 17, fontWeight: '800', color: COLORS.text, marginHorizontal: 22, marginBottom: 14 },
   sectionRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 22 },
   viewAll: { color: '#00C9A7', fontWeight: '700', fontSize: 13 },
 
   grid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 14, marginBottom: 28 },
   gridItem: { width: '25%', alignItems: 'center', marginBottom: 18, paddingHorizontal: 4 },
-  iconBox: { width: 58, height: 58, borderRadius: 16, justifyContent: 'center', alignItems: 'center', marginBottom: 7, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
-  gridText: { fontSize: 11, color: 'rgba(255,255,255,0.75)', textAlign: 'center', fontWeight: '600' },
+  iconBox: { width: 58, height: 58, borderRadius: 16, justifyContent: 'center', alignItems: 'center', marginBottom: 7, borderWidth: 1, borderColor: COLORS.border },
+  gridText: { fontSize: 11, color: COLORS.text, textAlign: 'center', fontWeight: '600' },
 
-  emptyCard: { backgroundColor: 'rgba(255,255,255,0.05)', marginHorizontal: 22, borderRadius: 18, padding: 28, alignItems: 'center', marginBottom: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
-  emptyText: { color: 'rgba(255,255,255,0.4)', marginTop: 10, marginBottom: 16, fontSize: 14 },
+  emptyCard: { backgroundColor: COLORS.cardBg, marginHorizontal: 22, borderRadius: 18, padding: 28, alignItems: 'center', marginBottom: 16, borderWidth: 1, borderColor: COLORS.border },
+  emptyText: { color: COLORS.textLight, marginTop: 10, marginBottom: 16, fontSize: 14 },
   bookBtn: { borderRadius: 22, overflow: 'hidden' },
   bookBtnGrad: { paddingHorizontal: 28, paddingVertical: 11 },
   bookBtnText: { color: '#fff', fontWeight: '700', fontSize: 14 },
 
-  notifCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.05)', marginHorizontal: 22, borderRadius: 14, padding: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
-  notifTitle: { color: '#fff', fontWeight: '700', fontSize: 14 },
-  notifSub: { color: 'rgba(255,255,255,0.45)', fontSize: 12, marginTop: 2 },
+  notifCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.cardBg, marginHorizontal: 22, borderRadius: 14, padding: 16, borderWidth: 1, borderColor: COLORS.border },
+  notifTitle: { color: COLORS.text, fontWeight: '700', fontSize: 14 },
+  notifSub: { color: COLORS.textLight, fontSize: 12, marginTop: 2 },
 
-  activeTicketCard: { backgroundColor: 'rgba(255,255,255,0.08)', marginHorizontal: 22, borderRadius: 20, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: 'rgba(0,201,167,0.3)' },
+  activeTicketCard: { backgroundColor: COLORS.cardBg, marginHorizontal: 22, borderRadius: 20, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: 'rgba(0,201,167,0.3)' },
   ticketHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
   ticketIconWrap: { width: 50, height: 50, borderRadius: 16, backgroundColor: 'rgba(0,201,167,0.15)', justifyContent: 'center', alignItems: 'center', marginRight: 14 },
   ticketInfo: { flex: 1 },
   ticketRoute: { fontSize: 16, fontWeight: '800', color: '#fff', marginBottom: 4 },
   ticketStatusText: { fontSize: 13, color: '#00C9A7', fontWeight: '700' },
-  ticketFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)', paddingTop: 14 },
-  ticketDetails: { fontSize: 14, color: 'rgba(255,255,255,0.7)', fontWeight: '500' },
+  ticketFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, borderTopColor: COLORS.border, paddingTop: 14 },
+  ticketDetails: { fontSize: 14, color: COLORS.textLight, fontWeight: '500' },
   ticketFare: { fontSize: 18, fontWeight: '900', color: '#fff' },
 });

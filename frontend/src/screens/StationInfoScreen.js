@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import COLORS from '../constants/colors';
 import { StyleSheet, View, Text, TouchableOpacity, StatusBar, ScrollView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -37,7 +38,7 @@ export default function StationInfoScreen({ navigation }) {
   const facilities = getFacilities(station);
 
   return (
-    <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.container}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.header}>
@@ -70,10 +71,10 @@ export default function StationInfoScreen({ navigation }) {
           <View style={styles.facilitiesGrid}>
             {facilities.map((fac) => (
               <View key={fac.id} style={[styles.facCard, { opacity: fac.status ? 1 : 0.6 }]}>
-                <View style={[styles.facIconBg, !fac.status && { backgroundColor: 'rgba(255,255,255,0.05)' }]}>
+                <View style={[styles.facIconBg, !fac.status && { backgroundColor: COLORS.cardBg }]}>
                   <MaterialCommunityIcons name={fac.icon} size={32} color={fac.status ? '#00C9A7' : 'rgba(255,255,255,0.4)'} />
                 </View>
-                <Text style={[styles.facText, !fac.status && { color: 'rgba(255,255,255,0.5)' }]}>{fac.name}</Text>
+                <Text style={[styles.facText, !fac.status && { color: COLORS.textLight }]}>{fac.name}</Text>
                 {!fac.status && (
                   <View style={styles.notAvailableBadge}>
                     <Text style={styles.notAvailable}>Unavailable</Text>
@@ -91,21 +92,21 @@ export default function StationInfoScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 40 : 10, paddingBottom: 16 },
-  headerTitle: { fontSize: 20, fontWeight: '900', color: '#fff', letterSpacing: 0.5 },
-  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  headerTitle: { fontSize: 20, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
+  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
   
   content: { padding: 20, paddingBottom: 40 },
   
-  card: { backgroundColor: 'rgba(255,255,255,0.06)', padding: 24, borderRadius: 28, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', marginBottom: 30 },
+  card: { backgroundColor: COLORS.cardBg, padding: 24, borderRadius: 28, borderWidth: 1, borderColor: COLORS.border, marginBottom: 30 },
   cardHeaderRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
   iconCircle: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(155,89,182,0.15)', justifyContent: 'center', alignItems: 'center', marginRight: 12, borderWidth: 1, borderColor: 'rgba(155,89,182,0.3)' },
-  label: { fontSize: 16, fontWeight: '800', color: '#fff' },
-  dropdownWrap: { backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  label: { fontSize: 16, fontWeight: '800', color: COLORS.text },
+  dropdownWrap: { backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border },
   
-  sectionTitle: { fontSize: 18, fontWeight: '800', color: '#fff', marginBottom: 20, letterSpacing: 0.5 },
+  sectionTitle: { fontSize: 18, fontWeight: '800', color: COLORS.text, marginBottom: 20, letterSpacing: 0.5 },
   
   facilitiesGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
-  facCard: { width: '47%', backgroundColor: 'rgba(255,255,255,0.04)', padding: 20, borderRadius: 24, alignItems: 'center', marginBottom: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  facCard: { width: '47%', backgroundColor: COLORS.cardBg, padding: 20, borderRadius: 24, alignItems: 'center', marginBottom: 16, borderWidth: 1, borderColor: COLORS.border },
   facIconBg: { width: 64, height: 64, borderRadius: 32, backgroundColor: 'rgba(0,201,167,0.1)', justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
   facText: { fontSize: 13, fontWeight: '700', color: '#fff', textAlign: 'center', lineHeight: 18 },
   

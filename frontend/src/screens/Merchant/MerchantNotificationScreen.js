@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import COLORS from '../../constants/colors';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator, StatusBar, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -51,7 +52,7 @@ export default function MerchantNotificationScreen({ navigation }) {
   };
 
   return (
-    <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.container}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         {toast.visible && <ToastMessage message={toast.message} type={toast.type} onHide={() => setToast({ ...toast, visible: false })} />}
@@ -101,26 +102,26 @@ export default function MerchantNotificationScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 20 : 10, paddingBottom: 16 },
-  backButton: { padding: 10, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  headerTitle: { fontSize: 20, fontWeight: '900', color: '#fff', letterSpacing: 0.5 },
-  markAllBtn: { padding: 10, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  backButton: { padding: 10, backgroundColor: COLORS.cardBg, borderRadius: 20, borderWidth: 1, borderColor: COLORS.border },
+  headerTitle: { fontSize: 20, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
+  markAllBtn: { padding: 10, backgroundColor: COLORS.cardBg, borderRadius: 20, borderWidth: 1, borderColor: COLORS.border },
   
   scrollContentEmpty: { flexGrow: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   scrollContent: { padding: 20, paddingBottom: 50 },
   
-  card: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.04)', padding: 18, borderRadius: 24, marginBottom: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  card: { flexDirection: 'row', backgroundColor: COLORS.cardBg, padding: 18, borderRadius: 24, marginBottom: 16, borderWidth: 1, borderColor: COLORS.border },
   unreadCard: { backgroundColor: 'rgba(155,89,182,0.05)', borderColor: 'rgba(155,89,182,0.2)' },
   
-  iconContainer: { width: 50, height: 50, borderRadius: 25, backgroundColor: 'rgba(255,255,255,0.06)', justifyContent: 'center', alignItems: 'center', marginRight: 16 },
+  iconContainer: { width: 50, height: 50, borderRadius: 25, backgroundColor: COLORS.cardBg, justifyContent: 'center', alignItems: 'center', marginRight: 16 },
   cardContent: { flex: 1 },
-  title: { fontSize: 16, fontWeight: '700', color: '#fff', marginBottom: 6 },
+  title: { fontSize: 16, fontWeight: '700', color: COLORS.text, marginBottom: 6 },
   unreadText: { color: '#9B59B6', fontWeight: '800' },
-  message: { fontSize: 14, color: 'rgba(255,255,255,0.6)', lineHeight: 22 },
-  time: { fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 8, fontWeight: '600' },
+  message: { fontSize: 14, color: COLORS.textLight, lineHeight: 22 },
+  time: { fontSize: 12, color: COLORS.textLight, marginTop: 8, fontWeight: '600' },
   unreadDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#9B59B6', alignSelf: 'center', marginLeft: 10 },
   
   emptyContainer: { alignItems: 'center', justifyContent: 'center', marginTop: -50 },
   iconCircle: { width: 100, height: 100, borderRadius: 50, backgroundColor: 'rgba(155,89,182,0.1)', alignItems: 'center', justifyContent: 'center', marginBottom: 20, borderWidth: 1, borderColor: 'rgba(155,89,182,0.3)' },
   emptyTitle: { fontSize: 22, fontWeight: '900', color: '#fff', marginBottom: 8 },
-  emptySubtitle: { fontSize: 15, color: 'rgba(255,255,255,0.5)', textAlign: 'center' }
+  emptySubtitle: { fontSize: 15, color: COLORS.textLight, textAlign: 'center' }
 });

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import COLORS from '../constants/colors';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   ActivityIndicator, Alert, KeyboardAvoidingView, Platform,
@@ -97,7 +98,7 @@ export default function LoginScreen({ navigation }) {
   };
 
   return (
-    <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.gradient}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.gradient}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
@@ -110,7 +111,7 @@ export default function LoginScreen({ navigation }) {
               delayLongPress={1000}
               style={{ alignItems: 'center' }}
             >
-              <LinearGradient colors={['#00C9A7', '#9B59B6']} style={styles.iconCircle} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+              <LinearGradient colors={[COLORS.secondary, COLORS.primary]} style={styles.iconCircle} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
                 <Icon name="subway-variant" size={44} color="#fff" />
               </LinearGradient>
               <Text style={styles.title}>PUNE METRO</Text>
@@ -266,13 +267,13 @@ export default function LoginScreen({ navigation }) {
             {/* Action Buttons */}
             {(!isRegister && activeTab === 'merchant') ? (
               <TouchableOpacity style={styles.btn} onPress={() => handlePasswordLogin('merchant')} disabled={loading}>
-                <LinearGradient colors={['#3498DB', '#1A5276']} style={styles.btnGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                <LinearGradient colors={['#1976D2', '#1565C0']} style={styles.btnGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
                   {loading ? <ActivityIndicator color="#fff" /> : <><Icon name="login" size={18} color="#fff" /><Text style={styles.btnText}>Login</Text></>}
                 </LinearGradient>
               </TouchableOpacity>
             ) : (
               <TouchableOpacity style={styles.btn} onPress={handleSendOTP} disabled={loading}>
-                <LinearGradient colors={['#00C9A7', '#009980']} style={styles.btnGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                <LinearGradient colors={[COLORS.secondary, COLORS.secondary]} style={styles.btnGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
                   {loading ? <ActivityIndicator color="#fff" /> : <><Icon name="message-text-outline" size={18} color="#fff" /><Text style={styles.btnText}>Send OTP</Text></>}
                 </LinearGradient>
               </TouchableOpacity>
@@ -308,7 +309,7 @@ export default function LoginScreen({ navigation }) {
               </TouchableOpacity>
             </View>
             <TouchableOpacity style={styles.btn} onPress={() => handlePasswordLogin('admin')} disabled={loading}>
-              <LinearGradient colors={['#9B59B6', '#6C3483']} style={styles.btnGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+              <LinearGradient colors={[COLORS.primary, COLORS.primary]} style={styles.btnGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
                 {loading ? <ActivityIndicator color="#fff" /> : <><Icon name="login" size={18} color="#fff" /><Text style={styles.btnText}>Authenticate</Text></>}
               </LinearGradient>
             </TouchableOpacity>
@@ -325,23 +326,23 @@ const styles = StyleSheet.create({
   scrollContainer: { flexGrow: 1, paddingHorizontal: 24, paddingTop: 60, paddingBottom: 30 },
   logoArea: { alignItems: 'center', marginBottom: 32 },
   iconCircle: { width: 90, height: 90, borderRadius: 45, justifyContent: 'center', alignItems: 'center', marginBottom: 14, elevation: 12 },
-  title: { fontSize: 28, fontWeight: '900', color: '#fff', letterSpacing: 3 },
-  subtitle: { fontSize: 14, color: 'rgba(255,255,255,0.55)', marginTop: 4, letterSpacing: 0.5 },
-  card: { backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 24, padding: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  title: { fontSize: 28, fontWeight: '900', color: COLORS.text, letterSpacing: 3 },
+  subtitle: { fontSize: 14, color: COLORS.textLight, marginTop: 4, letterSpacing: 0.5 },
+  card: { backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 22, borderWidth: 1, borderColor: COLORS.border },
   cardTitle: { fontSize: 22, fontWeight: '900', color: '#fff', marginBottom: 18, textAlign: 'center', letterSpacing: 0.5 },
-  tabRow: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 12, marginBottom: 20, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  tabRow: { flexDirection: 'row', backgroundColor: COLORS.cardBg, borderRadius: 12, marginBottom: 20, overflow: 'hidden', borderWidth: 1, borderColor: COLORS.border },
   tab: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 12, gap: 5 },
   tabActive: { backgroundColor: 'rgba(0,201,167,0.2)' },
-  tabText: { fontSize: 13, color: 'rgba(255,255,255,0.5)', fontWeight: '700' },
+  tabText: { fontSize: 13, color: COLORS.textLight, fontWeight: '700' },
   tabTextActive: { color: '#00C9A7' },
   
   toggleRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 20, gap: 15 },
-  toggleText: { fontSize: 15, color: 'rgba(255,255,255,0.4)', fontWeight: '700' },
+  toggleText: { fontSize: 15, color: COLORS.textLight, fontWeight: '700' },
   toggleTextActive: { color: '#fff', fontWeight: '900' },
   toggleDivider: { width: 2, height: 16, backgroundColor: 'rgba(255,255,255,0.2)' },
 
-  label: { fontSize: 13, color: 'rgba(255,255,255,0.6)', marginBottom: 6, marginTop: 14, fontWeight: '600' },
-  inputRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: 12, paddingHorizontal: 14, height: 52, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', gap: 10 },
+  label: { fontSize: 13, color: COLORS.textLight, marginBottom: 6, marginTop: 14, fontWeight: '600' },
+  inputRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, borderRadius: 12, paddingHorizontal: 14, height: 52, borderWidth: 1, borderColor: COLORS.border, gap: 10 },
   input: { flex: 1, fontSize: 15, color: '#fff' },
   btn: { marginTop: 24, borderRadius: 14, overflow: 'hidden', elevation: 5 },
   btnGrad: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 16, gap: 8 },
@@ -349,7 +350,7 @@ const styles = StyleSheet.create({
   footer: { textAlign: 'center', color: 'rgba(255,255,255,0.3)', marginTop: 28, fontSize: 12, fontWeight: '600' },
   
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', alignItems: 'center', padding: 20 },
-  adminCard: { width: '100%', backgroundColor: '#141432', borderRadius: 24, padding: 24, borderWidth: 1, borderColor: 'rgba(155,89,182,0.3)', position: 'relative' },
+  adminCard: { width: '100%', backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 24, borderWidth: 1, borderColor: 'rgba(155,89,182,0.3)', position: 'relative' },
   closeAdmin: { position: 'absolute', top: 15, right: 15, zIndex: 10, padding: 5 },
   adminHeader: { alignItems: 'center', marginBottom: 20 },
   adminTitle: { fontSize: 20, fontWeight: '900', color: '#fff', marginTop: 10, letterSpacing: 1 }

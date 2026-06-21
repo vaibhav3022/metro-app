@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calculator, MapPin, Clock, ArrowRightLeft } from 'lucide-react';
+import { Calculator, MapPin, Clock } from 'lucide-react';
 
 const ALL_STATIONS = [
   "PCMC", "Sant Tukaram Nagar", "Bhosari (Nashik Phata)", "Kasarwadi",
@@ -66,12 +66,17 @@ export default function FareCalculator() {
             onClick={handleSwap}
             style={{
               position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-              width: '40px', height: '40px', borderRadius: '20px', background: 'var(--bg-dark)',
+              width: '40px', height: '40px', borderRadius: '20px', background: 'var(--bg-secondary)',
               border: '1px solid var(--accent-teal)', color: 'var(--accent-teal)',
               display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', zIndex: 2
             }}
           >
-            <ArrowRightLeft size={18} style={{ transform: 'rotate(90deg)' }} />
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ transform: 'rotate(90deg)' }}>
+              <path d="m17 2 4 4-4 4" />
+              <path d="M3 6h18" />
+              <path d="M7 22l-4-4 4-4" />
+              <path d="M21 18H3" />
+            </svg>
           </button>
         </div>
 

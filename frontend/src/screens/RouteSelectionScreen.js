@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import COLORS from '../constants/colors';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView,
   Alert, ActivityIndicator, SafeAreaView, Platform, StatusBar
@@ -59,7 +60,7 @@ export default function RouteSelectionScreen() {
   };
 
   return (
-    <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.container}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -158,7 +159,7 @@ export default function RouteSelectionScreen() {
               onPress={handleCalculateFare}
               disabled={loading}
             >
-              <LinearGradient colors={['#00C9A7', '#009980']} style={styles.calcButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+              <LinearGradient colors={[COLORS.secondary, COLORS.secondary]} style={styles.calcButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
                 {loading ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
@@ -180,33 +181,33 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   scrollContent: { padding: 20, paddingBottom: 50, paddingTop: Platform.OS === 'android' ? 40 : 10 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 },
-  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  headerTitle: { fontSize: 22, fontWeight: '900', color: '#fff', letterSpacing: 0.5 },
+  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
+  headerTitle: { fontSize: 22, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
   
   errorBox: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(239,68,68,0.15)', borderWidth: 1, borderColor: 'rgba(239,68,68,0.3)', padding: 16, borderRadius: 16, marginBottom: 16 },
   errorText: { flex: 1, color: '#EF4444', fontSize: 14, fontWeight: '600' },
   
-  card: { backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 28, padding: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  card: { backgroundColor: COLORS.cardBg, borderRadius: 28, padding: 24, borderWidth: 1, borderColor: COLORS.border },
   
   swapButton: { alignSelf: 'center', marginVertical: -10, zIndex: 10 },
-  swapIconWrap: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#141432', justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: 'rgba(0,201,167,0.4)' },
+  swapIconWrap: { width: 48, height: 48, borderRadius: 24, backgroundColor: COLORS.cardBg, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: 'rgba(0,201,167,0.4)' },
   
-  divider: { borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.1)', marginVertical: 20 },
+  divider: { borderBottomWidth: 1, borderBottomColor: COLORS.border, marginVertical: 20 },
   
   rowBetween: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
   rowLabel: { fontSize: 16, fontWeight: '800', color: '#fff' },
-  rowSub: { fontSize: 13, color: 'rgba(255,255,255,0.5)', marginTop: 4, fontWeight: '500' },
+  rowSub: { fontSize: 13, color: COLORS.textLight, marginTop: 4, fontWeight: '500' },
   
-  counterWrap: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', padding: 6 },
-  counterBtn: { width: 44, height: 44, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
+  counterWrap: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border, padding: 6 },
+  counterBtn: { width: 44, height: 44, backgroundColor: COLORS.cardBg, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
   counterBtnDisabled: { backgroundColor: 'rgba(255,255,255,0.02)', opacity: 0.5 },
   counterBtnText: { fontSize: 24, fontWeight: '700', color: '#fff', marginTop: -2 },
   counterValue: { width: 40, textAlign: 'center', fontSize: 20, fontWeight: '800', color: '#fff' },
   
-  journeyTypeWrap: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.08)', padding: 6, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  journeyTypeWrap: { flexDirection: 'row', backgroundColor: COLORS.cardBg, padding: 6, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border },
   journeyBtn: { paddingHorizontal: 20, paddingVertical: 12, borderRadius: 12 },
   journeyBtnActive: { backgroundColor: 'rgba(0,201,167,0.2)' },
-  journeyBtnText: { fontSize: 14, fontWeight: '700', color: 'rgba(255,255,255,0.6)' },
+  journeyBtnText: { fontSize: 14, fontWeight: '700', color: COLORS.textLight },
   journeyBtnTextActive: { color: '#00C9A7' },
   
   calcButtonContainer: { marginTop: 24, borderRadius: 16, overflow: 'hidden' },

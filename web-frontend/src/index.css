@@ -1,29 +1,45 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 :root {
-  --bg-primary: #050510;
-  --bg-secondary: #0c0d21;
-  --bg-tertiary: #131130;
+  --bg-primary: #F5F5F5;
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary: #E0E0E0;
   
-  --accent-teal: #00c9a7;
-  --accent-purple: #9b59b6;
-  --accent-blue: #3498db;
-  --accent-rose: #e91e63;
-  --accent-orange: #ff6b35;
-  --accent-red: #ef4444;
+  --accent-teal: #00897B;
+  --accent-purple: #6A1B9A;
+  --accent-blue: #1976D2;
+  --accent-rose: #C2185B;
+  --accent-orange: #F57C00;
+  --accent-red: #D32F2F;
 
-  --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.7);
-  --text-muted: rgba(255, 255, 255, 0.4);
+  --text-primary: #212121;
+  --text-secondary: #757575;
+  --text-muted: #9E9E9E;
 
-  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'Space Grotesk', monospace;
 
-  --glass: rgba(255, 255, 255, 0.04);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-glow: rgba(0, 201, 167, 0.15);
+  --glass: #FFFFFF;
+  --glass-border: #E0E0E0;
+  --glass-glow: rgba(0, 137, 123, 0.1);
+  --box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.06);
   
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="dark"] {
+  --bg-primary: #0F172A;
+  --bg-secondary: #1E293B;
+  --bg-tertiary: #334155;
+  
+  --text-primary: #F8FAFC;
+  --text-secondary: #CBD5E1;
+  --text-muted: #64748B;
+
+  --glass: #1E293B;
+  --glass-border: #334155;
+  --glass-glow: rgba(0, 137, 123, 0.2);
+  --box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
 * {
@@ -60,11 +76,9 @@ body {
 /* Glassmorphism containers */
 .glass-panel {
   background: var(--glass);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border);
   border-radius: 20px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  box-shadow: var(--box-shadow);
   transition: var(--transition);
 }
 
@@ -104,12 +118,12 @@ button, .btn {
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--bg-tertiary);
   border: 1px solid var(--glass-border);
-  color: #fff;
+  color: var(--text-primary);
 }
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--bg-primary);
   transform: translateY(-2px);
 }
 
@@ -146,13 +160,13 @@ button, .btn {
 .input-field {
   width: 100%;
   height: 50px;
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--bg-secondary);
   border: 1px solid var(--glass-border);
   border-radius: 12px;
   padding: 0 16px;
   font-family: var(--font-sans);
   font-size: 15px;
-  color: #fff;
+  color: var(--text-primary);
   transition: var(--transition);
 }
 .input-field:focus {
@@ -169,7 +183,7 @@ button, .btn {
 
 .sidebar {
   width: 260px;
-  background: rgba(5, 5, 16, 0.85);
+  background: var(--bg-secondary);
   backdrop-filter: blur(20px);
   border-right: 1px solid var(--glass-border);
   display: flex;
@@ -248,10 +262,10 @@ button, .btn {
   font-weight: 700;
   text-transform: uppercase;
 }
-.badge-success { background: rgba(0, 201, 167, 0.15); color: var(--accent-teal); }
-.badge-warning { background: rgba(255, 107, 53, 0.15); color: var(--accent-orange); }
-.badge-danger { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
-.badge-primary { background: rgba(52, 152, 219, 0.15); color: var(--accent-blue); }
+.badge-success { background: rgba(46, 125, 50, 0.12); color: #2E7D32; }
+.badge-warning { background: rgba(245, 124, 0, 0.12); color: var(--accent-orange); }
+.badge-danger { background: rgba(211, 47, 47, 0.12); color: var(--accent-red); }
+.badge-primary { background: rgba(106, 27, 154, 0.12); color: var(--accent-purple); }
 
 .animate-pulse-slow {
   animation: pulse 3s infinite ease-in-out;

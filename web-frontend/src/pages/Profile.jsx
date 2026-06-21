@@ -66,9 +66,9 @@ export default function Profile() {
       {message.text && (
         <div style={{
           padding: '12px', borderRadius: '8px', marginBottom: '20px',
-          background: message.type === 'success' ? 'rgba(0, 201, 167, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-          color: message.type === 'success' ? 'var(--accent-teal)' : 'var(--accent-red)',
-          border: `1px solid ${message.type === 'success' ? 'rgba(0, 201, 167, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`
+          background: message.type === 'success' ? 'rgba(46, 125, 50, 0.12)' : 'rgba(239, 68, 68, 0.12)',
+          color: message.type === 'success' ? 'var(--success-color)' : 'var(--accent-red)',
+          border: `1px solid ${message.type === 'success' ? 'rgba(46, 125, 50, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`
         }}>
           {message.text}
         </div>
@@ -78,15 +78,15 @@ export default function Profile() {
         {/* Avatar Card */}
         <div className="col glass-panel" style={{ padding: '30px', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div style={{
-            width: '100px', height: '100px', borderRadius: '50%', background: 'linear-gradient(135deg, #00C9A7, #9B59B6)',
-            display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px', boxShadow: '0 8px 16px rgba(0,0,0,0.2)'
+            width: '100px', height: '100px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-teal), var(--accent-purple))',
+            display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px', boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
           }}>
             <span style={{ fontSize: '36px', fontWeight: '900', color: '#fff' }}>{initials}</span>
           </div>
 
           {!isEditing ? (
             <div style={{ width: '100%', textAlign: 'center' }}>
-              <h2 style={{ fontSize: '24px', fontWeight: '900', marginBottom: '4px' }}>{user?.name || 'Metro Traveler'}</h2>
+              <h2 style={{ fontSize: '24px', fontWeight: '900', marginBottom: '4px', color: 'var(--text-primary)' }}>{user?.name || 'Metro Traveler'}</h2>
               <div style={{ color: 'var(--text-secondary)', marginBottom: '16px', fontSize: '14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '4px' }}>
                   <Phone size={14} /> +91 {user?.phone || '9999999999'}
@@ -125,7 +125,7 @@ export default function Profile() {
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '10px' }}>
-                <button type="button" onClick={() => setIsEditing(false)} className="btn" style={{ flex: 1, background: 'rgba(255,255,255,0.08)', border: '1px solid var(--glass-border)' }}>
+                <button type="button" onClick={() => setIsEditing(false)} className="btn" style={{ flex: 1, background: 'var(--bg-primary)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)' }}>
                   <X size={16} /> Cancel
                 </button>
                 <button type="submit" disabled={loading} className="btn btn-primary" style={{ flex: 1 }}>
@@ -149,21 +149,21 @@ export default function Profile() {
                   borderBottom: idx < menuItems.length - 1 ? '1px solid var(--glass-border)' : 'none',
                   transition: 'background 0.2s',
                 }}
-                onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
+                onMouseOver={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.02)'}
                 onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
               >
-                <div style={{ padding: '10px', borderRadius: '12px', background: 'rgba(0,201,167,0.1)', color: 'var(--accent-teal)', marginRight: '16px' }}>
+                <div style={{ padding: '10px', borderRadius: '12px', background: 'rgba(0,137,123,0.1)', color: 'var(--accent-teal)', marginRight: '16px' }}>
                   {item.icon}
                 </div>
                 <div>
-                  <div style={{ fontSize: '16px', fontWeight: '800', color: '#fff' }}>{item.title}</div>
+                  <div style={{ fontSize: '16px', fontWeight: '800', color: 'var(--text-primary)' }}>{item.title}</div>
                   <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{item.subtitle}</div>
                 </div>
               </div>
             ))}
           </div>
 
-          <button onClick={handleLogout} className="btn" style={{ marginTop: '8px', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--accent-red)', border: '1px solid rgba(239, 68, 68, 0.3)', width: '100%', height: '54px' }}>
+          <button onClick={handleLogout} className="btn" style={{ marginTop: '8px', background: 'rgba(239, 68, 68, 0.08)', color: 'var(--accent-red)', border: '1px solid rgba(239, 68, 68, 0.2)', width: '100%', height: '54px' }}>
             <LogOut size={18} /> Log Out of Account
           </button>
         </div>

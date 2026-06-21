@@ -97,25 +97,26 @@ export default function Notifications() {
                 style={{
                   display: 'flex', gap: '16px', padding: '20px', cursor: item.isRead ? 'default' : 'pointer',
                   borderBottom: idx < notifications.length - 1 ? '1px solid var(--glass-border)' : 'none',
-                  background: item.isRead ? 'transparent' : 'rgba(0, 201, 167, 0.05)',
-                  transition: 'background 0.2s ease',
+                  borderLeft: item.isRead ? '4px solid transparent' : '4px solid var(--accent-teal)',
+                  background: item.isRead ? 'transparent' : 'var(--bg-primary)',
+                  transition: 'background 0.2s ease, border-left-color 0.2s ease',
                   position: 'relative'
                 }}
-                onMouseOver={(e) => { if (!item.isRead) e.currentTarget.style.background = 'rgba(0, 201, 167, 0.1)' }}
-                onMouseOut={(e) => { if (!item.isRead) e.currentTarget.style.background = 'rgba(0, 201, 167, 0.05)' }}
+                onMouseOver={(e) => { if (!item.isRead) e.currentTarget.style.background = 'var(--bg-tertiary)' }}
+                onMouseOut={(e) => { if (!item.isRead) e.currentTarget.style.background = 'var(--bg-primary)' }}
               >
                 <div style={{
                   width: '40px', height: '40px', borderRadius: '50%', flexShrink: 0,
-                  background: item.isRead ? 'rgba(255,255,255,0.05)' : 'rgba(0, 201, 167, 0.15)',
+                  background: item.isRead ? 'var(--bg-tertiary)' : 'rgba(0, 137, 123, 0.15)',
                   display: 'flex', justifyContent: 'center', alignItems: 'center'
                 }}>
                   {getIcon(item.type, item.isRead)}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <h4 style={{ fontSize: '16px', fontWeight: item.isRead ? '600' : '800', color: item.isRead ? '#fff' : 'var(--accent-teal)', marginBottom: '4px' }}>
+                  <h4 style={{ fontSize: '16px', fontWeight: item.isRead ? '600' : '800', color: item.isRead ? 'var(--text-secondary)' : 'var(--text-primary)', marginBottom: '4px' }}>
                     {item.title}
                   </h4>
-                  <p style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '8px' }}>
+                  <p style={{ fontSize: '14px', color: item.isRead ? 'var(--text-muted)' : 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '8px' }}>
                     {item.message}
                   </p>
                   <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '600' }}>

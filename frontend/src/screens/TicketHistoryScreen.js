@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import COLORS from '../constants/colors';
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
   ActivityIndicator, StatusBar, ScrollView, Platform
@@ -85,7 +86,7 @@ export default function TicketHistoryScreen() {
   );
 
   return (
-    <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.gradient}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.gradient}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <View style={styles.container}>
         <View style={styles.header}>
@@ -136,7 +137,7 @@ export default function TicketHistoryScreen() {
               No tickets matched the "{filter.toUpperCase()}" filter. Book a new ticket now.
             </Text>
             <TouchableOpacity onPress={() => navigation.navigate('RouteSelection')} style={styles.bookBtn}>
-              <LinearGradient colors={['#00C9A7', '#009980']} style={styles.bookButtonGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+              <LinearGradient colors={[COLORS.secondary, COLORS.secondary]} style={styles.bookButtonGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
                 <Text style={styles.bookButtonText}>Book Metro Ticket</Text>
               </LinearGradient>
             </TouchableOpacity>
@@ -151,37 +152,37 @@ const styles = StyleSheet.create({
   gradient: { flex: 1 },
   container: { flex: 1, padding: 20, paddingTop: Platform.OS === 'android' ? 40 : 20 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 },
-  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
   screenTitle: { fontSize: 24, fontWeight: '900', color: '#fff' },
   
   filterScroll: { flex: 1 },
   filterContainer: { gap: 10, paddingHorizontal: 4, alignItems: 'center' },
-  filterChip: { paddingHorizontal: 20, paddingVertical: 10, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.08)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  filterChip: { paddingHorizontal: 20, paddingVertical: 10, borderRadius: 24, backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.border },
   filterChipActive: { backgroundColor: '#00C9A7', borderColor: '#00C9A7' },
-  filterChipText: { fontSize: 14, fontWeight: '700', color: 'rgba(255,255,255,0.6)' },
+  filterChipText: { fontSize: 14, fontWeight: '700', color: COLORS.textLight },
   filterChipTextActive: { color: '#fff' },
   
   listContainer: { paddingBottom: 40 },
-  ticketCard: { backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 24, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  ticketCard: { backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: COLORS.border },
   ticketHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
   ticketIconWrap: { width: 50, height: 50, borderRadius: 16, backgroundColor: 'rgba(0,201,167,0.15)', justifyContent: 'center', alignItems: 'center', marginRight: 14 },
   ticketInfo: { flex: 1 },
   ticketRoute: { fontSize: 16, fontWeight: '800', color: '#fff', marginBottom: 4 },
-  ticketId: { fontSize: 12, color: 'rgba(255,255,255,0.4)' },
+  ticketId: { fontSize: 12, color: COLORS.textLight },
   statusBadge: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, borderWidth: 1 },
   statusText: { fontSize: 11, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5 },
   
   ticketFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.08)', paddingTop: 14 },
   ticketFare: { fontSize: 18, fontWeight: '900', color: '#00C9A7' },
-  ticketDate: { fontSize: 13, color: 'rgba(255,255,255,0.5)', fontWeight: '500' },
+  ticketDate: { fontSize: 13, color: COLORS.textLight, fontWeight: '500' },
   
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 16 },
-  loadingText: { color: 'rgba(255,255,255,0.6)', fontWeight: '600', fontSize: 15 },
+  loadingText: { color: COLORS.textLight, fontWeight: '600', fontSize: 15 },
   
   emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
-  emptyIconWrap: { width: 90, height: 90, borderRadius: 45, backgroundColor: 'rgba(255,255,255,0.06)', justifyContent: 'center', alignItems: 'center', marginBottom: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  emptyIconWrap: { width: 90, height: 90, borderRadius: 45, backgroundColor: COLORS.cardBg, justifyContent: 'center', alignItems: 'center', marginBottom: 20, borderWidth: 1, borderColor: COLORS.border },
   emptyTitle: { fontSize: 22, fontWeight: '900', color: '#fff', marginBottom: 10 },
-  emptySubtitle: { fontSize: 15, color: 'rgba(255,255,255,0.5)', textAlign: 'center', marginBottom: 30, lineHeight: 22 },
+  emptySubtitle: { fontSize: 15, color: COLORS.textLight, textAlign: 'center', marginBottom: 30, lineHeight: 22 },
   bookBtn: { borderRadius: 16, overflow: 'hidden' },
   bookButtonGrad: { paddingHorizontal: 30, paddingVertical: 14, justifyContent: 'center', alignItems: 'center' },
   bookButtonText: { color: '#fff', fontWeight: '800', fontSize: 16, letterSpacing: 0.5 },

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import COLORS from '../constants/colors';
 import {
   View, Text, StyleSheet, TouchableOpacity, TextInput,
   ScrollView, ActivityIndicator, Alert, SafeAreaView, StatusBar, Platform
@@ -110,7 +111,7 @@ export default function SmartCardScreen() {
     num.replace(/(\d{4})/g, '$1 ').trim();
 
   return (
-    <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.container}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -205,7 +206,7 @@ export default function SmartCardScreen() {
                   onPress={handleLinkCard}
                   disabled={loading || cardNumber.length !== 16}
                 >
-                  <LinearGradient colors={['#00C9A7', '#009980']} style={styles.linkButtonGrad} start={{x:0, y:0}} end={{x:1, y:0}}>
+                  <LinearGradient colors={[COLORS.secondary, COLORS.secondary]} style={styles.linkButtonGrad} start={{x:0, y:0}} end={{x:1, y:0}}>
                     {loading ? <ActivityIndicator color="#fff" /> : (
                       <>
                         <Icon name="link-variant" size={20} color="#fff" />
@@ -227,14 +228,14 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   scrollContent: { padding: 20, paddingBottom: 50, paddingTop: Platform.OS === 'android' ? 40 : 10 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 },
-  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  headerTitle: { fontSize: 22, fontWeight: '900', color: '#fff', letterSpacing: 0.5 },
+  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
+  headerTitle: { fontSize: 22, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
   
   centered: { height: 300, justifyContent: 'center', alignItems: 'center' },
-  sectionTitle: { fontSize: 16, fontWeight: '800', color: '#fff', marginBottom: 16, textTransform: 'uppercase', letterSpacing: 1 },
+  sectionTitle: { fontSize: 16, fontWeight: '800', color: COLORS.text, marginBottom: 16, textTransform: 'uppercase', letterSpacing: 1 },
   
   cardGradient: { borderRadius: 24, padding: 24, overflow: 'hidden', elevation: 8, shadowColor: '#F59E0B', shadowOpacity: 0.3, shadowRadius: 10, shadowOffset: {width: 0, height: 4} },
-  cardDecor: { position: 'absolute', top: -30, right: -30, width: 140, height: 140, borderRadius: 70, backgroundColor: 'rgba(255,255,255,0.1)' },
+  cardDecor: { position: 'absolute', top: -30, right: -30, width: 140, height: 140, borderRadius: 70, backgroundColor: COLORS.cardBg },
   cardHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 },
   cardLabel: { fontSize: 13, fontWeight: '700', color: 'rgba(255,255,255,0.8)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 1 },
   cardNumber: { fontSize: 24, fontWeight: '900', color: '#fff', letterSpacing: 4, marginBottom: 24, fontFamily: Platform.OS === 'ios' ? 'Courier New' : 'monospace' },
@@ -244,21 +245,21 @@ const styles = StyleSheet.create({
   rechargeBtn: { backgroundColor: '#fff', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 14 },
   rechargeBtnText: { color: '#D97706', fontWeight: '800', fontSize: 14 },
   
-  rechargeForm: { marginTop: 12, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 20, padding: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  rechargeInput: { backgroundColor: 'rgba(0,0,0,0.2)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', borderRadius: 14, paddingHorizontal: 16, paddingVertical: 16, color: '#fff', fontSize: 18, marginBottom: 16, fontWeight: '700' },
+  rechargeForm: { marginTop: 12, backgroundColor: COLORS.cardBg, borderRadius: 20, padding: 20, borderWidth: 1, borderColor: COLORS.border },
+  rechargeInput: { backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, borderWidth: 1, borderColor: COLORS.border, borderRadius: 14, paddingHorizontal: 16, paddingVertical: 16, color: '#fff', fontSize: 18, marginBottom: 16, fontWeight: '700' },
   rechargeActions: { flexDirection: 'row', gap: 12 },
-  cancelRecharge: { flex: 1, backgroundColor: 'rgba(255,255,255,0.08)', paddingVertical: 14, borderRadius: 12, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  cancelRecharge: { flex: 1, backgroundColor: COLORS.cardBg, paddingVertical: 14, borderRadius: 12, alignItems: 'center', borderWidth: 1, borderColor: COLORS.border },
   cancelRechargeText: { color: '#fff', fontWeight: '700', fontSize: 15 },
   confirmRecharge: { flex: 1, backgroundColor: '#00C9A7', paddingVertical: 14, borderRadius: 12, alignItems: 'center' },
   confirmRechargeText: { color: '#fff', fontWeight: '800', fontSize: 15 },
   
-  emptyCard: { backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 24, padding: 32, alignItems: 'center', marginBottom: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  emptyIconWrap: { width: 80, height: 80, borderRadius: 40, backgroundColor: 'rgba(255,255,255,0.06)', justifyContent: 'center', alignItems: 'center', marginBottom: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  emptyCard: { backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 32, alignItems: 'center', marginBottom: 24, borderWidth: 1, borderColor: COLORS.border },
+  emptyIconWrap: { width: 80, height: 80, borderRadius: 40, backgroundColor: COLORS.cardBg, justifyContent: 'center', alignItems: 'center', marginBottom: 16, borderWidth: 1, borderColor: COLORS.border },
   emptyTitle: { fontSize: 18, fontWeight: '800', color: '#fff', marginBottom: 8 },
-  emptySubtitle: { fontSize: 14, color: 'rgba(255,255,255,0.5)', textAlign: 'center', lineHeight: 22 },
+  emptySubtitle: { fontSize: 14, color: COLORS.textLight, textAlign: 'center', lineHeight: 22 },
   
-  linkCard: { backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 24, padding: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', marginTop: 8 },
-  inputRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.2)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', borderRadius: 16, paddingHorizontal: 16, marginBottom: 20 },
+  linkCard: { backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 24, borderWidth: 1, borderColor: COLORS.border, marginTop: 8 },
+  inputRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, paddingHorizontal: 16, marginBottom: 20 },
   inputIcon: { marginRight: 12 },
   cardInput: { flex: 1, paddingVertical: 16, fontSize: 16, color: '#fff', letterSpacing: 2, fontWeight: '600' },
   linkButtonWrap: { borderRadius: 14, overflow: 'hidden' },

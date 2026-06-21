@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import COLORS from '../constants/colors';
 import {
   StyleSheet, Text, View, TouchableOpacity, StatusBar,
   Alert, ScrollView, TextInput, ActivityIndicator, Platform
@@ -135,7 +136,7 @@ export default function PaymentScreen({ route, navigation }) {
   const selectOption = (methodId) => setSelectedMethod(methodId);
 
   return (
-    <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.container}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       
       {loading && (
@@ -302,8 +303,8 @@ export default function PaymentScreen({ route, navigation }) {
 
         <View style={styles.footer}>
           <TouchableOpacity onPress={processPayment} disabled={!selectedMethod} style={{ width: '100%', borderRadius: 16, overflow: 'hidden' }}>
-            <LinearGradient colors={!selectedMethod ? ['rgba(255,255,255,0.1)', 'rgba(255,255,255,0.1)'] : ['#00C9A7', '#009980']} style={styles.payButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-              <Text style={[styles.payButtonText, !selectedMethod && { color: 'rgba(255,255,255,0.4)' }]}>
+            <LinearGradient colors={!selectedMethod ? ['rgba(255,255,255,0.1)', 'rgba(255,255,255,0.1)'] : [COLORS.secondary, COLORS.secondary]} style={styles.payButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+              <Text style={[styles.payButtonText, !selectedMethod && { color: COLORS.textLight }]}>
                 {selectedMethod ? `PAY ₹${finalAmount}` : 'SELECT METHOD'}
               </Text>
               <Icon name="lock" size={18} color={!selectedMethod ? 'rgba(255,255,255,0.4)' : '#fff'} style={{ marginLeft: 8 }} />
@@ -318,24 +319,24 @@ export default function PaymentScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 40 : 10, paddingBottom: 16 },
-  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  headerTitle: { fontSize: 20, fontWeight: '800', color: '#fff', letterSpacing: 0.5 },
+  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
+  headerTitle: { fontSize: 20, fontWeight: '800', color: COLORS.text, letterSpacing: 0.5 },
   
   loadingOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(10,10,26,0.9)', justifyContent: 'center', alignItems: 'center', zIndex: 100, gap: 16 },
   loadingMsg: { fontSize: 16, fontWeight: '700', color: '#fff' },
 
   scrollContent: { padding: 20, paddingBottom: 40 },
-  summaryCard: { backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 24, padding: 30, alignItems: 'center', marginBottom: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  totalPayableLabel: { fontSize: 13, color: 'rgba(255,255,255,0.5)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 },
+  summaryCard: { backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 30, alignItems: 'center', marginBottom: 24, borderWidth: 1, borderColor: COLORS.border },
+  totalPayableLabel: { fontSize: 13, color: COLORS.textLight, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 },
   totalPayableAmount: { fontSize: 40, fontWeight: '900', color: '#00C9A7', marginBottom: 12 },
-  orderIdText: { fontSize: 12, color: 'rgba(255,255,255,0.4)', fontWeight: '500' },
+  orderIdText: { fontSize: 12, color: COLORS.textLight, fontWeight: '500' },
   
   merchantLabelWrap: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16, backgroundColor: 'rgba(0, 201, 167, 0.1)', paddingVertical: 8, paddingHorizontal: 16, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(0, 201, 167, 0.2)' },
   merchantLabel: { fontSize: 14, color: '#fff', fontWeight: '800' },
 
-  sectionTitle: { fontSize: 14, fontWeight: '800', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12, paddingHorizontal: 4 },
+  sectionTitle: { fontSize: 14, fontWeight: '800', color: COLORS.textLight, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12, paddingHorizontal: 4 },
   
-  accordionContainer: { backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 20, marginBottom: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' },
+  accordionContainer: { backgroundColor: COLORS.cardBg, borderRadius: 20, marginBottom: 16, borderWidth: 1, borderColor: COLORS.border, overflow: 'hidden' },
   accordionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16 },
   accordionLeft: { flexDirection: 'row', alignItems: 'center' },
   iconBg: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginRight: 16 },
@@ -346,8 +347,8 @@ const styles = StyleSheet.create({
   paymentOptionSelected: { backgroundColor: 'rgba(0,201,167,0.1)', borderColor: 'rgba(0,201,167,0.3)' },
   optionText: { fontSize: 15, fontWeight: '600', color: '#fff', marginLeft: 12 },
   
-  cardForm: { padding: 16, backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: 16, marginTop: 8 },
-  inputField: { backgroundColor: 'rgba(255,255,255,0.08)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', borderRadius: 12, paddingHorizontal: 16, height: 50, marginBottom: 12, fontSize: 15, color: '#fff', fontWeight: '500' },
+  cardForm: { padding: 16, backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, marginTop: 8 },
+  inputField: { backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.border, borderRadius: 12, paddingHorizontal: 16, height: 50, marginBottom: 12, fontSize: 15, color: '#fff', fontWeight: '500' },
   cardRow: { flexDirection: 'row', justifyContent: 'space-between' },
   
   footer: { padding: 20, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(10,10,26,0.8)' },

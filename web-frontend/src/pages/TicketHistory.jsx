@@ -174,22 +174,22 @@ export default function TicketHistory() {
                       className="input-field" 
                       value={scanStation} 
                       onChange={(e) => setScanStation(e.target.value)}
-                      style={{ height: '40px', fontSize: '13px', padding: '0 10px', background: '#0e0f22' }}
+                      style={{ height: '40px', fontSize: '13px', padding: '0 10px', background: 'var(--bg-secondary)', color: 'var(--text-primary)', appearance: 'auto' }}
                     >
-                      <option value="PCMC">PCMC Station (Purple)</option>
-                      <option value="Civil Court">Civil Court (Interchange)</option>
-                      <option value="Ramwadi">Ramwadi Station (Aqua)</option>
-                      <option value={selectedTicket.destination}>{selectedTicket.destination} (Ticket Dest)</option>
+                      <option value="PCMC" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>PCMC Station (Purple)</option>
+                      <option value="Civil Court" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Civil Court (Interchange)</option>
+                      <option value="Ramwadi" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Ramwadi Station (Aqua)</option>
+                      <option value={selectedTicket.destination} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{selectedTicket.destination} (Ticket Dest)</option>
                     </select>
 
                     <select 
                       className="input-field" 
                       value={scanType} 
                       onChange={(e) => setScanType(e.target.value)}
-                      style={{ height: '40px', fontSize: '13px', padding: '0 10px', background: '#0e0f22' }}
+                      style={{ height: '40px', fontSize: '13px', padding: '0 10px', background: 'var(--bg-secondary)', color: 'var(--text-primary)', appearance: 'auto' }}
                     >
-                      <option value="entry">Entry Gate</option>
-                      <option value="exit">Exit Gate</option>
+                      <option value="entry" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Entry Gate</option>
+                      <option value="exit" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Exit Gate</option>
                     </select>
                   </div>
 

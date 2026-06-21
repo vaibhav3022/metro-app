@@ -1,6 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import COLORS from '../constants/colors';
 
 // Screens
 import HomeScreen from '../screens/HomeScreen';
@@ -33,12 +34,12 @@ export default function MainTabNavigator() {
 
           return <Icon name={iconName} size={28} color={color} />;
         },
-        tabBarActiveTintColor: '#00C9A7',
-        tabBarInactiveTintColor: 'rgba(255,255,255,0.4)',
+        tabBarActiveTintColor: COLORS.secondary,
+        tabBarInactiveTintColor: COLORS.textLight,
         tabBarStyle: {
-          backgroundColor: '#0A0A1A',
+          backgroundColor: COLORS.white,
           borderTopWidth: 1,
-          borderTopColor: 'rgba(255,255,255,0.1)',
+          borderTopColor: COLORS.border,
           paddingBottom: 8,
           paddingTop: 8,
           height: 65,

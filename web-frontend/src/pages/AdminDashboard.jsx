@@ -131,13 +131,13 @@ export default function AdminDashboard() {
           <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginTop: '2px' }}>Pune Metro Control Center</p>
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
-          <button onClick={handleRefresh} className="btn" style={{ padding: '10px', background: 'rgba(255,255,255,0.08)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
-            <RefreshCw size={20} color="#fff" className={refreshing ? "spin-animation" : ""} />
+          <button onClick={handleRefresh} className="btn" style={{ padding: '10px', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
+            <RefreshCw size={20} color="var(--text-primary)" className={refreshing ? "spin-animation" : ""} />
           </button>
-          <button onClick={() => navigate('/admin/notifications')} className="btn" style={{ padding: '10px', background: 'rgba(255,255,255,0.08)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
-            <BellRing size={20} color="#fff" />
+          <button onClick={() => navigate('/admin/notifications')} className="btn" style={{ padding: '10px', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
+            <BellRing size={20} color="var(--text-primary)" />
           </button>
-          <button onClick={handleLogout} className="btn" style={{ padding: '10px', background: 'rgba(239,68,68,0.2)', borderRadius: '12px', border: '1px solid rgba(239,68,68,0.3)' }}>
+          <button onClick={handleLogout} className="btn" style={{ padding: '10px', background: 'rgba(239,68,68,0.1)', borderRadius: '12px', border: '1px solid rgba(239,68,68,0.2)' }}>
             <LogOut size={20} color="#EF4444" />
           </button>
         </div>
@@ -165,34 +165,34 @@ export default function AdminDashboard() {
 
       {activeTab === 'overview' && (
         <>
-          <h3 style={{ fontSize: '16px', fontWeight: '800', color: 'rgba(255,255,255,0.8)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '14px' }}>Overview</h3>
+          <h3 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '14px' }}>Overview</h3>
           
           <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
-            <StatCard title="Total Revenue" value={`₹${stats?.totalRevenue?.toLocaleString() || revenue?.totalRevenue || 0}`} icon={<BadgeCent size={28} color="#00C9A7" />} bg="rgba(0,201,167,0.15)" />
-            <StatCard title="Active Users" value={stats?.activeUsers?.toLocaleString() || users.length || 0} icon={<Users size={28} color="#9B59B6" />} bg="rgba(155,89,182,0.15)" />
+            <StatCard title="Total Revenue" value={`₹${stats?.totalRevenue?.toLocaleString() || revenue?.totalRevenue || 0}`} icon={<BadgeCent size={28} color="var(--accent-teal)" />} bg="rgba(0,137,123,0.12)" />
+            <StatCard title="Active Users" value={stats?.activeUsers?.toLocaleString() || users.length || 0} icon={<Users size={28} color="var(--accent-purple)" />} bg="rgba(106,27,154,0.12)" />
           </div>
           <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
-            <StatCard title="Merchants" value={stats?.totalMerchants || merchants.filter(m => m.status === 'approved').length || 0} icon={<Store size={28} color="#3498DB" />} bg="rgba(52,152,219,0.15)" />
-            <StatCard title="Pending Shops" value={stats?.pendingMerchantRequests || merchants.filter(m => m.status === 'pending').length || 0} icon={<AlertCircle size={28} color="#F39C12" />} bg="rgba(243,156,18,0.15)" />
+            <StatCard title="Merchants" value={stats?.totalMerchants || merchants.filter(m => m.status === 'approved').length || 0} icon={<Store size={28} color="var(--accent-blue)" />} bg="rgba(25,118,210,0.12)" />
+            <StatCard title="Pending Shops" value={stats?.pendingMerchantRequests || merchants.filter(m => m.status === 'pending').length || 0} icon={<AlertCircle size={28} color="var(--accent-orange)" />} bg="rgba(245,124,0,0.12)" />
           </div>
 
-          <h3 style={{ fontSize: '16px', fontWeight: '800', color: 'rgba(255,255,255,0.8)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '14px', marginTop: '30px' }}>Management Modules</h3>
+          <h3 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '14px', marginTop: '30px' }}>Management Modules</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '30px' }}>
             {[
-              { title: 'Revenue Analytics', icon: <ChartLine size={24} color="#00C9A7" />, bg: 'rgba(0,201,167,0.15)', tab: 'revenue' },
-              { title: 'Merchant Management', icon: <Store size={24} color="#9B59B6" />, bg: 'rgba(155,89,182,0.15)', tab: 'merchants' },
-              { title: 'User Management', icon: <Users size={24} color="#3498DB" />, bg: 'rgba(52,152,219,0.15)', tab: 'users' },
-              { title: 'Station Management', icon: <Train size={24} color="#F39C12" />, bg: 'rgba(243,156,18,0.15)', tab: 'stations' },
+              { title: 'Revenue Analytics', icon: <ChartLine size={24} color="var(--accent-teal)" />, bg: 'rgba(0,137,123,0.12)', tab: 'revenue' },
+              { title: 'Merchant Management', icon: <Store size={24} color="var(--accent-purple)" />, bg: 'rgba(106,27,154,0.12)', tab: 'merchants' },
+              { title: 'User Management', icon: <Users size={24} color="var(--accent-blue)" />, bg: 'rgba(25,118,210,0.12)', tab: 'users' },
+              { title: 'Station Management', icon: <Train size={24} color="var(--accent-orange)" />, bg: 'rgba(245,124,0,0.12)', tab: 'stations' },
             ].map(module => (
-              <button key={module.tab} onClick={() => navigate(`/admin/${module.tab}`)} className="btn" style={{ width: '100%', textAlign: 'left', background: 'rgba(255,255,255,0.06)', padding: '16px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center' }}>
+              <button key={module.tab} onClick={() => navigate(`/admin/${module.tab}`)} className="btn" style={{ width: '100%', textAlign: 'left', background: 'var(--bg-secondary)', padding: '16px', borderRadius: '20px', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center' }}>
                 <div style={{ width: '50px', height: '50px', borderRadius: '16px', background: module.bg, display: 'flex', justifyContent: 'center', alignItems: 'center', marginRight: '16px' }}>
                   {module.icon}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '16px', fontWeight: '800', color: '#fff' }}>{module.title}</div>
-                  <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>Manage & view details</div>
+                  <div style={{ fontSize: '16px', fontWeight: '800', color: 'var(--text-primary)' }}>{module.title}</div>
+                  <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Manage & view details</div>
                 </div>
-                <div style={{ color: 'rgba(255,255,255,0.3)' }}>&gt;</div>
+                <div style={{ color: 'var(--text-muted)' }}>&gt;</div>
               </button>
             ))}
           </div>
@@ -200,21 +200,21 @@ export default function AdminDashboard() {
           <div className="row" style={{ gap: '20px' }}>
             {/* Recent Ticket Bookings */}
             <div className="col glass-panel" style={{ padding: '24px', flex: 1 }}>
-              <h3 style={{ fontSize: '16px', fontWeight: '800', color: 'rgba(255,255,255,0.8)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '14px' }}>Recent Ticket Bookings</h3>
+              <h3 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '14px' }}>Recent Ticket Bookings</h3>
               {recentBookings.length === 0 ? (
                 <p style={{ color: 'var(--text-muted)' }}>No recent bookings.</p>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {recentBookings.map((bk, i) => (
-                    <div key={i} onClick={() => setSelectedItem({ type: 'booking', data: bk })} style={{ cursor: 'pointer', background: 'rgba(255,255,255,0.06)', padding: '16px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center' }}>
-                      <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(0,201,167,0.15)', display: 'flex', justifyContent: 'center', alignItems: 'center', marginRight: '14px' }}>
-                        <Train size={24} color="#00C9A7" />
+                    <div key={i} onClick={() => setSelectedItem({ type: 'booking', data: bk })} style={{ cursor: 'pointer', background: 'var(--bg-primary)', padding: '16px', borderRadius: '20px', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center' }}>
+                      <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(0,137,123,0.12)', display: 'flex', justifyContent: 'center', alignItems: 'center', marginRight: '14px' }}>
+                        <Train size={24} color="var(--accent-teal)" />
                       </div>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: '15px', fontWeight: '800', color: '#fff' }}>{bk.userId?.name || 'Unknown User'}</div>
-                        <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>{(bk.source || bk.sourceStation)} &rarr; {(bk.destination || bk.destinationStation)}</div>
+                        <div style={{ fontSize: '15px', fontWeight: '800', color: 'var(--text-primary)' }}>{bk.userId?.name || 'Unknown User'}</div>
+                        <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{(bk.source || bk.sourceStation)} &rarr; {(bk.destination || bk.destinationStation)}</div>
                       </div>
-                      <div style={{ fontSize: '16px', fontWeight: '900', color: '#fff' }}>₹{bk.fare}</div>
+                      <div style={{ fontSize: '16px', fontWeight: '900', color: 'var(--text-primary)' }}>₹{bk.fare}</div>
                     </div>
                   ))}
                 </div>
@@ -223,21 +223,21 @@ export default function AdminDashboard() {
 
             {/* Recent Shop Payments */}
             <div className="col glass-panel" style={{ padding: '24px', flex: 1 }}>
-              <h3 style={{ fontSize: '16px', fontWeight: '800', color: 'rgba(255,255,255,0.8)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '14px' }}>Recent Shop Payments</h3>
+              <h3 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '14px' }}>Recent Shop Payments</h3>
               {recentTransactions.length === 0 ? (
                 <p style={{ color: 'var(--text-muted)' }}>No recent transactions.</p>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {recentTransactions.map((tx, i) => (
-                    <div key={i} onClick={() => setSelectedItem({ type: 'transaction', data: tx })} style={{ cursor: 'pointer', background: 'rgba(255,255,255,0.06)', padding: '16px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center' }}>
-                      <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(155,89,182,0.15)', display: 'flex', justifyContent: 'center', alignItems: 'center', marginRight: '14px' }}>
-                        <Store size={24} color="#9B59B6" />
+                    <div key={i} onClick={() => setSelectedItem({ type: 'transaction', data: tx })} style={{ cursor: 'pointer', background: 'var(--bg-primary)', padding: '16px', borderRadius: '20px', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center' }}>
+                      <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(106,27,154,0.12)', display: 'flex', justifyContent: 'center', alignItems: 'center', marginRight: '14px' }}>
+                        <Store size={24} color="var(--accent-purple)" />
                       </div>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: '15px', fontWeight: '800', color: '#fff' }}>{tx.userId?.name || 'User'} at {tx.merchantId?.businessName || 'Shop'}</div>
-                        <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>{new Date(tx.createdAt).toLocaleDateString()} &bull; {tx.paymentMethod}</div>
+                        <div style={{ fontSize: '15px', fontWeight: '800', color: 'var(--text-primary)' }}>{tx.userId?.name || 'User'} at {tx.merchantId?.businessName || 'Shop'}</div>
+                        <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{new Date(tx.createdAt).toLocaleDateString()} &bull; {tx.paymentMethod}</div>
                       </div>
-                      <div style={{ fontSize: '16px', fontWeight: '900', color: '#00C9A7' }}>+{tx.paymentMethod === 'Token' ? `Rs. ${tx.amount}` : `₹${tx.amount}`}</div>
+                      <div style={{ fontSize: '16px', fontWeight: '900', color: 'var(--accent-teal)' }}>+{tx.paymentMethod === 'Token' ? `Rs. ${tx.amount}` : `₹${tx.amount}`}</div>
                     </div>
                   ))}
                 </div>
@@ -261,7 +261,7 @@ export default function AdminDashboard() {
             </thead>
             <tbody>
               {users.map(u => (
-                <tr key={u._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.02)' }}>
+                <tr key={u._id} style={{ borderBottom: '1px solid var(--glass-border)' }}>
                   <td style={{ padding: '16px', fontWeight: '600' }}>{u.name}</td>
                   <td style={{ padding: '16px' }}>{u.email}</td>
                   <td style={{ padding: '16px' }}>
@@ -290,7 +290,7 @@ export default function AdminDashboard() {
             </thead>
             <tbody>
               {merchants.map(m => (
-                <tr key={m._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.02)' }}>
+                <tr key={m._id} style={{ borderBottom: '1px solid var(--glass-border)' }}>
                   <td style={{ padding: '16px', fontWeight: '600' }}>{m.businessName}</td>
                   <td style={{ padding: '16px' }}>{m.userId?.name || 'Owner'}</td>
                   <td style={{ padding: '16px' }}>
@@ -320,29 +320,29 @@ export default function AdminDashboard() {
         <div className="glass-panel" style={{ padding: '30px' }}>
           <h3 style={{ fontSize: '20px', fontWeight: '700', marginBottom: '24px' }}>Revenue Analytics</h3>
           <div style={{ display: 'flex', gap: '20px', marginBottom: '30px' }}>
-            <div className="stat-card glass-panel" style={{ flex: 1, padding: '20px', background: 'rgba(0, 201, 167, 0.05)' }}>
+            <div className="stat-card glass-panel" style={{ flex: 1, padding: '20px', background: 'rgba(0, 137, 123, 0.08)' }}>
               <h4 style={{ color: 'var(--text-secondary)', marginBottom: '8px' }}>Total System Revenue</h4>
               <h2 style={{ fontSize: '32px', color: 'var(--accent-teal)' }}>₹{revenue?.totalRevenue || 0}</h2>
             </div>
-            <div className="stat-card glass-panel" style={{ flex: 1, padding: '20px', background: 'rgba(52, 152, 219, 0.05)' }}>
+            <div className="stat-card glass-panel" style={{ flex: 1, padding: '20px', background: 'rgba(25, 118, 210, 0.08)' }}>
               <h4 style={{ color: 'var(--text-secondary)', marginBottom: '8px' }}>Ticket Revenue</h4>
               <h2 style={{ fontSize: '32px', color: 'var(--accent-blue)' }}>₹{revenue?.ticketRevenue || 0}</h2>
             </div>
-            <div className="stat-card glass-panel" style={{ flex: 1, padding: '20px', background: 'rgba(155, 89, 182, 0.05)' }}>
+            <div className="stat-card glass-panel" style={{ flex: 1, padding: '20px', background: 'rgba(106, 27, 154, 0.08)' }}>
               <h4 style={{ color: 'var(--text-secondary)', marginBottom: '8px' }}>Wallet Recharges</h4>
               <h2 style={{ fontSize: '32px', color: 'var(--accent-purple)' }}>₹{revenue?.walletRecharges || 0}</h2>
             </div>
           </div>
-          <div style={{ height: '300px', width: '100%', background: 'rgba(0,0,0,0.2)', borderRadius: '12px', padding: '20px' }}>
+          <div style={{ height: '300px', width: '100%', background: 'var(--bg-primary)', borderRadius: '12px', padding: '20px', border: '1px solid var(--glass-border)' }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={revenueChart}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                <XAxis dataKey="date" stroke="rgba(255,255,255,0.5)" />
-                <YAxis stroke="rgba(255,255,255,0.5)" />
-                <Tooltip contentStyle={{ backgroundColor: '#1A0A3E', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" />
+                <XAxis dataKey="date" stroke="var(--text-secondary)" />
+                <YAxis stroke="var(--text-secondary)" />
+                <Tooltip contentStyle={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: 'var(--text-primary)' }} labelStyle={{ color: 'var(--text-primary)' }} />
                 <Legend />
-                <Bar dataKey="tickets" name="Tickets (₹)" fill="#00C9A7" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="wallet" name="Wallet (₹)" fill="#9B59B6" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="tickets" name="Tickets (₹)" fill="var(--accent-teal)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="wallet" name="Wallet (₹)" fill="var(--accent-purple)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -355,9 +355,9 @@ export default function AdminDashboard() {
           <p style={{ color: 'var(--text-secondary)', marginBottom: '20px' }}>All metro stations currently active in the transit network.</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
             {stations.map(st => (
-              <div key={st._id} style={{ background: 'rgba(255,255,255,0.05)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <div key={st._id} style={{ background: 'var(--bg-secondary)', padding: '16px', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
                 <Train size={24} color="var(--accent-blue)" style={{ marginBottom: '8px' }} />
-                <div style={{ fontWeight: '800' }}>{st.name}</div>
+                <div style={{ fontWeight: '800', color: 'var(--text-primary)' }}>{st.name}</div>
                 <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Status: {st.status || 'Active'}</div>
               </div>
             ))}
@@ -367,21 +367,21 @@ export default function AdminDashboard() {
 
       {/* Transaction / Booking Detail Modal Overlay */}
       {selectedItem && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.85)', zIndex: 1000, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <div style={{ background: '#141432', width: '90%', maxWidth: '400px', borderRadius: '32px', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', flexDirection: 'column', padding: '24px' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <div style={{ background: 'var(--bg-secondary)', width: '90%', maxWidth: '400px', borderRadius: '32px', border: '1px solid var(--glass-border)', display: 'flex', flexDirection: 'column', padding: '24px' }}>
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
-              <button onClick={() => setSelectedItem(null)} className="btn" style={{ background: 'rgba(255,255,255,0.1)', padding: '8px', borderRadius: '16px' }}>
+              <button onClick={() => setSelectedItem(null)} className="btn" style={{ background: 'var(--bg-primary)', padding: '8px', borderRadius: '16px', color: 'var(--text-primary)' }}>
                 <X size={20} />
               </button>
             </div>
             
             {selectedItem.type === 'booking' && (
               <>
-                <div style={{ width: '80px', height: '80px', borderRadius: '40px', background: 'rgba(0,201,167,0.15)', display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '0 auto 16px' }}>
-                  <Train size={40} color="#00C9A7" />
+                <div style={{ width: '80px', height: '80px', borderRadius: '40px', background: 'rgba(0,137,123,0.12)', display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '0 auto 16px' }}>
+                  <Train size={40} color="var(--accent-teal)" />
                 </div>
-                <h2 style={{ fontSize: '20px', fontWeight: '900', color: '#fff', textAlign: 'center', marginBottom: '20px' }}>Ticket Booking Details</h2>
-                <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '20px', padding: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <h2 style={{ fontSize: '20px', fontWeight: '900', color: 'var(--text-primary)', textAlign: 'center', marginBottom: '20px' }}>Ticket Booking Details</h2>
+                <div style={{ background: 'var(--bg-primary)', borderRadius: '20px', padding: '16px', border: '1px solid var(--glass-border)' }}>
                   {[
                     ['User', selectedItem.data.userId?.name || 'Unknown'],
                     ['Email', selectedItem.data.userId?.email || 'N/A'],
@@ -390,9 +390,9 @@ export default function AdminDashboard() {
                     ['Status', selectedItem.data.status?.toUpperCase()],
                     ['Date', new Date(selectedItem.data.createdAt).toLocaleString()]
                   ].map(([label, val]) => (
-                    <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                      <span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.6)', fontWeight: '600' }}>{label}:</span>
-                      <span style={{ fontSize: '14px', fontWeight: '800', color: '#fff', textAlign: 'right' }}>{val}</span>
+                    <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid var(--glass-border)' }}>
+                      <span style={{ fontSize: '14px', color: 'var(--text-secondary)', fontWeight: '600' }}>{label}:</span>
+                      <span style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-primary)', textAlign: 'right' }}>{val}</span>
                     </div>
                   ))}
                 </div>
@@ -401,11 +401,11 @@ export default function AdminDashboard() {
 
             {selectedItem.type === 'transaction' && (
               <>
-                <div style={{ width: '80px', height: '80px', borderRadius: '40px', background: 'rgba(155,89,182,0.15)', display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '0 auto 16px' }}>
-                  <Store size={40} color="#9B59B6" />
+                <div style={{ width: '80px', height: '80px', borderRadius: '40px', background: 'rgba(106,27,154,0.12)', display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '0 auto 16px' }}>
+                  <Store size={40} color="var(--accent-purple)" />
                 </div>
-                <h2 style={{ fontSize: '20px', fontWeight: '900', color: '#fff', textAlign: 'center', marginBottom: '20px' }}>Order Payment Details</h2>
-                <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '20px', padding: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <h2 style={{ fontSize: '20px', fontWeight: '900', color: 'var(--text-primary)', textAlign: 'center', marginBottom: '20px' }}>Order Payment Details</h2>
+                <div style={{ background: 'var(--bg-primary)', borderRadius: '20px', padding: '16px', border: '1px solid var(--glass-border)' }}>
                   {[
                     ['User', selectedItem.data.userId?.name || 'Unknown'],
                     ['Merchant', selectedItem.data.merchantId?.businessName || 'N/A'],
@@ -413,9 +413,9 @@ export default function AdminDashboard() {
                     ['Amount', selectedItem.data.paymentMethod === 'Token' ? `${selectedItem.data.amount} Tokens` : `\u20B9${selectedItem.data.amount}`],
                     ['Date', new Date(selectedItem.data.createdAt).toLocaleString()]
                   ].map(([label, val]) => (
-                    <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                      <span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.6)', fontWeight: '600' }}>{label}:</span>
-                      <span style={{ fontSize: '14px', fontWeight: '800', color: '#fff', textAlign: 'right' }}>{val}</span>
+                    <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid var(--glass-border)' }}>
+                      <span style={{ fontSize: '14px', color: 'var(--text-secondary)', fontWeight: '600' }}>{label}:</span>
+                      <span style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-primary)', textAlign: 'right' }}>{val}</span>
                     </div>
                   ))}
                 </div>

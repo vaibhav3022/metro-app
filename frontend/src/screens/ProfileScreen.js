@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import COLORS from '../constants/colors';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   TextInput, ActivityIndicator, Alert, StatusBar, Platform
@@ -83,7 +84,7 @@ export default function ProfileScreen() {
     : 'MT';
 
   return (
-    <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.safeArea}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       {loading && (
         <View style={styles.loadingOverlay}>
@@ -102,7 +103,7 @@ export default function ProfileScreen() {
         {/* Avatar Card */}
         <View style={styles.avatarCard}>
           <LinearGradient
-            colors={['#00C9A7', '#9B59B6']}
+            colors={[COLORS.secondary, COLORS.primary]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.avatar}
@@ -117,7 +118,7 @@ export default function ProfileScreen() {
               {user?.email ? <Text style={styles.userEmail}>{user.email}</Text> : null}
               <TouchableOpacity onPress={() => setIsEditing(true)}>
                 <LinearGradient
-                  colors={['#00C9A7', '#009980']}
+                  colors={[COLORS.secondary, COLORS.secondary]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={styles.editButton}
@@ -171,7 +172,7 @@ export default function ProfileScreen() {
                 </TouchableOpacity>
                 <TouchableOpacity onPress={handleSaveProfile} style={{ flex: 1 }}>
                   <LinearGradient
-                    colors={['#00C9A7', '#009980']}
+                    colors={[COLORS.secondary, COLORS.secondary]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
                     style={styles.saveButton}
@@ -236,20 +237,20 @@ const styles = StyleSheet.create({
     height: 44,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: COLORS.cardBg,
     borderRadius: 22,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: COLORS.border,
   },
-  headerTitle: { fontSize: 24, fontWeight: '900', color: '#fff', letterSpacing: 0.5 },
+  headerTitle: { fontSize: 24, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
   avatarCard: {
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: COLORS.cardBg,
     borderRadius: 32,
     padding: 24,
     alignItems: 'center',
     marginBottom: 28,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: COLORS.border,
   },
   avatar: {
     width: 96,
@@ -262,9 +263,9 @@ const styles = StyleSheet.create({
   },
   avatarText: { color: '#fff', fontSize: 36, fontWeight: '900' },
   profileInfo: { alignItems: 'center', width: '100%' },
-  userName: { fontSize: 24, fontWeight: '900', color: '#fff', marginBottom: 4 },
-  userPhone: { fontSize: 16, fontWeight: '600', color: 'rgba(255,255,255,0.6)', marginBottom: 2 },
-  userEmail: { fontSize: 14, color: 'rgba(255,255,255,0.45)', marginBottom: 20 },
+  userName: { fontSize: 24, fontWeight: '900', color: COLORS.text, marginBottom: 4 },
+  userPhone: { fontSize: 16, fontWeight: '600', color: COLORS.textLight, marginBottom: 2 },
+  userEmail: { fontSize: 14, color: COLORS.textLight, marginBottom: 20 },
   editButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -277,16 +278,16 @@ const styles = StyleSheet.create({
   fieldLabel: {
     fontSize: 12,
     fontWeight: '800',
-    color: 'rgba(255,255,255,0.6)',
+    color: COLORS.textLight,
     textTransform: 'uppercase',
     letterSpacing: 1,
     marginBottom: 8,
     marginTop: 16,
   },
   input: {
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: COLORS.cardBg,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
+    borderColor: COLORS.border,
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 14,
@@ -297,14 +298,14 @@ const styles = StyleSheet.create({
   editActions: { flexDirection: 'row', gap: 14, marginTop: 24 },
   cancelButton: {
     flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: COLORS.cardBg,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.15)',
     paddingVertical: 16,
     borderRadius: 16,
     alignItems: 'center',
   },
-  cancelButtonText: { fontWeight: '800', color: 'rgba(255,255,255,0.7)', fontSize: 15 },
+  cancelButtonText: { fontWeight: '800', color: COLORS.textLight, fontSize: 15 },
   saveButton: {
     paddingVertical: 16,
     borderRadius: 16,
@@ -314,19 +315,19 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 14,
     fontWeight: '800',
-    color: 'rgba(255,255,255,0.6)',
+    color: COLORS.textLight,
     textTransform: 'uppercase',
     letterSpacing: 1,
     marginBottom: 12,
     paddingHorizontal: 6,
   },
   menuCard: {
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: COLORS.cardBg,
     borderRadius: 28,
     overflow: 'hidden',
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: COLORS.border,
   },
   menuItem: { flexDirection: 'row', alignItems: 'center', padding: 18 },
   menuItemBorder: { borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)' },
@@ -341,7 +342,7 @@ const styles = StyleSheet.create({
   },
   menuTextWrap: { flex: 1 },
   menuTitle: { fontSize: 16, fontWeight: '800', color: '#fff', marginBottom: 2 },
-  menuSubtitle: { fontSize: 13, color: 'rgba(255,255,255,0.45)' },
+  menuSubtitle: { fontSize: 13, color: COLORS.textLight },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',

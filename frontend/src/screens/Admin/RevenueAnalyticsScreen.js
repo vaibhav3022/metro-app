@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import COLORS from '../../constants/colors';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator, Dimensions, StatusBar, Modal, FlatList, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -114,7 +115,7 @@ export default function RevenueAnalyticsScreen({ navigation }) {
   ];
 
   return (
-    <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.container}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         {toast.visible && <ToastMessage message={toast.message} type={toast.type} onHide={() => setToast({ ...toast, visible: false })} />}
@@ -207,7 +208,7 @@ export default function RevenueAnalyticsScreen({ navigation }) {
               <View style={styles.modalContent}>
                 <View style={styles.modalHeader}>
                   <Text style={styles.modalTitle}>{selectedMerchant.businessName} Orders</Text>
-                  <TouchableOpacity onPress={() => setSelectedMerchant(null)} style={{ padding: 5, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 20 }}>
+                  <TouchableOpacity onPress={() => setSelectedMerchant(null)} style={{ padding: 5, backgroundColor: COLORS.cardBg, borderRadius: 20 }}>
                     <MaterialCommunityIcons name="close" size={24} color="#fff" />
                   </TouchableOpacity>
                 </View>
@@ -247,47 +248,47 @@ export default function RevenueAnalyticsScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 20 : 10, paddingBottom: 16 },
-  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  headerTitle: { fontSize: 20, fontWeight: '900', color: '#fff', letterSpacing: 0.5 },
+  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
+  headerTitle: { fontSize: 20, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
   
   scrollContent: { padding: 20, paddingBottom: 50 },
   
-  statCard: { flex: 1, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 20, padding: 16, marginHorizontal: 6, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  statCard: { flex: 1, backgroundColor: COLORS.cardBg, borderRadius: 20, padding: 16, marginHorizontal: 6, borderWidth: 1, borderColor: COLORS.border },
   statIconWrap: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
-  statTitle: { fontSize: 13, color: 'rgba(255,255,255,0.6)', fontWeight: '600', marginBottom: 4 },
+  statTitle: { fontSize: 13, color: COLORS.textLight, fontWeight: '600', marginBottom: 4 },
   statValue: { fontSize: 20, color: '#fff', fontWeight: '900' },
   
   summaryRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12, marginHorizontal: -6 },
   
-  toggleRow: { flexDirection: 'row', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: 16, padding: 6, marginVertical: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  toggleRow: { flexDirection: 'row', backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, padding: 6, marginVertical: 20, borderWidth: 1, borderColor: COLORS.border },
   toggleBtn: { flex: 1, paddingVertical: 12, alignItems: 'center', borderRadius: 12 },
-  toggleBtnActive: { backgroundColor: 'rgba(255,255,255,0.1)' },
-  toggleBtnText: { color: 'rgba(255,255,255,0.5)', fontWeight: '700' },
+  toggleBtnActive: { backgroundColor: COLORS.cardBg },
+  toggleBtnText: { color: COLORS.textLight, fontWeight: '700' },
   toggleBtnTextActive: { color: '#fff' },
   
-  chartCard: { backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 24, padding: 20, marginBottom: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  chartCard: { backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 20, marginBottom: 20, borderWidth: 1, borderColor: COLORS.border },
   chartTitle: { fontSize: 16, color: '#fff', fontWeight: '800', marginBottom: 20, letterSpacing: 0.5 },
   chartWrapper: { alignItems: 'center' },
   
-  noDataText: { marginVertical: 40, color: 'rgba(255,255,255,0.4)', fontStyle: 'italic', textAlign: 'center' },
+  noDataText: { marginVertical: 40, color: COLORS.textLight, fontStyle: 'italic', textAlign: 'center' },
   
   rankingSection: { marginTop: 10 },
-  sectionTitle: { fontSize: 18, fontWeight: '800', color: '#fff', marginBottom: 16, letterSpacing: 0.5 },
-  rankingCard: { backgroundColor: 'rgba(255,255,255,0.06)', flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 20, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  sectionTitle: { fontSize: 18, fontWeight: '800', color: COLORS.text, marginBottom: 16, letterSpacing: 0.5 },
+  rankingCard: { backgroundColor: COLORS.cardBg, flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 20, marginBottom: 12, borderWidth: 1, borderColor: COLORS.border },
   rankBadge: { width: 44, alignItems: 'center' },
-  rankNum: { fontSize: 20, fontWeight: '900', color: 'rgba(255,255,255,0.5)' },
+  rankNum: { fontSize: 20, fontWeight: '900', color: COLORS.textLight },
   rankInfo: { flex: 1, marginLeft: 12 },
   rankName: { fontSize: 16, fontWeight: '800', color: '#fff' },
-  rankSubtitle: { fontSize: 13, color: 'rgba(255,255,255,0.5)', marginTop: 4, fontWeight: '600' },
+  rankSubtitle: { fontSize: 13, color: COLORS.textLight, marginTop: 4, fontWeight: '600' },
   rankRevenue: { fontSize: 18, fontWeight: '900', color: '#00C9A7' },
   
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'flex-end' },
-  modalContent: { backgroundColor: '#141432', borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, height: '75%', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  modalContent: { backgroundColor: COLORS.cardBg, borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, height: '75%', borderWidth: 1, borderColor: COLORS.border },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
   modalTitle: { fontSize: 20, fontWeight: '900', color: '#fff' },
   
-  orderCard: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.06)', padding: 16, borderRadius: 16, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  orderCard: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: COLORS.cardBg, padding: 16, borderRadius: 16, marginBottom: 12, borderWidth: 1, borderColor: COLORS.border },
   orderUser: { fontSize: 15, fontWeight: '800', color: '#fff', marginBottom: 6 },
-  orderDate: { fontSize: 12, color: 'rgba(255,255,255,0.5)', fontWeight: '600' },
+  orderDate: { fontSize: 12, color: COLORS.textLight, fontWeight: '600' },
   orderAmount: { fontSize: 18, fontWeight: '900' }
 });

@@ -69,7 +69,7 @@ export default function HelpSupport() {
         Reach out for grievance redressal, lost & found, or suggestions.
       </p>
 
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '24px', background: 'rgba(255,255,255,0.06)', padding: '6px', borderRadius: '16px' }}>
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '24px', background: 'rgba(0,0,0,0.05)', padding: '6px', borderRadius: '16px' }}>
         {['New', 'MyTickets'].map(t => (
           <button 
             key={t}
@@ -77,8 +77,8 @@ export default function HelpSupport() {
             className="btn"
             style={{ 
               flex: 1, 
-              background: tab === t ? 'rgba(0,201,167,0.2)' : 'transparent',
-              color: tab === t ? 'var(--accent-teal)' : 'rgba(255,255,255,0.5)',
+              background: tab === t ? 'rgba(0,137,123,0.12)' : 'transparent',
+              color: tab === t ? 'var(--accent-teal)' : 'var(--text-secondary)',
               border: 'none',
               borderRadius: '12px',
               padding: '12px'
@@ -92,18 +92,18 @@ export default function HelpSupport() {
       {tab === 'New' ? (
         <div className="glass-panel" style={{ padding: '32px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
-            <div style={{ width: '60px', height: '60px', borderRadius: '30px', background: 'rgba(155,89,182,0.15)', display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid rgba(155,89,182,0.3)' }}>
-              <Headphones size={28} color="#9B59B6" />
+            <div style={{ width: '60px', height: '60px', borderRadius: '30px', background: 'rgba(106,27,154,0.12)', display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid rgba(106,27,154,0.2)' }}>
+              <Headphones size={28} color="var(--accent-purple)" />
             </div>
-            <h2 style={{ fontSize: '24px', fontWeight: '900', color: '#fff' }}>How can we help you?</h2>
+            <h2 style={{ fontSize: '24px', fontWeight: '900', color: 'var(--text-primary)' }}>How can we help you?</h2>
           </div>
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div className="form-group">
               <label>Select Category</label>
               <div style={{ position: 'relative' }}>
-                <select className="input-field" value={category} onChange={(e) => setCategory(e.target.value)} style={{ appearance: 'none', width: '100%' }}>
-                  {CATEGORIES.map(c => <option key={c} value={c} style={{ color: '#000' }}>{c}</option>)}
+                <select className="input-field" value={category} onChange={(e) => setCategory(e.target.value)} style={{ appearance: 'none', width: '100%', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                  {CATEGORIES.map(c => <option key={c} value={c} style={{ color: 'var(--text-primary)', background: 'var(--bg-secondary)' }}>{c}</option>)}
                 </select>
                 <ChevronDown size={20} color="var(--text-muted)" style={{ position: 'absolute', right: '16px', top: '16px', pointerEvents: 'none' }} />
               </div>
@@ -117,7 +117,7 @@ export default function HelpSupport() {
                 placeholder="Describe your issue, suggestion, or what you lost in detail..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                style={{ resize: 'none' }}
+                style={{ resize: 'none', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
               />
             </div>
 
@@ -130,8 +130,8 @@ export default function HelpSupport() {
         <div>
           {myComplaints.length === 0 ? (
             <div className="glass-panel" style={{ padding: '60px 20px', textAlign: 'center' }}>
-              <Ticket size={48} color="rgba(255,255,255,0.2)" style={{ marginBottom: '16px' }} />
-              <h3 style={{ fontSize: '20px', fontWeight: '800', marginBottom: '8px' }}>No support tickets found</h3>
+              <Ticket size={48} color="var(--text-muted)" style={{ marginBottom: '16px' }} />
+              <h3 style={{ fontSize: '20px', fontWeight: '800', marginBottom: '8px', color: 'var(--text-primary)' }}>No support tickets found</h3>
               <p style={{ color: 'var(--text-secondary)' }}>You haven't submitted any queries yet.</p>
             </div>
           ) : (
@@ -139,14 +139,14 @@ export default function HelpSupport() {
               {myComplaints.map(c => (
                 <div key={c._id} className="glass-panel" style={{ padding: '24px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                    <span className="badge" style={{ background: 'rgba(255,255,255,0.1)', color: '#fff' }}>
+                    <span className="badge" style={{ background: 'var(--bg-tertiary)', color: 'var(--text-primary)' }}>
                       {c.category}
                     </span>
                     <span className="badge" style={{ background: getStatusBg(c.status), color: getStatusColor(c.status), border: `1px solid ${getStatusColor(c.status)}33` }}>
                       {c.status || 'Pending'}
                     </span>
                   </div>
-                  <p style={{ fontSize: '15px', color: '#fff', lineHeight: '1.6', marginBottom: '16px' }}>
+                  <p style={{ fontSize: '15px', color: 'var(--text-primary)', lineHeight: '1.6', marginBottom: '16px' }}>
                     {c.description}
                   </p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-muted)', fontSize: '13px', borderTop: '1px solid var(--glass-border)', paddingTop: '12px' }}>

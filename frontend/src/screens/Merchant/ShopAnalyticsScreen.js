@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import COLORS from '../../constants/colors';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, RefreshControl, TextInput, ActivityIndicator, Alert, Modal, StatusBar, Switch, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -84,7 +85,7 @@ export default function ShopAnalyticsScreen({ navigation }) {
   };
 
   return (
-    <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.container}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         {toast.visible && <ToastMessage message={toast.message} type={toast.type} onHide={() => setToast({ ...toast, visible: false })} />}
@@ -232,46 +233,46 @@ export default function ShopAnalyticsScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 20 : 10, paddingBottom: 16 },
-  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  headerTitle: { fontSize: 20, fontWeight: '900', color: '#fff', letterSpacing: 0.5 },
+  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
+  headerTitle: { fontSize: 20, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
   
   scrollContent: { padding: 20, paddingBottom: 50 },
   
-  shopHeaderCard: { padding: 24, borderRadius: 24, marginBottom: 30, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  shopHeaderCard: { padding: 24, borderRadius: 24, marginBottom: 30, borderWidth: 1, borderColor: COLORS.border },
   shopName: { color: '#fff', fontSize: 24, fontWeight: '900', marginBottom: 4 },
-  shopCategory: { color: 'rgba(255,255,255,0.7)', fontSize: 15, marginBottom: 16, fontWeight: '600' },
+  shopCategory: { color: COLORS.textLight, fontSize: 15, marginBottom: 16, fontWeight: '600' },
   shopStatsRow: { flexDirection: 'row', gap: 12 },
-  statBadge: { backgroundColor: 'rgba(0,0,0,0.2)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  statBadge: { backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, borderWidth: 1, borderColor: COLORS.border },
   shopStatText: { color: '#fff', fontWeight: '800', fontSize: 13 },
   
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
-  sectionTitle: { fontSize: 18, fontWeight: '800', color: '#fff' },
+  sectionTitle: { fontSize: 18, fontWeight: '800', color: COLORS.text },
   addBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(0,201,167,0.15)', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(0,201,167,0.3)' },
   addBtnText: { color: '#fff', fontWeight: '800', marginLeft: 6, fontSize: 13 },
   
-  itemCard: { backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 20, padding: 20, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  itemCard: { backgroundColor: COLORS.cardBg, borderRadius: 20, padding: 20, marginBottom: 12, borderWidth: 1, borderColor: COLORS.border, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   itemInfo: { flex: 1, marginRight: 16 },
   itemName: { fontSize: 18, fontWeight: '800', color: '#fff', marginBottom: 6 },
   itemPrice: { fontSize: 16, color: '#00C9A7', fontWeight: '900', marginBottom: 10 },
-  itemDesc: { fontSize: 14, color: 'rgba(255,255,255,0.6)', marginBottom: 8, fontWeight: '600' },
+  itemDesc: { fontSize: 14, color: COLORS.textLight, marginBottom: 8, fontWeight: '600' },
   itemDate: { fontSize: 12, color: 'rgba(245,158,11,0.8)', fontWeight: '700' },
   
   badge: { alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10, borderWidth: 1 },
   badgeText: { fontSize: 11, fontWeight: '800', textTransform: 'uppercase' },
   
   itemActions: { flexDirection: 'row', gap: 12 },
-  iconBtn: { padding: 8, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  iconBtn: { padding: 8, backgroundColor: COLORS.cardBg, borderRadius: 12, borderWidth: 1, borderColor: COLORS.border },
   
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'center', alignItems: 'center', padding: 20 },
-  modalContent: { backgroundColor: '#141432', width: '100%', borderRadius: 28, padding: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  modalContent: { backgroundColor: COLORS.cardBg, width: '100%', borderRadius: 28, padding: 24, borderWidth: 1, borderColor: COLORS.border },
   modalTitle: { fontSize: 22, fontWeight: '900', marginBottom: 24, color: '#fff' },
-  modalInput: { backgroundColor: 'rgba(0,0,0,0.3)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', borderRadius: 16, padding: 16, marginBottom: 16, fontSize: 16, color: '#fff' },
+  modalInput: { backgroundColor: 'rgba(0,0,0,0.3)', borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, padding: 16, marginBottom: 16, fontSize: 16, color: '#fff' },
   
-  switchRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 12, backgroundColor: 'rgba(0,0,0,0.2)', padding: 16, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  switchRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 12, backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, padding: 16, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border },
   switchLabel: { fontSize: 16, color: '#fff', fontWeight: '700' },
   
   modalActions: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 24, gap: 12 },
-  modalCancel: { paddingVertical: 14, paddingHorizontal: 20, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 14 },
+  modalCancel: { paddingVertical: 14, paddingHorizontal: 20, backgroundColor: COLORS.cardBg, borderRadius: 14 },
   modalCancelText: { color: '#fff', fontWeight: '700', fontSize: 16 },
   modalSubmit: { backgroundColor: '#00C9A7', paddingVertical: 14, paddingHorizontal: 24, borderRadius: 14 },
   modalSubmitText: { color: '#fff', fontWeight: '800', fontSize: 16 },
@@ -279,5 +280,5 @@ const styles = StyleSheet.create({
   emptyContainer: { alignItems: 'center', justifyContent: 'center', paddingVertical: 20 },
   iconCircle: { width: 80, height: 80, borderRadius: 40, backgroundColor: 'rgba(0,201,167,0.1)', alignItems: 'center', justifyContent: 'center', marginBottom: 16, borderWidth: 1, borderColor: 'rgba(0,201,167,0.3)' },
   emptyTitle: { fontSize: 20, fontWeight: '900', color: '#fff', marginBottom: 6 },
-  emptySubtitle: { fontSize: 14, color: 'rgba(255,255,255,0.5)', textAlign: 'center' }
+  emptySubtitle: { fontSize: 14, color: COLORS.textLight, textAlign: 'center' }
 });

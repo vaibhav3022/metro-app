@@ -1,4 +1,5 @@
 import React from 'react';
+import COLORS from '../constants/colors';
 import {
   View, Text, StyleSheet, TouchableOpacity, Image, SafeAreaView, ScrollView, Platform, StatusBar, BackHandler
 } from 'react-native';
@@ -25,14 +26,14 @@ export default function QRTicketScreen() {
 
   if (!ticket) {
     return (
-      <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.safeArea}>
+      <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.safeArea}>
         <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
         <SafeAreaView style={{ flex: 1 }}>
           <View style={styles.centered}>
             <Icon name="ticket-confirmation-outline" size={70} color="rgba(255,255,255,0.2)" style={{ marginBottom: 20 }} />
             <Text style={styles.noTicketText}>No active ticket selected.</Text>
             <TouchableOpacity style={styles.homeBtn} onPress={() => navigation.navigate('HomeTab')}>
-              <LinearGradient colors={['#00C9A7', '#009980']} style={styles.homeBtnGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+              <LinearGradient colors={[COLORS.secondary, COLORS.secondary]} style={styles.homeBtnGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
                 <Text style={styles.homeBtnText}>Go to Dashboard</Text>
               </LinearGradient>
             </TouchableOpacity>
@@ -46,7 +47,7 @@ export default function QRTicketScreen() {
   const isInvalid = ['expired', 'used', 'failed'].includes(ticket.ticketStatus?.toLowerCase());
 
   return (
-    <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.safeArea}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
@@ -134,35 +135,35 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   container: { padding: 20, paddingBottom: 50, paddingTop: Platform.OS === 'android' ? 40 : 10 },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
-  noTicketText: { fontSize: 18, color: 'rgba(255,255,255,0.6)', marginBottom: 24, fontWeight: '600' },
+  noTicketText: { fontSize: 18, color: COLORS.textLight, marginBottom: 24, fontWeight: '600' },
   homeBtn: { borderRadius: 16, overflow: 'hidden' },
   homeBtnGrad: { paddingHorizontal: 30, paddingVertical: 14, justifyContent: 'center', alignItems: 'center' },
   homeBtnText: { color: '#fff', fontWeight: '800', fontSize: 16 },
   
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 30 },
-  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  headerTitle: { fontSize: 22, fontWeight: '900', color: '#fff', letterSpacing: 0.5 },
+  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
+  headerTitle: { fontSize: 22, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
   
-  card: { backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 32, padding: 24, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  card: { backgroundColor: COLORS.cardBg, borderRadius: 32, padding: 24, alignItems: 'center', borderWidth: 1, borderColor: COLORS.border },
   iconWrap: { width: 70, height: 70, borderRadius: 35, backgroundColor: 'rgba(155,89,182,0.15)', justifyContent: 'center', alignItems: 'center', marginBottom: 16, borderWidth: 1, borderColor: 'rgba(155,89,182,0.3)' },
   cardTitle: { fontSize: 24, fontWeight: '900', color: '#fff', marginBottom: 6 },
-  cardSubtitle: { fontSize: 14, color: 'rgba(255,255,255,0.5)', marginBottom: 24, fontWeight: '500' },
+  cardSubtitle: { fontSize: 14, color: COLORS.textLight, marginBottom: 24, fontWeight: '500' },
   
   qrWrapper: { backgroundColor: '#fff', borderWidth: 3, borderColor: '#00C9A7', borderStyle: 'dashed', borderRadius: 24, padding: 20, marginBottom: 16 },
   qrImage: { width: 220, height: 220 },
   invalidOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(255,255,255,0.8)', justifyContent: 'center', alignItems: 'center', borderRadius: 20 },
   invalidOverlayText: { color: '#EF4444', fontWeight: '900', fontSize: 24, marginTop: 10, letterSpacing: 2 },
   
-  ticketId: { fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 24, fontWeight: '700', letterSpacing: 1 },
+  ticketId: { fontSize: 12, color: COLORS.textLight, marginBottom: 24, fontWeight: '700', letterSpacing: 1 },
   
-  routeRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: 20, padding: 20, width: '100%', marginBottom: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
+  routeRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, borderRadius: 20, padding: 20, width: '100%', marginBottom: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
   stationInfo: { flex: 1 },
-  stationLabel: { fontSize: 11, color: 'rgba(255,255,255,0.5)', marginBottom: 4, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1 },
+  stationLabel: { fontSize: 11, color: COLORS.textLight, marginBottom: 4, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1 },
   stationName: { fontSize: 17, fontWeight: '800', color: '#fff' },
   routeArrow: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(0,201,167,0.15)', justifyContent: 'center', alignItems: 'center' },
   
   detailsRow: { flexDirection: 'row', gap: 10, flexWrap: 'wrap', justifyContent: 'center' },
-  detailChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.06)', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12, gap: 6, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  detailChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.cardBg, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12, gap: 6, borderWidth: 1, borderColor: COLORS.border },
   activeChip: { backgroundColor: 'rgba(34,197,94,0.1)', borderColor: 'rgba(34,197,94,0.2)' },
   invalidChip: { backgroundColor: 'rgba(239,68,68,0.15)', borderColor: 'rgba(239,68,68,0.3)' },
   detailText: { fontSize: 13, color: 'rgba(255,255,255,0.8)', fontWeight: '700' },

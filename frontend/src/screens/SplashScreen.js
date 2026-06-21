@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.7)',
+    color: COLORS.textLight,
     marginTop: 6,
     fontWeight: '500',
     letterSpacing: 0.5,

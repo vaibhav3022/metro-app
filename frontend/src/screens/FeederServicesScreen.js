@@ -1,4 +1,5 @@
 import React from 'react';
+import COLORS from '../constants/colors';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView,
   Alert, SafeAreaView, StatusBar, Platform, Linking
@@ -44,7 +45,7 @@ export default function FeederServicesScreen() {
   ];
 
   return (
-    <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.container}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.header}>
@@ -98,23 +99,23 @@ export default function FeederServicesScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 40 : 10, paddingBottom: 16 },
-  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  headerTitle: { fontSize: 20, fontWeight: '900', color: '#fff', letterSpacing: 0.5 },
+  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
+  headerTitle: { fontSize: 20, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
   
   scrollContent: { padding: 20, paddingBottom: 40 },
   
   banner: { borderRadius: 28, padding: 24, alignItems: 'center', marginBottom: 30, borderWidth: 1, borderColor: 'rgba(0,201,167,0.3)' },
-  bannerIcon: { width: 80, height: 80, borderRadius: 40, backgroundColor: 'rgba(255,255,255,0.1)', justifyContent: 'center', alignItems: 'center', marginBottom: 16, borderWidth: 1, borderColor: 'rgba(0,201,167,0.5)' },
+  bannerIcon: { width: 80, height: 80, borderRadius: 40, backgroundColor: COLORS.cardBg, justifyContent: 'center', alignItems: 'center', marginBottom: 16, borderWidth: 1, borderColor: 'rgba(0,201,167,0.5)' },
   bannerTitle: { fontSize: 20, fontWeight: '900', color: '#fff', marginBottom: 8, letterSpacing: 0.5 },
-  bannerSubtitle: { fontSize: 14, color: 'rgba(255,255,255,0.7)', textAlign: 'center', lineHeight: 22, fontWeight: '500' },
+  bannerSubtitle: { fontSize: 14, color: COLORS.textLight, textAlign: 'center', lineHeight: 22, fontWeight: '500' },
   
-  sectionTitle: { fontSize: 18, fontWeight: '800', color: '#fff', marginBottom: 16, letterSpacing: 0.5 },
+  sectionTitle: { fontSize: 18, fontWeight: '800', color: COLORS.text, marginBottom: 16, letterSpacing: 0.5 },
   
-  serviceCard: { backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 24, padding: 24, marginBottom: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  serviceCard: { backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 24, marginBottom: 16, borderWidth: 1, borderColor: COLORS.border },
   serviceHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
-  serviceIcon: { width: 56, height: 56, borderRadius: 20, justifyContent: 'center', alignItems: 'center', marginRight: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  serviceIcon: { width: 56, height: 56, borderRadius: 20, justifyContent: 'center', alignItems: 'center', marginRight: 16, borderWidth: 1, borderColor: COLORS.border },
   serviceTitle: { fontSize: 18, fontWeight: '800', color: '#fff', flex: 1 },
-  serviceDesc: { fontSize: 14, color: 'rgba(255,255,255,0.6)', lineHeight: 22, marginBottom: 20 },
+  serviceDesc: { fontSize: 14, color: COLORS.textLight, lineHeight: 22, marginBottom: 20 },
   
   serviceButtonWrap: { borderRadius: 14, overflow: 'hidden', alignSelf: 'flex-start' },
   serviceButtonGrad: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 12 },

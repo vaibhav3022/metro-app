@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import COLORS from '../constants/colors';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView,
   ActivityIndicator, Alert, StatusBar, Platform
@@ -41,7 +42,7 @@ export default function FareCalculatorScreen() {
   };
 
   return (
-    <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.gradient}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.gradient}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
@@ -76,7 +77,7 @@ export default function FareCalculatorScreen() {
           />
 
           <TouchableOpacity onPress={calculateFare} style={styles.calcBtnContainer}>
-            <LinearGradient colors={['#00C9A7', '#009980']} style={styles.calcButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+            <LinearGradient colors={[COLORS.secondary, COLORS.secondary]} style={styles.calcButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
               <Text style={styles.calcButtonText}>Calculate Fare</Text>
               <Icon name="calculator-variant-outline" size={20} color="#fff" style={{ marginLeft: 10 }} />
             </LinearGradient>
@@ -122,23 +123,23 @@ const styles = StyleSheet.create({
   gradient: { flex: 1 },
   container: { padding: 20, paddingBottom: 50, paddingTop: Platform.OS === 'android' ? 50 : 20 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 },
-  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  headerTitle: { fontSize: 24, fontWeight: '900', color: '#fff', letterSpacing: 0.5 },
+  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
+  headerTitle: { fontSize: 24, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
   
-  card: { backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 28, padding: 24, marginBottom: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  card: { backgroundColor: COLORS.cardBg, borderRadius: 28, padding: 24, marginBottom: 24, borderWidth: 1, borderColor: COLORS.border },
   swapButton: { alignSelf: 'center', marginVertical: -10, zIndex: 10 },
-  swapIconWrap: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#141432', justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: 'rgba(0,201,167,0.4)' },
+  swapIconWrap: { width: 48, height: 48, borderRadius: 24, backgroundColor: COLORS.cardBg, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: 'rgba(0,201,167,0.4)' },
   
   calcBtnContainer: { marginTop: 24, borderRadius: 16, overflow: 'hidden' },
   calcButton: { paddingVertical: 18, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
   calcButtonText: { color: '#fff', fontSize: 16, fontWeight: '800', letterSpacing: 1 },
   
-  resultCard: { backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 28, padding: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  resultCard: { backgroundColor: COLORS.cardBg, borderRadius: 28, padding: 24, borderWidth: 1, borderColor: COLORS.border },
   resultTitle: { fontSize: 16, fontWeight: '800', color: '#fff', textAlign: 'center', marginBottom: 20, letterSpacing: 0.5 },
   resultGrid: { flexDirection: 'row', justifyContent: 'space-between' },
   resultItem: { flex: 1, alignItems: 'center' },
-  resultItemBorder: { borderLeftWidth: 1, borderRightWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  resultItemBorder: { borderLeftWidth: 1, borderRightWidth: 1, borderColor: COLORS.border },
   resultIconWrap: { width: 64, height: 64, borderRadius: 32, justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
-  resultValue: { fontSize: 26, fontWeight: '900', color: '#fff', marginBottom: 4 },
-  resultLabel: { fontSize: 12, fontWeight: '700', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: 1 },
+  resultValue: { fontSize: 26, fontWeight: '900', color: COLORS.text, marginBottom: 4 },
+  resultLabel: { fontSize: 12, fontWeight: '700', color: COLORS.textLight, textTransform: 'uppercase', letterSpacing: 1 },
 });

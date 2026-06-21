@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Sidebar from './components/Sidebar';
+import ThemeToggle from './components/ThemeToggle';
 import Login from './pages/Login';
 import Home from './pages/Home';
 import BookTicket from './pages/BookTicket';
@@ -52,8 +53,32 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   return (
     <div className="app-layout">
       <Sidebar />
-      <main className="main-content">
-        {children}
+      <main className="main-content" style={{ display: 'flex', flexDirection: 'column', padding: 0 }}>
+        <header className="top-header" style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '16px 40px',
+          borderBottom: '1px solid var(--glass-border)',
+          background: 'var(--bg-secondary)',
+          position: 'sticky',
+          top: 0,
+          zIndex: 90,
+          height: '70px',
+          width: '100%'
+        }}>
+          <div>
+            <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-secondary)' }}>
+              Pune Metro Transit System
+            </span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <ThemeToggle />
+          </div>
+        </header>
+        <div style={{ flex: 1, padding: '40px' }}>
+          {children}
+        </div>
       </main>
     </div>
   );

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import COLORS from '../constants/colors';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, Platform, StatusBar, Animated
 } from 'react-native';
@@ -73,7 +74,7 @@ export default function MetroMapScreen() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.container}>
+      <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
         <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.header}>
@@ -191,20 +192,20 @@ export default function MetroMapScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 40 : 10, paddingBottom: 16 },
-  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  headerTitle: { fontSize: 20, fontWeight: '900', color: '#fff', letterSpacing: 0.5 },
+  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
+  headerTitle: { fontSize: 20, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
   
   mapContainer: { flex: 1, backgroundColor: 'rgba(255,255,255,0.02)', marginHorizontal: 20, borderRadius: 28, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)', overflow: 'hidden', position: 'relative' },
   svgWrapper: { padding: 20 },
   
-  zoomControls: { position: 'absolute', right: 20, bottom: 20, backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  zoomControls: { position: 'absolute', right: 20, bottom: 20, backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 12, borderWidth: 1, borderColor: COLORS.border },
   zoomButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center' },
-  zoomDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.1)' },
+  zoomDivider: { height: 1, backgroundColor: COLORS.cardBg },
 
-  legend: { backgroundColor: 'rgba(10,10,26,0.9)', padding: 24, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)', borderTopLeftRadius: 32, borderTopRightRadius: 32, marginTop: 20 },
+  legend: { backgroundColor: 'rgba(10,10,26,0.9)', padding: 24, borderTopWidth: 1, borderTopColor: COLORS.border, borderTopLeftRadius: 32, borderTopRightRadius: 32, marginTop: 20 },
   legendTitle: { fontSize: 16, fontWeight: '800', color: '#fff', marginBottom: 16, letterSpacing: 0.5 },
   legendItems: { flexDirection: 'column', gap: 12 },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  legendDot: { width: 16, height: 16, borderRadius: 8, borderWidth: 2, borderColor: 'rgba(255,255,255,0.2)' },
-  legendLabel: { fontSize: 14, color: 'rgba(255,255,255,0.7)', fontWeight: '600' },
+  legendDot: { width: 16, height: 16, borderRadius: 8, borderWidth: 2, borderColor: COLORS.border },
+  legendLabel: { fontSize: 14, color: COLORS.textLight, fontWeight: '600' },
 });

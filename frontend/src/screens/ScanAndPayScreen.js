@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import COLORS from '../constants/colors';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ActivityIndicator, Alert, SafeAreaView, KeyboardAvoidingView, Platform, StatusBar } from 'react-native';
 import { useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -143,7 +144,7 @@ export default function ScanAndPayScreen({ route, navigation }) {
   // Token success UI removed as payment is now direct
 
   return (
-    <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.container}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.header}>
@@ -195,7 +196,7 @@ export default function ScanAndPayScreen({ route, navigation }) {
               onPress={handlePayment}
               disabled={isProcessing}
             >
-              <LinearGradient colors={isProcessing ? ['#555', '#444'] : ['#00C9A7', '#009980']} style={styles.primaryButtonGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+              <LinearGradient colors={isProcessing ? ['#555', '#444'] : [COLORS.secondary, COLORS.secondary]} style={styles.primaryButtonGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
                 {isProcessing ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Pay Securely</Text>}
               </LinearGradient>
             </TouchableOpacity>
@@ -221,22 +222,22 @@ export default function ScanAndPayScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 40 : 20, paddingBottom: 16 },
-  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  headerTitle: { fontSize: 20, fontWeight: '800', color: '#fff' },
+  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
+  headerTitle: { fontSize: 20, fontWeight: '800', color: COLORS.text },
   
-  scannerContainer: { flex: 1, backgroundColor: '#0A0A1A', margin: 20, borderRadius: 32, overflow: 'hidden' },
+  scannerContainer: { flex: 1, backgroundColor: COLORS.background, margin: 20, borderRadius: 32, overflow: 'hidden' },
   camera: { flex: 1 },
   overlay: { flex: 1, backgroundColor: 'rgba(10,10,26,0.6)', justifyContent: 'center', alignItems: 'center' },
   scanFrame: { width: 280, height: 280, borderWidth: 3, borderColor: '#00C9A7', backgroundColor: 'transparent', borderRadius: 24 },
   scanText: { color: '#fff', marginTop: 24, fontSize: 16, fontWeight: '600', letterSpacing: 0.5 },
   
   paymentContainer: { flex: 1, padding: 20, justifyContent: 'center' },
-  merchantCard: { backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 24, padding: 32, alignItems: 'center', marginBottom: 30, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  merchantCard: { backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 32, alignItems: 'center', marginBottom: 30, borderWidth: 1, borderColor: COLORS.border },
   merchantIconWrap: { width: 80, height: 80, borderRadius: 40, backgroundColor: 'rgba(155,89,182,0.15)', justifyContent: 'center', alignItems: 'center', marginBottom: 16 },
   merchantName: { fontSize: 24, fontWeight: '900', color: '#fff', textAlign: 'center' },
-  merchantId: { fontSize: 14, color: 'rgba(255,255,255,0.5)', marginTop: 6 },
+  merchantId: { fontSize: 14, color: COLORS.textLight, marginTop: 6 },
   
-  amountInputContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 20, paddingHorizontal: 20, height: 80, marginBottom: 30, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)' },
+  amountInputContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 20, paddingHorizontal: 20, height: 80, marginBottom: 30, borderWidth: 1, borderColor: COLORS.border },
   currencySymbol: { fontSize: 40, color: '#00C9A7', fontWeight: '900', marginRight: 15 },
   amountInput: { flex: 1, fontSize: 40, color: '#fff', fontWeight: 'bold' },
   
@@ -250,8 +251,8 @@ const styles = StyleSheet.create({
   successContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
   successIconWrap: { width: 140, height: 140, borderRadius: 70, backgroundColor: 'rgba(0,201,167,0.15)', justifyContent: 'center', alignItems: 'center', marginBottom: 24 },
   successTitle: { fontSize: 28, fontWeight: '900', color: '#00C9A7', marginBottom: 12 },
-  successDesc: { fontSize: 16, color: 'rgba(255,255,255,0.6)', textAlign: 'center', marginBottom: 40, paddingHorizontal: 20 },
-  tokenBox: { backgroundColor: 'rgba(255,255,255,0.08)', paddingVertical: 24, paddingHorizontal: 40, borderRadius: 24, borderWidth: 2, borderColor: '#00C9A7', borderStyle: 'dashed', marginBottom: 40 },
+  successDesc: { fontSize: 16, color: COLORS.textLight, textAlign: 'center', marginBottom: 40, paddingHorizontal: 20 },
+  tokenBox: { backgroundColor: COLORS.cardBg, paddingVertical: 24, paddingHorizontal: 40, borderRadius: 24, borderWidth: 2, borderColor: '#00C9A7', borderStyle: 'dashed', marginBottom: 40 },
   tokenText: { fontSize: 48, fontWeight: '900', color: '#fff', letterSpacing: 12 },
   homeBtn: { width: '100%', borderRadius: 16, overflow: 'hidden' }
 });

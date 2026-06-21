@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import COLORS from '../constants/colors';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, TextInput, StatusBar, ActivityIndicator, Modal, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
@@ -51,7 +52,7 @@ export default function ShopsScreen({ navigation }) {
           <Text style={styles.shopCategory}>{item.category || 'Retail'}</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Icon name="email-outline" size={14} color="rgba(255,255,255,0.5)" />
-            <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', marginLeft: 4 }}>{item.merchantId?.userId?.email || 'No email'}</Text>
+            <Text style={{ fontSize: 12, color: COLORS.textLight, marginLeft: 4 }}>{item.merchantId?.userId?.email || 'No email'}</Text>
           </View>
         </View>
         <View style={styles.locationRow}>
@@ -68,7 +69,7 @@ export default function ShopsScreen({ navigation }) {
               onPress={() => navigation.navigate('ScanAndPay', { shopId: item._id, shopName: item.shopName })}
               style={{ borderRadius: 16, overflow: 'hidden' }}
             >
-              <LinearGradient colors={['#9B59B6', '#6C3483']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.payBtn}>
+              <LinearGradient colors={[COLORS.primary, COLORS.primary]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.payBtn}>
                 <Icon name="form-textbox" size={16} color="#fff" style={{ marginRight: 6 }} />
                 <Text style={styles.payBtnText}>Pay</Text>
               </LinearGradient>
@@ -78,7 +79,7 @@ export default function ShopsScreen({ navigation }) {
               onPress={() => navigation.navigate('ScanAndPay')}
               style={{ borderRadius: 16, overflow: 'hidden' }}
             >
-              <LinearGradient colors={['#00C9A7', '#009980']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.payBtn}>
+              <LinearGradient colors={[COLORS.secondary, COLORS.secondary]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.payBtn}>
                 <Icon name="qrcode-scan" size={16} color="#fff" style={{ marginRight: 6 }} />
                 <Text style={styles.payBtnText}>Scan</Text>
               </LinearGradient>
@@ -90,7 +91,7 @@ export default function ShopsScreen({ navigation }) {
   );
 
   return (
-    <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.container}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
@@ -198,7 +199,7 @@ export default function ShopsScreen({ navigation }) {
                     navigation.navigate('ScanAndPay', { shopId, shopName });
                   }}
                 >
-                  <LinearGradient colors={['#9B59B6', '#6C3483']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.modalActionGrad}>
+                  <LinearGradient colors={[COLORS.primary, COLORS.primary]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.modalActionGrad}>
                     <Icon name="form-textbox" size={20} color="#fff" style={{ marginRight: 8 }} />
                     <Text style={styles.modalActionText}>Pay Bill</Text>
                   </LinearGradient>
@@ -211,7 +212,7 @@ export default function ShopsScreen({ navigation }) {
                     navigation.navigate('ScanAndPay');
                   }}
                 >
-                  <LinearGradient colors={['#00C9A7', '#009980']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.modalActionGrad}>
+                  <LinearGradient colors={[COLORS.secondary, COLORS.secondary]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.modalActionGrad}>
                     <Icon name="qrcode-scan" size={20} color="#fff" style={{ marginRight: 8 }} />
                     <Text style={styles.modalActionText}>Scan QR</Text>
                   </LinearGradient>
@@ -241,34 +242,34 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: COLORS.cardBg,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: COLORS.border,
   },
-  headerTitle: { fontSize: 20, fontWeight: '800', color: '#fff' },
+  headerTitle: { fontSize: 20, fontWeight: '800', color: COLORS.text },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: COLORS.cardBg,
     marginHorizontal: 20,
     marginBottom: 20,
     borderRadius: 16,
     paddingHorizontal: 16,
     height: 54,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: COLORS.border,
   },
   searchIcon: { marginRight: 10 },
   searchInput: { flex: 1, fontSize: 15, color: '#fff' },
   listContent: { paddingHorizontal: 20, paddingBottom: 40 },
   card: {
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: COLORS.cardBg,
     borderRadius: 24,
     marginBottom: 20,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: COLORS.border,
   },
   cardImage: { width: '100%', height: 160 },
   cardImageOverlay: {
@@ -280,7 +281,7 @@ const styles = StyleSheet.create({
   shopName: { fontSize: 18, fontWeight: '800', color: '#fff', marginBottom: 4 },
   shopCategory: { fontSize: 13, color: '#00C9A7', marginBottom: 12, fontWeight: '700' },
   locationRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
-  shopLocation: { fontSize: 13, color: 'rgba(255,255,255,0.6)', marginLeft: 6, fontWeight: '500' },
+  shopLocation: { fontSize: 13, color: COLORS.textLight, marginLeft: 6, fontWeight: '500' },
   footerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   ratingBox: {
     flexDirection: 'row',
@@ -301,10 +302,10 @@ const styles = StyleSheet.create({
   },
   payBtnText: { color: '#fff', fontWeight: '700', fontSize: 14, letterSpacing: 0.5 },
   emptyContainer: { alignItems: 'center', marginTop: 80 },
-  emptyText: { color: 'rgba(255,255,255,0.4)', marginTop: 16, fontSize: 16, fontWeight: '500' },
+  emptyText: { color: COLORS.textLight, marginTop: 16, fontSize: 16, fontWeight: '500' },
   
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'flex-end' },
-  modalContent: { backgroundColor: '#141432', height: '80%', borderTopLeftRadius: 32, borderTopRightRadius: 32, overflow: 'hidden' },
+  modalContent: { backgroundColor: COLORS.cardBg, height: '80%', borderTopLeftRadius: 32, borderTopRightRadius: 32, overflow: 'hidden' },
   modalCloseBtn: { position: 'absolute', top: 16, right: 16, zIndex: 10, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
   modalImage: { width: '100%', height: 250 },
   modalImageGrad: { position: 'absolute', top: 0, width: '100%', height: 250 },
@@ -312,11 +313,11 @@ const styles = StyleSheet.create({
   modalHeaderInfo: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
   modalTitle: { fontSize: 26, fontWeight: '900', color: '#fff', flex: 1, marginRight: 10 },
   modalCategory: { fontSize: 15, color: '#00C9A7', fontWeight: '700', marginBottom: 24 },
-  modalInfoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16, backgroundColor: 'rgba(255,255,255,0.05)', padding: 14, borderRadius: 16 },
+  modalInfoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16, backgroundColor: COLORS.cardBg, padding: 14, borderRadius: 16 },
   modalInfoText: { color: 'rgba(255,255,255,0.8)', fontSize: 14, marginLeft: 12, fontWeight: '600' },
   modalDescWrap: { marginTop: 10, marginBottom: 40, backgroundColor: 'rgba(255,255,255,0.03)', padding: 16, borderRadius: 16 },
   modalDescTitle: { color: '#fff', fontSize: 16, fontWeight: '800', marginBottom: 8 },
-  modalDesc: { color: 'rgba(255,255,255,0.5)', fontSize: 14, lineHeight: 22 },
+  modalDesc: { color: COLORS.textLight, fontSize: 14, lineHeight: 22 },
   modalFooter: { flexDirection: 'row', padding: 20, paddingBottom: 30, backgroundColor: 'rgba(25,25,50,0.9)', gap: 12 },
   modalActionBtn: { flex: 1, borderRadius: 16, overflow: 'hidden' },
   modalActionGrad: { paddingVertical: 16, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },

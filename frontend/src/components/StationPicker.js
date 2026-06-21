@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import COLORS from '../constants/colors';
 import {
   View, Text, StyleSheet, TouchableOpacity, TextInput,
   Modal, FlatList, SafeAreaView
@@ -107,21 +108,21 @@ export default function StationPicker({
 
 const styles = StyleSheet.create({
   wrapper: { marginBottom: 8 },
-  label: { fontSize: 13, fontWeight: '600', color: 'rgba(255,255,255,0.6)', marginBottom: 8 },
-  selector: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12 },
+  label: { fontSize: 13, fontWeight: '600', color: COLORS.textLight, marginBottom: 8 },
+  selector: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.border, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12 },
   selectorOpen: { borderColor: '#00C9A7' },
   selectorText: { flex: 1, fontSize: 15, fontWeight: '600', color: '#fff' },
-  placeholderText: { color: 'rgba(255,255,255,0.4)', fontWeight: '400' },
+  placeholderText: { color: COLORS.textLight, fontWeight: '400' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
   modalContainer: { backgroundColor: '#1A0A3E', borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '80%' },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.1)' },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, borderBottomWidth: 1, borderBottomColor: COLORS.border },
   modalTitle: { fontSize: 18, fontWeight: '700', color: '#fff' },
-  searchWrap: { flexDirection: 'row', alignItems: 'center', margin: 16, backgroundColor: 'rgba(255,255,255,0.08)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10 },
+  searchWrap: { flexDirection: 'row', alignItems: 'center', margin: 16, backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.border, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10 },
   searchInput: { flex: 1, fontSize: 15, color: '#fff' },
   stationItem: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)' },
   stationItemActive: { backgroundColor: 'rgba(0,201,167,0.1)' },
   stationName: { fontSize: 15, color: 'rgba(255,255,255,0.8)', fontWeight: '500' },
   stationNameActive: { color: '#00C9A7', fontWeight: '800' },
   emptyItem: { padding: 32, alignItems: 'center' },
-  emptyText: { color: 'rgba(255,255,255,0.4)', fontSize: 14 },
+  emptyText: { color: COLORS.textLight, fontSize: 14 },
 });

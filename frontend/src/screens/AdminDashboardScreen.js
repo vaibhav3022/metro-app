@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import COLORS from '../constants/colors';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView,
   ActivityIndicator, Alert, Modal, Image, SafeAreaView, RefreshControl, StatusBar
@@ -88,7 +89,7 @@ export default function AdminDashboardScreen() {
   );
 
   return (
-    <LinearGradient colors={['#0A0A1A', '#0D1B3E', '#1A0A3E']} style={styles.safeArea}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         {/* Header */}
@@ -241,36 +242,36 @@ export default function AdminDashboardScreen() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   header: { paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 40 : 14, paddingBottom: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  headerTitle: { fontSize: 24, fontWeight: '900', color: '#fff', letterSpacing: 0.5 },
-  headerSubtitle: { fontSize: 13, color: 'rgba(255,255,255,0.55)', marginTop: 2 },
+  headerTitle: { fontSize: 24, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
+  headerSubtitle: { fontSize: 13, color: COLORS.textLight, marginTop: 2 },
   headerActions: { flexDirection: 'row', gap: 10 },
-  headerBtn: { backgroundColor: 'rgba(255,255,255,0.08)', padding: 10, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  headerBtn: { backgroundColor: COLORS.cardBg, padding: 10, borderRadius: 12, borderWidth: 1, borderColor: COLORS.border },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   container: { padding: 20, paddingBottom: 40 },
-  sectionTitle: { fontSize: 16, fontWeight: '800', color: 'rgba(255,255,255,0.8)', marginTop: 20, marginBottom: 14, textTransform: 'uppercase', letterSpacing: 1 },
+  sectionTitle: { fontSize: 16, fontWeight: '800', color: COLORS.textLight, marginTop: 20, marginBottom: 14, textTransform: 'uppercase', letterSpacing: 1 },
   statsGrid: { flexDirection: 'row', marginHorizontal: -6, marginBottom: 12 },
-  statCard: { flex: 1, marginHorizontal: 6, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 24, padding: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', alignItems: 'flex-start' },
+  statCard: { flex: 1, marginHorizontal: 6, backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 20, borderWidth: 1, borderColor: COLORS.border, alignItems: 'flex-start' },
   statIconWrap: { width: 50, height: 50, borderRadius: 16, justifyContent: 'center', alignItems: 'center', marginBottom: 16 },
   statValue: { fontSize: 24, fontWeight: '900', color: '#fff', marginBottom: 4 },
-  statTitle: { fontSize: 13, color: 'rgba(255,255,255,0.6)', fontWeight: '600' },
-  navCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.06)', padding: 16, borderRadius: 24, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  statTitle: { fontSize: 13, color: COLORS.textLight, fontWeight: '600' },
+  navCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.cardBg, padding: 16, borderRadius: 24, marginBottom: 12, borderWidth: 1, borderColor: COLORS.border },
   navIconWrap: { width: 54, height: 54, borderRadius: 16, justifyContent: 'center', alignItems: 'center', marginRight: 16 },
   navCardTitle: { fontSize: 16, fontWeight: '800', color: '#fff', marginBottom: 4 },
-  navCardSubtitle: { fontSize: 13, color: 'rgba(255,255,255,0.5)' },
-  emptyBox: { backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 20, padding: 30, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
-  emptyBoxText: { color: 'rgba(255,255,255,0.5)', fontWeight: '600', fontSize: 14 },
-  listItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.06)', padding: 16, borderRadius: 20, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  navCardSubtitle: { fontSize: 13, color: COLORS.textLight },
+  emptyBox: { backgroundColor: COLORS.cardBg, borderRadius: 20, padding: 30, alignItems: 'center', borderWidth: 1, borderColor: COLORS.border },
+  emptyBoxText: { color: COLORS.textLight, fontWeight: '600', fontSize: 14 },
+  listItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.cardBg, padding: 16, borderRadius: 20, marginBottom: 12, borderWidth: 1, borderColor: COLORS.border },
   listItemIcon: { width: 48, height: 48, borderRadius: 14, backgroundColor: 'rgba(0,201,167,0.15)', justifyContent: 'center', alignItems: 'center', marginRight: 14 },
   listItemTitle: { fontSize: 15, fontWeight: '800', color: '#fff', marginBottom: 2 },
-  listItemSub: { fontSize: 13, color: 'rgba(255,255,255,0.5)' },
+  listItemSub: { fontSize: 13, color: COLORS.textLight },
   listItemAmount: { fontSize: 16, fontWeight: '900', color: '#fff' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', alignItems: 'center', padding: 20 },
-  modalCard: { backgroundColor: '#141432', borderRadius: 32, padding: 24, width: '100%', maxWidth: 400, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  modalClose: { position: 'absolute', top: 20, right: 20, zIndex: 1, padding: 8, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 16 },
+  modalCard: { backgroundColor: COLORS.cardBg, borderRadius: 32, padding: 24, width: '100%', maxWidth: 400, borderWidth: 1, borderColor: COLORS.border },
+  modalClose: { position: 'absolute', top: 20, right: 20, zIndex: 1, padding: 8, backgroundColor: COLORS.cardBg, borderRadius: 16 },
   modalIconWrap: { width: 80, height: 80, borderRadius: 40, backgroundColor: 'rgba(0,201,167,0.15)', justifyContent: 'center', alignItems: 'center', alignSelf: 'center', marginBottom: 16 },
   modalTitle: { fontSize: 20, fontWeight: '900', color: '#fff', textAlign: 'center', marginBottom: 20 },
-  modalBody: { backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 20, padding: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
+  modalBody: { backgroundColor: COLORS.cardBg, borderRadius: 20, padding: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
   modalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)' },
-  modalLabel: { fontSize: 14, color: 'rgba(255,255,255,0.6)', fontWeight: '600' },
+  modalLabel: { fontSize: 14, color: COLORS.textLight, fontWeight: '600' },
   modalValue: { fontSize: 14, fontWeight: '800', color: '#fff', maxWidth: '60%', textAlign: 'right' },
 });

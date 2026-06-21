@@ -1,17 +1,18 @@
 export const COLORS = {
-  primary: '#0066CC',      // Metro Blue
-  secondary: '#FF6B00',    // Orange
+  primary: '#6A1B9A',      // Pune Metro Purple Line
+  secondary: '#00897B',    // Pune Metro Aqua Line
   background: '#F5F5F5',
   white: '#FFFFFF',
-  text: '#333333',
-  textLight: '#777777',
-  success: '#4CAF50',
-  error: '#F44336',
+  text: '#212121',
+  textLight: '#757575',
+  success: '#2E7D32',
+  error: '#D32F2F',
   warning: '#FFC107',
   border: '#E0E0E0',
   cardBg: '#FFFFFF',
-  purpleLine: '#8E24AA',   // PCMC to Swargate Line
-  aquaLine: '#00ACC1'      // Vanaz to Ramwadi Line
+  purpleLine: '#6A1B9A',   // PCMC to Swargate Line
+  aquaLine: '#00897B'      // Vanaz to Ramwadi Line
 };
 
 export default COLORS;
+
