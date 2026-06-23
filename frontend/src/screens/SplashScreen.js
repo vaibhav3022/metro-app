@@ -3,13 +3,15 @@ import { StyleSheet, Text, View, ActivityIndicator, StatusBar } from 'react-nati
 import { useDispatch } from 'react-redux';
 import LinearGradient from 'react-native-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import COLORS from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import { storage } from '../utils/storage';
 import { authSuccess, logout } from '../redux/slices/authSlice';
 import { authAPI } from '../api/authAPI';
 
 export default function SplashScreen({ navigation }) {
   const dispatch = useDispatch();
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
 
   useEffect(() => {
     const checkAuthStatus = async () => {
@@ -89,7 +91,7 @@ export default function SplashScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'space-between',
@@ -124,7 +126,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
-    color: COLORS.textLight,
+    color: COLORS.white,
     marginTop: 6,
     fontWeight: '500',
     letterSpacing: 0.5,
@@ -133,7 +135,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    color: 'rgba(255, 255, 255, 0.6)',
+    color: 'rgba(255, 255, 255, 0.8)',
     marginTop: 12,
     fontSize: 12,
     fontWeight: '500',

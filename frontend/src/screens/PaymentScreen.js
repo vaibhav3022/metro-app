@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import COLORS from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import {
   StyleSheet, Text, View, TouchableOpacity, StatusBar,
-  Alert, ScrollView, TextInput, ActivityIndicator, Platform
+  Alert, ScrollView, TextInput, ActivityIndicator, Platform, Modal
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector, useDispatch } from 'react-redux';
@@ -17,11 +17,14 @@ import { deductMoneySuccess } from '../redux/slices/walletSlice';
 export default function PaymentScreen({ route, navigation }) {
   const { paymentContext = 'ticket', amount = 0 } = route?.params || {};
   const dispatch = useDispatch();
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
   const bookingDetails = useSelector((state) => state.tickets.bookingDetails);
   const balance = useSelector((state) => state.wallet.balance);
 
   const [loading, setLoading] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState('');
+  const [successData, setSuccessData] = useState(null);
   
   const [expandedSection, setExpandedSection] = useState('upi');
   const [selectedMethod, setSelectedMethod] = useState(null);
@@ -42,8 +45,14 @@ export default function PaymentScreen({ route, navigation }) {
         const res = await walletAPI.addMoney(finalAmount, paymentId);
         dispatch(addMoneySuccess({ balance: res.balance, transaction: res.transaction }));
         setLoading(false);
-        Alert.alert('Recharge Successful', `₹${finalAmount} added to your wallet.`);
-        navigation.goBack();
+        setSuccessData({
+          title: 'Recharge Successful!',
+          amount: finalAmount,
+          message: `Added ₹${finalAmount} to your wallet.`,
+          method: 'Top Up',
+          actionText: 'Back to Dashboard',
+          onAction: () => navigation.goBack()
+        });
         return;
       }
 
@@ -60,9 +69,14 @@ export default function PaymentScreen({ route, navigation }) {
         }
 
         setLoading(false);
-        Alert.alert('Payment Successful', `₹${finalAmount} paid to ${businessName || 'Merchant'} successfully!`, [
-          { text: 'OK', onPress: () => navigation.navigate('Home') }
-        ]);
+        setSuccessData({
+          title: 'Payment Successful!',
+          amount: finalAmount,
+          message: `Paid to ${businessName || 'Merchant'}`,
+          method: 'Merchant Payment',
+          actionText: 'Back to Dashboard',
+          onAction: () => navigation.navigate('Home')
+        });
         return;
       }
 
@@ -82,11 +96,14 @@ export default function PaymentScreen({ route, navigation }) {
       setLoading(false);
       dispatch(setCurrentTicket(paymentResult.ticket));
 
-      Alert.alert(
-        'Payment Successful',
-        `Ticket booked successfully!\nTicket ID: ${paymentResult.ticket.ticketId}`,
-        [{ text: 'View Ticket QR', onPress: () => navigation.replace('QRTicket') }]
-      );
+      setSuccessData({
+        title: 'Ticket Booked!',
+        amount: finalAmount,
+        message: `Ticket ID: ${paymentResult.ticket.ticketId}`,
+        method: 'Ticket Booking',
+        actionText: 'View Ticket QR',
+        onAction: () => navigation.replace('QRTicket')
+      });
     } catch (error) {
       setLoading(false);
       Alert.alert('Payment Failure', error.response?.data?.message || 'Error processing transaction.');
@@ -137,7 +154,7 @@ export default function PaymentScreen({ route, navigation }) {
 
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
       
       {loading && (
         <View style={styles.loadingOverlay}>
@@ -149,7 +166,7 @@ export default function PaymentScreen({ route, navigation }) {
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <Icon name="arrow-left" size={24} color="#fff" />
+            <Icon name="arrow-left" size={24} color={COLORS.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Secure Checkout</Text>
           <View style={{ width: 40 }} />
@@ -231,7 +248,7 @@ export default function PaymentScreen({ route, navigation }) {
                          <TextInput 
                            style={styles.inputField} 
                            placeholder="e.g. username@bank" 
-                           placeholderTextColor="rgba(255,255,255,0.3)" 
+                           placeholderTextColor="#AAAAAA" 
                            autoCapitalize="none"
                            value={manualUpiId}
                            onChangeText={setManualUpiId}
@@ -265,10 +282,10 @@ export default function PaymentScreen({ route, navigation }) {
                  
                  {selectedMethod === 'card' && (
                    <View style={styles.cardForm}>
-                     <TextInput style={styles.inputField} placeholder="Card Number" placeholderTextColor="rgba(255,255,255,0.3)" keyboardType="number-pad" maxLength={16} />
+                     <TextInput style={styles.inputField} placeholder="Card Number" placeholderTextColor="#AAAAAA" keyboardType="number-pad" maxLength={16} />
                      <View style={styles.cardRow}>
-                       <TextInput style={[styles.inputField, {flex: 1, marginRight: 8}]} placeholder="MM/YY" placeholderTextColor="rgba(255,255,255,0.3)" keyboardType="number-pad" maxLength={5} />
-                       <TextInput style={[styles.inputField, {flex: 1, marginLeft: 8}]} placeholder="CVV" placeholderTextColor="rgba(255,255,255,0.3)" keyboardType="number-pad" secureTextEntry maxLength={3} />
+                       <TextInput style={[styles.inputField, {flex: 1, marginRight: 8}]} placeholder="MM/YY" placeholderTextColor="#AAAAAA" keyboardType="number-pad" maxLength={5} />
+                       <TextInput style={[styles.inputField, {flex: 1, marginLeft: 8}]} placeholder="CVV" placeholderTextColor="#AAAAAA" keyboardType="number-pad" secureTextEntry maxLength={3} />
                      </View>
                    </View>
                  )}
@@ -311,12 +328,47 @@ export default function PaymentScreen({ route, navigation }) {
             </LinearGradient>
           </TouchableOpacity>
         </View>
+
+        {/* Premium Success Modal */}
+        <Modal visible={!!successData} transparent animationType="fade">
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalIconWrap}>
+                <Icon name="check-decagram" size={70} color="#00C9A7" />
+              </View>
+              <Text style={styles.modalTitle}>{successData?.title}</Text>
+              <Text style={styles.modalAmount}>₹{successData?.amount?.toFixed(2)}</Text>
+              <Text style={styles.modalMessage}>{successData?.message}</Text>
+              
+              <View style={styles.modalDivider} />
+              <View style={styles.modalRow}>
+                 <Text style={styles.modalLabel}>Type:</Text>
+                 <Text style={styles.modalValue}>{successData?.method}</Text>
+              </View>
+              <View style={styles.modalRow}>
+                 <Text style={styles.modalLabel}>Date:</Text>
+                 <Text style={styles.modalValue}>{new Date().toLocaleString()}</Text>
+              </View>
+
+              <TouchableOpacity style={styles.modalBtn} onPress={() => {
+                const action = successData?.onAction;
+                setSuccessData(null);
+                if (action) action();
+              }}>
+                <LinearGradient colors={['#00C9A7', '#00A88F']} style={styles.modalBtnGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                   <Text style={styles.modalBtnText}>{successData?.actionText || 'OK'}</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
       </SafeAreaView>
     </LinearGradient>
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 40 : 10, paddingBottom: 16 },
   backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
@@ -332,7 +384,7 @@ const styles = StyleSheet.create({
   orderIdText: { fontSize: 12, color: COLORS.textLight, fontWeight: '500' },
   
   merchantLabelWrap: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16, backgroundColor: 'rgba(0, 201, 167, 0.1)', paddingVertical: 8, paddingHorizontal: 16, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(0, 201, 167, 0.2)' },
-  merchantLabel: { fontSize: 14, color: '#fff', fontWeight: '800' },
+  merchantLabel: { fontSize: 14, color: COLORS.text, fontWeight: '800' },
 
   sectionTitle: { fontSize: 14, fontWeight: '800', color: COLORS.textLight, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12, paddingHorizontal: 4 },
   
@@ -340,18 +392,35 @@ const styles = StyleSheet.create({
   accordionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16 },
   accordionLeft: { flexDirection: 'row', alignItems: 'center' },
   iconBg: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginRight: 16 },
-  accordionTitle: { fontSize: 16, fontWeight: '700', color: '#fff' },
+  accordionTitle: { fontSize: 16, fontWeight: '700', color: COLORS.text },
   
   accordionBody: { paddingHorizontal: 16, paddingBottom: 16 },
   paymentOption: { flexDirection: 'row', alignItems: 'center', padding: 14, borderRadius: 12, marginBottom: 8, backgroundColor: 'rgba(255,255,255,0.03)', borderWidth: 1, borderColor: 'transparent' },
   paymentOptionSelected: { backgroundColor: 'rgba(0,201,167,0.1)', borderColor: 'rgba(0,201,167,0.3)' },
-  optionText: { fontSize: 15, fontWeight: '600', color: '#fff', marginLeft: 12 },
+  optionText: { fontSize: 15, fontWeight: '600', color: COLORS.text, marginLeft: 12 },
   
-  cardForm: { padding: 16, backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, marginTop: 8 },
-  inputField: { backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.border, borderRadius: 12, paddingHorizontal: 16, height: 50, marginBottom: 12, fontSize: 15, color: '#fff', fontWeight: '500' },
+  cardForm: { padding: 16, backgroundColor: COLORS.background, borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, marginTop: 8 },
+  inputField: { backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.border, borderRadius: 12, paddingHorizontal: 16, height: 50, marginBottom: 12, fontSize: 15, color: COLORS.text, fontWeight: '500' },
   cardRow: { flexDirection: 'row', justifyContent: 'space-between' },
   
-  footer: { padding: 20, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(10,10,26,0.8)' },
+  footer: { padding: 20, borderTopWidth: 1, borderTopColor: COLORS.border, backgroundColor: COLORS.cardBg },
   payButton: { flexDirection: 'row', height: 60, alignItems: 'center', justifyContent: 'center' },
   payButtonText: { fontSize: 16, fontWeight: '800', letterSpacing: 1 },
+
+  // Modal Styles
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+  modalContent: { width: '100%', backgroundColor: '#ffffff', borderRadius: 28, padding: 30, alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.25, shadowRadius: 20, elevation: 15 },
+  modalIconWrap: { width: 100, height: 100, borderRadius: 50, backgroundColor: 'rgba(0,201,167,0.15)', justifyContent: 'center', alignItems: 'center', marginBottom: 20 },
+  modalTitle: { fontSize: 24, fontWeight: '900', color: '#111', marginBottom: 10, textAlign: 'center' },
+  modalAmount: { fontSize: 40, fontWeight: '900', color: '#00C9A7', marginBottom: 10 },
+  modalMessage: { fontSize: 16, color: '#555', marginBottom: 25, textAlign: 'center', fontWeight: '600' },
+  
+  modalDivider: { width: '100%', height: 1, backgroundColor: '#eee', marginBottom: 20 },
+  modalRow: { flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginBottom: 12 },
+  modalLabel: { fontSize: 14, color: '#888', fontWeight: '600' },
+  modalValue: { fontSize: 14, color: '#333', fontWeight: '800' },
+  
+  modalBtn: { width: '100%', borderRadius: 16, overflow: 'hidden', marginTop: 30 },
+  modalBtnGrad: { paddingVertical: 16, alignItems: 'center' },
+  modalBtnText: { color: '#fff', fontSize: 16, fontWeight: '800', letterSpacing: 0.5 },
 });

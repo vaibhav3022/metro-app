@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import COLORS from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import { StyleSheet, Text, View, TouchableOpacity, StatusBar, ScrollView, RefreshControl, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -10,6 +10,8 @@ import moment from 'moment';
 export default function NotificationsScreen({ navigation }) {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
 
   const fetchNotifications = async () => {
     setLoading(true);
@@ -50,7 +52,7 @@ export default function NotificationsScreen({ navigation }) {
 
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
       
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.header}>
@@ -97,7 +99,7 @@ export default function NotificationsScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingTop: Platform.OS === 'android' ? 20 : 10, paddingBottom: 16 },
   backButton: { padding: 10, backgroundColor: COLORS.cardBg, borderRadius: 20, borderWidth: 1, borderColor: COLORS.border },

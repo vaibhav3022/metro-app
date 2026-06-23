@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
-import COLORS from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet,
-  StatusBar, ActivityIndicator, Dimensions, Image, FlatList
+  StatusBar, ActivityIndicator, Dimensions, Image, FlatList, Alert, Linking
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,6 +12,8 @@ import { fetchHistorySuccess, setCurrentTicket } from '../redux/slices/ticketSli
 
 export default function HomeScreen({ navigation }) {
   const dispatch = useDispatch();
+  const { theme: COLORS, isDark, toggleTheme } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
   const { user } = useSelector((state) => state.auth);
   const { balance, loading: walletLoading } = useSelector((state) => state.wallet);
   const { history } = useSelector((state) => state.tickets);
@@ -85,7 +87,7 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
 
       {/* ── STICKY TOP: Header + Slider ── */}
       <View style={styles.stickyTop}>
@@ -93,13 +95,18 @@ export default function HomeScreen({ navigation }) {
         <View style={styles.header}>
           <View>
             <Text style={styles.greeting}>{greeting},</Text>
-            <Text style={styles.userName}>{user?.name || 'Passenger'} 👋</Text>
+            <Text style={styles.userName}>{user?.name || 'Passenger'}</Text>
           </View>
-          <TouchableOpacity onPress={() => navigation.navigate('ProfileTab')} style={styles.avatarWrap}>
-            <LinearGradient colors={[COLORS.secondary, COLORS.primary]} style={styles.avatar}>
-              <Text style={styles.avatarText}>{(user?.name || 'P')[0].toUpperCase()}</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <TouchableOpacity onPress={toggleTheme} style={[styles.themeToggle, { marginRight: 15 }]}>
+              <Icon name={isDark ? "weather-night" : "white-balance-sunny"} size={24} color={COLORS.text} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('ProfileTab')} style={styles.avatarWrap}>
+              <LinearGradient colors={[COLORS.secondary, COLORS.primary]} style={styles.avatar}>
+                <Text style={styles.avatarText}>{(user?.name || 'P')[0].toUpperCase()}</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Image Slider */}
@@ -192,6 +199,59 @@ export default function HomeScreen({ navigation }) {
           </View>
         )}
 
+        {/* PMPML Bus Booking Card */}
+        <TouchableOpacity style={styles.pmpmlCard} onPress={async () => {
+          try {
+            // Android 11+ requires explicit intents to launch other apps directly
+            const intents = [
+              'intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=com.chartr.pmpml;end;',
+              'intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=org.pmpml.econnect;end;',
+              'intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=com.amnex.pmpml;end;',
+              'pmpml://'
+            ];
+            
+            let opened = false;
+            for (let intentUri of intents) {
+              try {
+                // We use openURL directly because canOpenURL fails on Android 11+ without Manifest <queries>
+                await Linking.openURL(intentUri);
+                opened = true;
+                break;
+              } catch (e) {
+                // Ignore and try next intent
+              }
+            }
+            
+            if (!opened) {
+               // Fallback ONLY if all intents fail
+               Linking.openURL('https://play.google.com/store/search?q=PMPML&c=apps');
+            }
+          } catch (error) {
+            Alert.alert('Error', 'Could not process request');
+          }
+        }}>
+          <LinearGradient colors={['#FF9800', '#F57C00']} style={styles.pmpmlIconWrap} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+            <Icon name="bus" size={24} color="#fff" />
+          </LinearGradient>
+          <View style={{ flex: 1, marginLeft: 16 }}>
+            <Text style={styles.pmpmlTitle}>PMPML Bus Tickets</Text>
+            <Text style={styles.pmpmlSub}>Book city bus tickets seamlessly</Text>
+          </View>
+          <Icon name="chevron-right" size={22} color="#888" />
+        </TouchableOpacity>
+
+        {/* EV Auto Rickshaws Card */}
+        <TouchableOpacity style={styles.evAutoCard} onPress={() => Linking.openURL('https://play.google.com/store/search?q=Pune+EV+Auto&c=apps').catch(() => Alert.alert('Error', 'Could not open Play Store'))}>
+          <LinearGradient colors={['#3b82f6', '#2563eb']} style={styles.evAutoIconWrap} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+            <Icon name="car-electric" size={24} color="#fff" />
+          </LinearGradient>
+          <View style={{ flex: 1, marginLeft: 16 }}>
+            <Text style={styles.evAutoTitle}>EV Auto</Text>
+            <Text style={styles.evAutoSub}>Book shared EV autos to your destination</Text>
+          </View>
+          <Icon name="chevron-right" size={22} color="#888" />
+        </TouchableOpacity>
+
         {/* Notifications shortcut */}
         <TouchableOpacity style={styles.notifCard} onPress={() => navigation.navigate('Notifications')}>
           <Icon name="bell-outline" size={22} color="#00C9A7" />
@@ -209,7 +269,7 @@ export default function HomeScreen({ navigation }) {
 }
 
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   container: { flex: 1 },
   stickyTop: {
     paddingTop: 50,
@@ -217,9 +277,10 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   scroll: { paddingTop: 10, paddingBottom: 30 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 22, marginBottom: 22 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, marginBottom: 22 },
   greeting: { fontSize: 14, color: COLORS.textLight },
   userName: { fontSize: 22, fontWeight: '800', color: COLORS.text, marginTop: 2 },
+  themeToggle: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.border },
   avatarWrap: { borderRadius: 28, overflow: 'hidden' },
   avatar: { width: 50, height: 50, borderRadius: 25, justifyContent: 'center', alignItems: 'center' },
   avatarText: { fontSize: 20, fontWeight: '800', color: '#fff' },
@@ -248,17 +309,27 @@ const styles = StyleSheet.create({
   bookBtnGrad: { paddingHorizontal: 28, paddingVertical: 11 },
   bookBtnText: { color: '#fff', fontWeight: '700', fontSize: 14 },
 
-  notifCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.cardBg, marginHorizontal: 22, borderRadius: 14, padding: 16, borderWidth: 1, borderColor: COLORS.border },
+  notifCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.cardBg, marginHorizontal: 22, borderRadius: 14, padding: 16, borderWidth: 1, borderColor: COLORS.border, marginBottom: 16 },
   notifTitle: { color: COLORS.text, fontWeight: '700', fontSize: 14 },
   notifSub: { color: COLORS.textLight, fontSize: 12, marginTop: 2 },
+
+  pmpmlCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.cardBg, marginHorizontal: 22, borderRadius: 14, padding: 16, borderWidth: 1, borderColor: '#F57C00', marginBottom: 16 },
+  pmpmlIconWrap: { width: 44, height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
+  pmpmlTitle: { color: COLORS.text, fontWeight: '700', fontSize: 14 },
+  pmpmlSub: { color: '#F57C00', fontSize: 12, marginTop: 2, fontWeight: '600' },
+
+  evAutoCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.cardBg, marginHorizontal: 22, borderRadius: 14, padding: 16, borderWidth: 1, borderColor: '#3b82f6', marginBottom: 16 },
+  evAutoIconWrap: { width: 44, height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
+  evAutoTitle: { color: COLORS.text, fontWeight: '700', fontSize: 14 },
+  evAutoSub: { color: '#3b82f6', fontSize: 12, marginTop: 2, fontWeight: '600' },
 
   activeTicketCard: { backgroundColor: COLORS.cardBg, marginHorizontal: 22, borderRadius: 20, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: 'rgba(0,201,167,0.3)' },
   ticketHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
   ticketIconWrap: { width: 50, height: 50, borderRadius: 16, backgroundColor: 'rgba(0,201,167,0.15)', justifyContent: 'center', alignItems: 'center', marginRight: 14 },
   ticketInfo: { flex: 1 },
-  ticketRoute: { fontSize: 16, fontWeight: '800', color: '#fff', marginBottom: 4 },
+  ticketRoute: { fontSize: 16, fontWeight: '800', color: COLORS.text, marginBottom: 4 },
   ticketStatusText: { fontSize: 13, color: '#00C9A7', fontWeight: '700' },
   ticketFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, borderTopColor: COLORS.border, paddingTop: 14 },
   ticketDetails: { fontSize: 14, color: COLORS.textLight, fontWeight: '500' },
-  ticketFare: { fontSize: 18, fontWeight: '900', color: '#fff' },
+  ticketFare: { fontSize: 18, fontWeight: '900', color: COLORS.text },
 });

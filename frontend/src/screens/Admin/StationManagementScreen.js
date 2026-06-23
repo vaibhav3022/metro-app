@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import COLORS from '../../constants/colors';
+import { useTheme } from '../../context/ThemeContext';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, RefreshControl, TextInput, ActivityIndicator, Alert, Modal, StatusBar, Switch, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -9,6 +9,9 @@ import EmptyState from '../../components/EmptyState';
 import ToastMessage from '../../components/ToastMessage';
 
 export default function StationManagementScreen({ navigation }) {
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
+
   const [stations, setStations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('All');
@@ -90,13 +93,13 @@ export default function StationManagementScreen({ navigation }) {
 
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         {toast.visible && <ToastMessage message={toast.message} type={toast.type} onHide={() => setToast({ ...toast, visible: false })} />}
         
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack?.()}>
-            <MaterialCommunityIcons name="arrow-left" size={24} color="#fff" />
+            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Station Config</Text>
           <TouchableOpacity style={styles.addBtn} onPress={() => { resetForm(); setModalVisible(true); }}>
@@ -109,7 +112,7 @@ export default function StationManagementScreen({ navigation }) {
           <TextInput
             style={styles.searchInput}
             placeholder="Search stations..."
-            placeholderTextColor="rgba(255,255,255,0.4)"
+            placeholderTextColor="#AAAAAA"
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -172,8 +175,8 @@ export default function StationManagementScreen({ navigation }) {
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>{form._id ? 'Edit Station' : 'Add Station'}</Text>
               <ScrollView showsVerticalScrollIndicator={false}>
-                <TextInput style={styles.modalInput} placeholderTextColor="rgba(255,255,255,0.4)" placeholder="Station Name" value={form.name} onChangeText={(t) => setForm({...form, name: t})} />
-                <TextInput style={styles.modalInput} placeholderTextColor="rgba(255,255,255,0.4)" placeholder="Station Code (Max 5)" maxLength={5} autoCapitalize="characters" value={form.code} onChangeText={(t) => setForm({...form, code: t})} />
+                <TextInput style={styles.modalInput} placeholderTextColor="#AAAAAA" placeholder="Station Name" value={form.name} onChangeText={(t) => setForm({...form, name: t})} />
+                <TextInput style={styles.modalInput} placeholderTextColor="#AAAAAA" placeholder="Station Code (Max 5)" maxLength={5} autoCapitalize="characters" value={form.code} onChangeText={(t) => setForm({...form, code: t})} />
                 
                 <View style={styles.lineSelector}>
                   {['Line 1', 'Line 2', 'Line 3'].map(l => (
@@ -183,8 +186,8 @@ export default function StationManagementScreen({ navigation }) {
                   ))}
                 </View>
 
-                <TextInput style={styles.modalInput} placeholderTextColor="rgba(255,255,255,0.4)" placeholder="Latitude (-90 to 90)" keyboardType="numeric" value={form.latitude} onChangeText={(t) => setForm({...form, latitude: t})} />
-                <TextInput style={styles.modalInput} placeholderTextColor="rgba(255,255,255,0.4)" placeholder="Longitude (-180 to 180)" keyboardType="numeric" value={form.longitude} onChangeText={(t) => setForm({...form, longitude: t})} />
+                <TextInput style={styles.modalInput} placeholderTextColor="#AAAAAA" placeholder="Latitude (-90 to 90)" keyboardType="numeric" value={form.latitude} onChangeText={(t) => setForm({...form, latitude: t})} />
+                <TextInput style={styles.modalInput} placeholderTextColor="#AAAAAA" placeholder="Longitude (-180 to 180)" keyboardType="numeric" value={form.longitude} onChangeText={(t) => setForm({...form, longitude: t})} />
                 
                 <View style={styles.switchRow}>
                   <Text style={styles.switchLabel}>Station Active</Text>
@@ -208,15 +211,15 @@ export default function StationManagementScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 20 : 10, paddingBottom: 16 },
   backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
   headerTitle: { fontSize: 20, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
   addBtn: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,201,167,0.15)', borderRadius: 22, borderWidth: 1, borderColor: 'rgba(0,201,167,0.3)' },
   
-  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, marginHorizontal: 20, marginVertical: 10, paddingHorizontal: 16, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border },
-  searchInput: { flex: 1, paddingVertical: 14, marginLeft: 10, fontSize: 16, color: '#fff' },
+  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.border, marginHorizontal: 20, marginVertical: 10, paddingHorizontal: 16, borderRadius: 16 },
+  searchInput: { flex: 1, fontSize: 15, color: COLORS.text, paddingVertical: 12, marginLeft: 8 },
   
   filterTabs: { paddingVertical: 10, marginBottom: 5 },
   tab: { paddingHorizontal: 20, paddingVertical: 10, borderRadius: 20, marginHorizontal: 6, backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.border },
@@ -228,7 +231,7 @@ const styles = StyleSheet.create({
   
   card: { backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 20, marginBottom: 16, elevation: 2, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderWidth: 1, borderColor: COLORS.border },
   cardInfo: { flex: 1 },
-  stationName: { fontSize: 18, fontWeight: '800', color: '#fff', marginBottom: 10 },
+  stationName: { fontSize: 18, fontWeight: '800', color: COLORS.text, marginBottom: 10 },
   badges: { flexDirection: 'row', gap: 10 },
   badge: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, borderWidth: 1 },
   badgeText: { fontSize: 11, fontWeight: '800', textTransform: 'uppercase' },
@@ -238,8 +241,8 @@ const styles = StyleSheet.create({
   
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'center', alignItems: 'center', padding: 20 },
   modalContent: { backgroundColor: COLORS.cardBg, width: '100%', maxHeight: '85%', borderRadius: 28, padding: 24, borderWidth: 1, borderColor: COLORS.border },
-  modalTitle: { fontSize: 22, fontWeight: '900', color: '#fff', marginBottom: 20 },
-  modalInput: { backgroundColor: 'rgba(0,0,0,0.3)', borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, padding: 16, marginBottom: 16, fontSize: 16, color: '#fff' },
+  modalTitle: { fontSize: 22, fontWeight: '900', color: COLORS.text, marginBottom: 20 },
+  modalInput: { backgroundColor: COLORS.background, borderRadius: 12, padding: 14, color: COLORS.text, fontSize: 15, marginBottom: 14, borderWidth: 1, borderColor: COLORS.border },
   
   lineSelector: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16, gap: 8 },
   lineOption: { flex: 1, paddingVertical: 14, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center', borderRadius: 14, backgroundColor: COLORS.cardBg },
@@ -247,17 +250,17 @@ const styles = StyleSheet.create({
   lineOptionText: { color: COLORS.textLight, fontWeight: '700' },
   lineOptionTextActive: { color: '#9B59B6', fontWeight: '800' },
   
-  switchRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 12, backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, padding: 16, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border },
-  switchLabel: { fontSize: 16, color: '#fff', fontWeight: '700' },
+  switchRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 12, backgroundColor: COLORS.cardBg, padding: 16, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border },
+  switchLabel: { fontSize: 16, color: COLORS.text, fontWeight: '700' },
   
   modalActions: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 24, gap: 12 },
   modalCancel: { paddingVertical: 14, paddingHorizontal: 20, backgroundColor: COLORS.cardBg, borderRadius: 14 },
-  modalCancelText: { color: '#fff', fontWeight: '700', fontSize: 16 },
+  modalCancelText: { color: COLORS.text, fontWeight: '700', fontSize: 16 },
   modalSubmit: { backgroundColor: '#00C9A7', paddingVertical: 14, paddingHorizontal: 24, borderRadius: 14 },
   modalSubmitText: { color: '#fff', fontWeight: '800', fontSize: 16 },
   
   emptyContainer: { alignItems: 'center', justifyContent: 'center', marginTop: 40 },
   iconCircle: { width: 100, height: 100, borderRadius: 50, backgroundColor: 'rgba(0,201,167,0.1)', alignItems: 'center', justifyContent: 'center', marginBottom: 20, borderWidth: 1, borderColor: 'rgba(0,201,167,0.3)' },
-  emptyTitle: { fontSize: 22, fontWeight: '900', color: '#fff', marginBottom: 8 },
+  emptyTitle: { fontSize: 22, fontWeight: '900', color: COLORS.text, marginBottom: 8 },
   emptySubtitle: { fontSize: 15, color: COLORS.textLight, textAlign: 'center' }
 });

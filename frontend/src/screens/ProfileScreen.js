@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import COLORS from '../constants/colors';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   TextInput, ActivityIndicator, Alert, StatusBar, Platform
@@ -11,8 +10,12 @@ import LinearGradient from 'react-native-linear-gradient';
 import { authAPI } from '../api/authAPI';
 import { updateProfileSuccess, logout } from '../redux/slices/authSlice';
 import { storage } from '../utils/storage';
+import { useTheme } from '../context/ThemeContext';
 
 export default function ProfileScreen() {
+  const { theme: COLORS, isDark, toggleTheme } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
+  
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const user = useSelector((state) => state.auth.user);
@@ -85,7 +88,7 @@ export default function ProfileScreen() {
 
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
       {loading && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color="#00C9A7" />
@@ -136,7 +139,7 @@ export default function ProfileScreen() {
                 value={name}
                 onChangeText={setName}
                 placeholder="Enter your name"
-                placeholderTextColor="rgba(255,255,255,0.3)"
+                placeholderTextColor="#AAAAAA"
               />
               <Text style={styles.fieldLabel}>Mobile Number</Text>
               <TextInput
@@ -146,7 +149,7 @@ export default function ProfileScreen() {
                 keyboardType="phone-pad"
                 maxLength={10}
                 placeholder="Enter mobile number"
-                placeholderTextColor="rgba(255,255,255,0.3)"
+                placeholderTextColor="#AAAAAA"
               />
               <Text style={styles.fieldLabel}>Email Address</Text>
               <TextInput
@@ -156,7 +159,7 @@ export default function ProfileScreen() {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 placeholder="Enter email address"
-                placeholderTextColor="rgba(255,255,255,0.3)"
+                placeholderTextColor="#AAAAAA"
               />
               <View style={styles.editActions}>
                 <TouchableOpacity
@@ -206,6 +209,21 @@ export default function ProfileScreen() {
           ))}
         </View>
 
+        {/* Preferences */}
+        <Text style={styles.sectionTitle}>Preferences</Text>
+        <View style={styles.menuCard}>
+          <TouchableOpacity style={styles.menuItem} onPress={toggleTheme}>
+            <View style={[styles.menuIconWrap, { backgroundColor: isDark ? 'rgba(245,158,11,0.15)' : 'rgba(106,27,154,0.15)' }]}>
+              <Icon name={isDark ? "weather-sunny" : "weather-night"} size={22} color={isDark ? "#F59E0B" : "#6A1B9A"} />
+            </View>
+            <View style={styles.menuTextWrap}>
+              <Text style={styles.menuTitle}>Theme Mode</Text>
+              <Text style={styles.menuSubtitle}>Currently: {isDark ? 'Dark Mode' : 'Light Mode'}</Text>
+            </View>
+            <Icon name="chevron-right" size={22} color="rgba(255,255,255,0.3)" />
+          </TouchableOpacity>
+        </View>
+
         {/* Logout */}
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Icon name="logout" size={20} color="#EF4444" />
@@ -216,7 +234,7 @@ export default function ProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   safeArea: { flex: 1 },
   container: { padding: 20, paddingTop: Platform.OS === 'android' ? 50 : 20, paddingBottom: 40 },
   loadingOverlay: {
@@ -285,14 +303,14 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   input: {
-    backgroundColor: COLORS.cardBg,
+    backgroundColor: COLORS.inputBg,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: 16,
+    borderColor: COLORS.inputBorder,
+    borderRadius: 14,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 16,
-    color: '#fff',
+    color: COLORS.inputText,
     fontWeight: '500'
   },
   editActions: { flexDirection: 'row', gap: 14, marginTop: 24 },
@@ -300,7 +318,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.cardBg,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
+    borderColor: COLORS.border,
     paddingVertical: 16,
     borderRadius: 16,
     alignItems: 'center',
@@ -330,7 +348,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   menuItem: { flexDirection: 'row', alignItems: 'center', padding: 18 },
-  menuItemBorder: { borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)' },
+  menuItemBorder: { borderBottomWidth: 1, borderBottomColor: COLORS.border },
   menuIconWrap: {
     width: 44,
     height: 44,
@@ -341,7 +359,7 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   menuTextWrap: { flex: 1 },
-  menuTitle: { fontSize: 16, fontWeight: '800', color: '#fff', marginBottom: 2 },
+  menuTitle: { fontSize: 16, fontWeight: '800', color: COLORS.text, marginBottom: 2 },
   menuSubtitle: { fontSize: 13, color: COLORS.textLight },
   logoutButton: {
     flexDirection: 'row',

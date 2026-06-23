@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import COLORS from '../constants/colors';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, StatusBar } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { authStart, authSuccess, authFailure, clearError } from '../redux/slices/authSlice';
@@ -7,8 +6,12 @@ import api from '../api/axiosConfig';
 import { storage } from '../utils/storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
+import { useTheme } from '../context/ThemeContext';
 
 export default function OTPScreen({ route, navigation }) {
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
+  
   const { email, name, phone, shopName, password, address, role, isRegister } = route.params || {};
   const [otp, setOtp] = useState('');
   
@@ -50,11 +53,11 @@ export default function OTPScreen({ route, navigation }) {
 
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <Icon name="arrow-left" size={24} color="#fff" />
+            <Icon name="arrow-left" size={24} color={COLORS.text} />
           </TouchableOpacity>
         </View>
         
@@ -72,7 +75,7 @@ export default function OTPScreen({ route, navigation }) {
               <TextInput
                 style={styles.input}
                 placeholder="••••••"
-                placeholderTextColor="rgba(255,255,255,0.3)"
+                placeholderTextColor="#AAAAAA"
                 value={otp}
                 onChangeText={setOtp}
                 keyboardType="number-pad"
@@ -93,7 +96,7 @@ export default function OTPScreen({ route, navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   container: { flex: 1 },
   header: { padding: 20, paddingTop: 50 },
   backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
@@ -104,8 +107,8 @@ const styles = StyleSheet.create({
   emailText: { fontSize: 16, fontWeight: '800', color: '#00C9A7', marginBottom: 30, marginTop: 5 },
   formContainer: { width: '100%', backgroundColor: COLORS.cardBg, padding: 24, borderRadius: 24, borderWidth: 1, borderColor: COLORS.border },
   label: { fontSize: 14, fontWeight: '600', color: COLORS.textLight, marginBottom: 12, textAlign: 'center' },
-  inputContainer: { backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, height: 70, justifyContent: 'center' },
-  input: { fontSize: 32, letterSpacing: 12, color: '#fff', fontWeight: '900' },
+  inputContainer: { backgroundColor: COLORS.inputBg, borderWidth: 1, borderColor: COLORS.inputBorder, borderRadius: 16, height: 70, justifyContent: 'center' },
+  input: { fontSize: 32, color: COLORS.inputText, fontWeight: '900' },
   primaryButton: { marginTop: 24, borderRadius: 16, overflow: 'hidden' },
   primaryButtonGrad: { height: 55, justifyContent: 'center', alignItems: 'center' },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: '800', letterSpacing: 1 }

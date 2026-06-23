@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import COLORS from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView,
   ActivityIndicator, Alert, Modal, Image, SafeAreaView, RefreshControl, StatusBar
@@ -12,7 +12,7 @@ import { logout } from '../redux/slices/authSlice';
 import api from '../api/axiosConfig';
 import { storage } from '../utils/storage';
 
-const StatCard = ({ title, value, iconName, iconColor, bgColor, onPress }) => (
+const StatCard = ({ title, value, iconName, iconColor, bgColor, onPress, styles }) => (
   <TouchableOpacity style={styles.statCard} onPress={onPress}>
     <View style={[styles.statIconWrap, { backgroundColor: bgColor }]}>
       <Icon name={iconName} size={28} color={iconColor} />
@@ -25,6 +25,8 @@ const StatCard = ({ title, value, iconName, iconColor, bgColor, onPress }) => (
 export default function AdminDashboardScreen() {
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -90,7 +92,7 @@ export default function AdminDashboardScreen() {
 
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         {/* Header */}
         <View style={styles.header}>
@@ -100,10 +102,10 @@ export default function AdminDashboardScreen() {
           </View>
           <View style={styles.headerActions}>
             <TouchableOpacity style={styles.headerBtn} onPress={onRefresh}>
-              <Icon name="refresh" size={22} color="#fff" />
+              <Icon name="refresh" size={22} color={COLORS.text} />
             </TouchableOpacity>
             <TouchableOpacity style={styles.headerBtn} onPress={() => navigation.navigate('AdminNotifications')}>
-              <Icon name="bell-outline" size={22} color="#fff" />
+              <Icon name="bell-outline" size={22} color={COLORS.text} />
             </TouchableOpacity>
             <TouchableOpacity style={[styles.headerBtn, { backgroundColor: 'rgba(239,68,68,0.2)' }]} onPress={handleLogout}>
               <Icon name="logout" size={22} color="#EF4444" />
@@ -124,12 +126,12 @@ export default function AdminDashboardScreen() {
             {/* Stats */}
             <Text style={styles.sectionTitle}>Overview</Text>
             <View style={styles.statsGrid}>
-              <StatCard title="Total Revenue" value={`₹${dashboardData?.totalRevenue?.toLocaleString() || 0}`} iconName="currency-inr" iconColor="#00C9A7" bgColor="rgba(0,201,167,0.15)" onPress={() => navigation.navigate('RevenueAnalytics')} />
-              <StatCard title="Active Users" value={dashboardData?.activeUsers?.toLocaleString() || 0} iconName="account-group-outline" iconColor="#9B59B6" bgColor="rgba(155,89,182,0.15)" onPress={() => navigation.navigate('UserManagement')} />
+              <StatCard styles={styles} title="Total Revenue" value={`₹${dashboardData?.totalRevenue?.toLocaleString() || 0}`} iconName="currency-inr" iconColor="#00C9A7" bgColor="rgba(0,201,167,0.15)" onPress={() => navigation.navigate('RevenueAnalytics')} />
+              <StatCard styles={styles} title="Active Users" value={dashboardData?.activeUsers?.toLocaleString() || 0} iconName="account-group-outline" iconColor="#9B59B6" bgColor="rgba(155,89,182,0.15)" onPress={() => navigation.navigate('UserManagement')} />
             </View>
             <View style={styles.statsGrid}>
-              <StatCard title="Merchants" value={dashboardData?.totalMerchants || 0} iconName="storefront-outline" iconColor="#3498DB" bgColor="rgba(52,152,219,0.15)" onPress={() => navigation.navigate('MerchantManagement')} />
-              <StatCard title="Pending Shops" value={dashboardData?.pendingMerchantRequests || 0} iconName="clock-outline" iconColor="#F39C12" bgColor="rgba(243,156,18,0.15)" onPress={() => navigation.navigate('MerchantManagement')} />
+              <StatCard styles={styles} title="Merchants" value={dashboardData?.totalMerchants || 0} iconName="storefront-outline" iconColor="#3498DB" bgColor="rgba(52,152,219,0.15)" onPress={() => navigation.navigate('MerchantManagement')} />
+              <StatCard styles={styles} title="Pending Shops" value={dashboardData?.pendingMerchantRequests || 0} iconName="clock-outline" iconColor="#F39C12" bgColor="rgba(243,156,18,0.15)" onPress={() => navigation.navigate('MerchantManagement')} />
             </View>
 
             {/* Management Modules */}
@@ -182,7 +184,7 @@ export default function AdminDashboardScreen() {
           <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setSelectedItem(null)}>
             <View style={styles.modalCard}>
               <TouchableOpacity style={styles.modalClose} onPress={() => setSelectedItem(null)}>
-                <Icon name="close" size={22} color="rgba(255,255,255,0.8)" />
+                <Icon name="close" size={22} color={COLORS.text} />
               </TouchableOpacity>
 
               {selectedItem?.type === 'booking' && (
@@ -239,7 +241,7 @@ export default function AdminDashboardScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   safeArea: { flex: 1 },
   header: { paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 40 : 14, paddingBottom: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   headerTitle: { fontSize: 24, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
@@ -252,26 +254,26 @@ const styles = StyleSheet.create({
   statsGrid: { flexDirection: 'row', marginHorizontal: -6, marginBottom: 12 },
   statCard: { flex: 1, marginHorizontal: 6, backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 20, borderWidth: 1, borderColor: COLORS.border, alignItems: 'flex-start' },
   statIconWrap: { width: 50, height: 50, borderRadius: 16, justifyContent: 'center', alignItems: 'center', marginBottom: 16 },
-  statValue: { fontSize: 24, fontWeight: '900', color: '#fff', marginBottom: 4 },
+  statValue: { fontSize: 24, fontWeight: '900', color: COLORS.text, marginBottom: 4 },
   statTitle: { fontSize: 13, color: COLORS.textLight, fontWeight: '600' },
   navCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.cardBg, padding: 16, borderRadius: 24, marginBottom: 12, borderWidth: 1, borderColor: COLORS.border },
   navIconWrap: { width: 54, height: 54, borderRadius: 16, justifyContent: 'center', alignItems: 'center', marginRight: 16 },
-  navCardTitle: { fontSize: 16, fontWeight: '800', color: '#fff', marginBottom: 4 },
+  navCardTitle: { fontSize: 16, fontWeight: '800', color: COLORS.text, marginBottom: 4 },
   navCardSubtitle: { fontSize: 13, color: COLORS.textLight },
   emptyBox: { backgroundColor: COLORS.cardBg, borderRadius: 20, padding: 30, alignItems: 'center', borderWidth: 1, borderColor: COLORS.border },
   emptyBoxText: { color: COLORS.textLight, fontWeight: '600', fontSize: 14 },
   listItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.cardBg, padding: 16, borderRadius: 20, marginBottom: 12, borderWidth: 1, borderColor: COLORS.border },
   listItemIcon: { width: 48, height: 48, borderRadius: 14, backgroundColor: 'rgba(0,201,167,0.15)', justifyContent: 'center', alignItems: 'center', marginRight: 14 },
-  listItemTitle: { fontSize: 15, fontWeight: '800', color: '#fff', marginBottom: 2 },
+  listItemTitle: { fontSize: 15, fontWeight: '800', color: COLORS.text, marginBottom: 2 },
   listItemSub: { fontSize: 13, color: COLORS.textLight },
-  listItemAmount: { fontSize: 16, fontWeight: '900', color: '#fff' },
+  listItemAmount: { fontSize: 16, fontWeight: '900', color: COLORS.text },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', alignItems: 'center', padding: 20 },
   modalCard: { backgroundColor: COLORS.cardBg, borderRadius: 32, padding: 24, width: '100%', maxWidth: 400, borderWidth: 1, borderColor: COLORS.border },
   modalClose: { position: 'absolute', top: 20, right: 20, zIndex: 1, padding: 8, backgroundColor: COLORS.cardBg, borderRadius: 16 },
   modalIconWrap: { width: 80, height: 80, borderRadius: 40, backgroundColor: 'rgba(0,201,167,0.15)', justifyContent: 'center', alignItems: 'center', alignSelf: 'center', marginBottom: 16 },
-  modalTitle: { fontSize: 20, fontWeight: '900', color: '#fff', textAlign: 'center', marginBottom: 20 },
-  modalBody: { backgroundColor: COLORS.cardBg, borderRadius: 20, padding: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
-  modalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)' },
+  modalTitle: { fontSize: 20, fontWeight: '900', color: COLORS.text, textAlign: 'center', marginBottom: 20 },
+  modalBody: { backgroundColor: COLORS.cardBg, borderRadius: 20, padding: 16, borderWidth: 1, borderColor: COLORS.border },
+  modalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: COLORS.border },
   modalLabel: { fontSize: 14, color: COLORS.textLight, fontWeight: '600' },
-  modalValue: { fontSize: 14, fontWeight: '800', color: '#fff', maxWidth: '60%', textAlign: 'right' },
+  modalValue: { fontSize: 14, fontWeight: '800', color: COLORS.text, maxWidth: '60%', textAlign: 'right' },
 });

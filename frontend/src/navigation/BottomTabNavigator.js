@@ -8,11 +8,12 @@ import TicketHistoryScreen from '../screens/TicketHistoryScreen';
 import WalletScreen from '../screens/WalletScreen';
 import ShopsScreen from '../screens/ShopsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import COLORS from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 
 const Tab = createBottomTabNavigator();
 
 export function BottomTabNavigator() {
+  const { theme: COLORS } = useTheme();
   const insets = useSafeAreaInsets();
 
   return (
@@ -38,7 +39,7 @@ export function BottomTabNavigator() {
         tabBarActiveTintColor: COLORS.primary,
         tabBarInactiveTintColor: COLORS.textLight,
         tabBarStyle: {
-          backgroundColor: COLORS.white,
+          backgroundColor: COLORS.cardBg,
           borderTopWidth: 1,
           borderTopColor: COLORS.border,
           height: 60 + insets.bottom,

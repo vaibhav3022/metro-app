@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import COLORS from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 
 export default function ToastMessage({ message, type = 'success', onHide }) {
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
   const translateY = new Animated.Value(-100);
 
   useEffect(() => {
@@ -27,7 +29,7 @@ export default function ToastMessage({ message, type = 'success', onHide }) {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   container: {
     position: 'absolute', top: 0, left: 20, right: 20, zIndex: 1000,
     flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 12, elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84

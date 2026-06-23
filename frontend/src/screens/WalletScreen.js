@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import COLORS from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StatusBar } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchWallet, addMoney } from '../redux/slices/walletSlice';
@@ -10,6 +10,8 @@ import walletAPI from '../api/walletAPI';
 
 export default function WalletScreen({ navigation }) {
   const dispatch = useDispatch();
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
   const { balance, loading, transactions } = useSelector((state) => state.wallet);
   const user = useSelector((state) => state.auth.user);
   
@@ -51,8 +53,13 @@ export default function WalletScreen({ navigation }) {
         theme: { color: '#00C9A7' }
       };
 
+      // If backend gave a mock order (due to test keys), delete the fake order_id 
+      // so Razorpay SDK opens normally in test mode without failing validation.
+      if (orderRes.orderId && orderRes.orderId.startsWith('order_mock_')) {
+        delete options.order_id;
+      }
+
       setIsProcessing(false);
-      
       RazorpayCheckout.open(options).then(async (data) => {
          setIsProcessing(true);
          try {
@@ -81,11 +88,11 @@ export default function WalletScreen({ navigation }) {
 
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <Icon name="arrow-left" size={24} color="#fff" />
+            <Icon name="arrow-left" size={24} color={COLORS.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>My Wallet</Text>
           <View style={{ width: 40 }} />
@@ -115,7 +122,7 @@ export default function WalletScreen({ navigation }) {
               <TextInput
                 style={styles.amountInput}
                 placeholder="0.00"
-                placeholderTextColor="rgba(255,255,255,0.3)"
+                placeholderTextColor="#AAAAAA"
                 keyboardType="number-pad"
                 value={amount}
                 onChangeText={setAmount}
@@ -156,7 +163,7 @@ export default function WalletScreen({ navigation }) {
                       <Text style={styles.txDate}>{new Date(tx.date || tx.createdAt).toLocaleDateString()}</Text>
                     </View>
                   </View>
-                  <Text style={[styles.txAmount, { color: tx.type?.toLowerCase() === 'credit' ? '#00C9A7' : '#fff' }]}>
+                  <Text style={[styles.txAmount, { color: tx.type?.toLowerCase() === 'credit' ? '#00C9A7' : COLORS.text }]}>
                     {tx.type?.toLowerCase() === 'credit' ? '+' : '-'}₹{parseFloat(tx.amount).toFixed(2)}
                   </Text>
                 </View>
@@ -171,7 +178,7 @@ export default function WalletScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 50, paddingBottom: 16 },
   backButton: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 20, borderWidth: 1, borderColor: COLORS.border },
@@ -187,19 +194,19 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 18, fontWeight: '800', color: COLORS.text, marginBottom: 16 },
   inputContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, paddingHorizontal: 16, height: 60, marginBottom: 16 },
   currencySymbol: { fontSize: 24, color: '#00C9A7', fontWeight: '800', marginRight: 10 },
-  amountInput: { flex: 1, fontSize: 24, color: '#fff', fontWeight: 'bold' },
+  amountInput: { flex: 1, fontSize: 28, color: COLORS.text, fontWeight: 'bold' },
   chipContainer: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 22 },
-  chip: { backgroundColor: COLORS.cardBg, paddingVertical: 10, paddingHorizontal: 16, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
-  chipText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  chip: { backgroundColor: COLORS.cardBg, paddingVertical: 10, paddingHorizontal: 16, borderRadius: 20, borderWidth: 1, borderColor: COLORS.border },
+  chipText: { color: COLORS.text, fontWeight: '700', fontSize: 14 },
   primaryButton: { borderRadius: 16, overflow: 'hidden' },
   primaryButtonGrad: { height: 54, justifyContent: 'center', alignItems: 'center' },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: '700', letterSpacing: 0.5 },
   
   transactionsSection: { backgroundColor: COLORS.cardBg, padding: 22, borderRadius: 24, borderWidth: 1, borderColor: COLORS.border },
-  transactionItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)' },
+  transactionItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: COLORS.border },
   txLeft: { flexDirection: 'row', alignItems: 'center', flex: 1 },
   txIconBox: { width: 44, height: 44, borderRadius: 14, justifyContent: 'center', alignItems: 'center', marginRight: 14 },
-  txTitle: { fontSize: 15, fontWeight: '700', color: '#fff', marginBottom: 2 },
+  txTitle: { fontSize: 15, fontWeight: '700', color: COLORS.text, marginBottom: 2 },
   txDate: { fontSize: 12, color: COLORS.textLight },
   txAmount: { fontSize: 16, fontWeight: '800' },
   noTransactionsText: { color: COLORS.textLight, fontStyle: 'italic', marginTop: 10, textAlign: 'center' }

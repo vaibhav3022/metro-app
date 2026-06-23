@@ -16,7 +16,9 @@ export default function TicketHistory() {
     try {
       const res = await api.get('/tickets/history');
       if (res.data.success) {
-        setTickets(res.data.tickets);
+        // Safety filter: only show tickets with successful payment
+        const paid = res.data.tickets.filter(t => t.paymentStatus === 'success');
+        setTickets(paid);
       }
     } catch (err) {
       console.error('Error fetching ticket history', err);
@@ -65,6 +67,10 @@ export default function TicketHistory() {
         return <span className="badge badge-success">Completed</span>;
       case 'expired':
         return <span className="badge badge-danger">Expired</span>;
+      case 'pending':
+        return <span className="badge" style={{ background: 'rgba(255,165,0,0.15)', color: 'orange', border: '1px solid rgba(255,165,0,0.3)' }}>Pending</span>;
+      case 'failed':
+        return <span className="badge badge-danger">Failed</span>;
       default:
         return <span className="badge">{status}</span>;
     }

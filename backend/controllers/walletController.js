@@ -53,7 +53,17 @@ const createRazorpayOrder = async (req, res) => {
       receipt: `receipt_wallet_${Date.now()}`
     };
 
-    const order = await razorpay.orders.create(options);
+    let order;
+    if (process.env.RAZORPAY_KEY_SECRET === 'puneMetroRazorSecret123') {
+      // Mock order creation for development/testing if dummy secret is used
+      order = {
+        id: `order_mock_${Date.now()}`,
+        amount: options.amount,
+        currency: options.currency
+      };
+    } else {
+      order = await razorpay.orders.create(options);
+    }
 
     res.status(200).json({
       success: true,

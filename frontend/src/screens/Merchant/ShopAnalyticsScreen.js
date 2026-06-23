@@ -191,9 +191,9 @@ export default function ShopAnalyticsScreen({ navigation }) {
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>{productModal.isEdit ? 'Edit Product' : 'Add Product'}</Text>
-              <TextInput style={styles.modalInput} placeholderTextColor="rgba(255,255,255,0.4)" placeholder="Product Name" value={prodForm.name} onChangeText={t => setProdForm({...prodForm, name: t})} />
-              <TextInput style={styles.modalInput} placeholderTextColor="rgba(255,255,255,0.4)" placeholder="Price (₹)" keyboardType="numeric" value={prodForm.price} onChangeText={t => setProdForm({...prodForm, price: t})} />
-              <TextInput style={styles.modalInput} placeholderTextColor="rgba(255,255,255,0.4)" placeholder="Description (Optional)" value={prodForm.description} onChangeText={t => setProdForm({...prodForm, description: t})} />
+              <TextInput style={styles.modalInput} placeholderTextColor="#AAAAAA" placeholder="Product Name" value={prodForm.name} onChangeText={t => setProdForm({...prodForm, name: t})} />
+              <TextInput style={styles.modalInput} placeholderTextColor="#AAAAAA" placeholder="Price (₹)" keyboardType="numeric" value={prodForm.price} onChangeText={t => setProdForm({...prodForm, price: t})} />
+              <TextInput style={styles.modalInput} placeholderTextColor="#AAAAAA" placeholder="Description (Optional)" value={prodForm.description} onChangeText={t => setProdForm({...prodForm, description: t})} />
               
               <View style={styles.switchRow}>
                 <Text style={styles.switchLabel}>Is Available</Text>
@@ -213,9 +213,9 @@ export default function ShopAnalyticsScreen({ navigation }) {
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Add Offer</Text>
-              <TextInput style={styles.modalInput} placeholderTextColor="rgba(255,255,255,0.4)" placeholder="Offer Title (e.g. Summer Sale)" value={offerForm.title} onChangeText={t => setOfferForm({...offerForm, title: t})} />
-              <TextInput style={styles.modalInput} placeholderTextColor="rgba(255,255,255,0.4)" placeholder="Discount (e.g. 20% OFF)" value={offerForm.discount} onChangeText={t => setOfferForm({...offerForm, discount: t})} />
-              <TextInput style={styles.modalInput} placeholderTextColor="rgba(255,255,255,0.4)" placeholder="Valid Until (YYYY-MM-DD)" value={offerForm.validUntil} onChangeText={t => setOfferForm({...offerForm, validUntil: t})} />
+              <TextInput style={styles.modalInput} placeholderTextColor="#AAAAAA" placeholder="Offer Title (e.g. Summer Sale)" value={offerForm.title} onChangeText={t => setOfferForm({...offerForm, title: t})} />
+              <TextInput style={styles.modalInput} placeholderTextColor="#AAAAAA" placeholder="Discount (e.g. 20% OFF)" value={offerForm.discount} onChangeText={t => setOfferForm({...offerForm, discount: t})} />
+              <TextInput style={styles.modalInput} placeholderTextColor="#AAAAAA" placeholder="Valid Until (YYYY-MM-DD)" value={offerForm.validUntil} onChangeText={t => setOfferForm({...offerForm, validUntil: t})} />
               
               <View style={styles.modalActions}>
                 <TouchableOpacity style={styles.modalCancel} onPress={() => setOfferModal(false)}><Text style={styles.modalCancelText}>Cancel</Text></TouchableOpacity>
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'center', alignItems: 'center', padding: 20 },
   modalContent: { backgroundColor: COLORS.cardBg, width: '100%', borderRadius: 28, padding: 24, borderWidth: 1, borderColor: COLORS.border },
   modalTitle: { fontSize: 22, fontWeight: '900', marginBottom: 24, color: '#fff' },
-  modalInput: { backgroundColor: 'rgba(0,0,0,0.3)', borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, padding: 16, marginBottom: 16, fontSize: 16, color: '#fff' },
+  modalInput: { backgroundColor: '#F5F5F5', borderRadius: 12, padding: 14, color: '#212121', fontSize: 15, marginBottom: 14, borderWidth: 1, borderColor: '#DDDDDD' },
   
   switchRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 12, backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, padding: 16, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border },
   switchLabel: { fontSize: 16, color: '#fff', fontWeight: '700' },

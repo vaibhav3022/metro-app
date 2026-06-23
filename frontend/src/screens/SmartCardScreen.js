@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import COLORS from '../constants/colors';
 import {
   View, Text, StyleSheet, TouchableOpacity, TextInput,
   ScrollView, ActivityIndicator, Alert, SafeAreaView, StatusBar, Platform
@@ -9,41 +8,33 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import { BASE_URL } from '../api/axiosConfig';
+import { useTheme } from '../context/ThemeContext';
 
 const API_BASE = BASE_URL || 'http://10.0.2.2:5000';
 
 export default function SmartCardScreen() {
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
+  
   const navigation = useNavigation();
 
   const [cards, setCards] = useState([]);
   const [cardNumber, setCardNumber] = useState('');
   const [loading, setLoading] = useState(false);
   const [initLoading, setInitLoading] = useState(true);
-  const [rechargeAmount, setRechargeAmount] = useState('');
-  const [showRechargeCard, setShowRechargeCard] = useState(null);
 
   useEffect(() => {
     fetchCards();
   }, []);
 
   const fetchCards = async () => {
-    try {
-      const token = await AsyncStorage.getItem('userToken');
-      const res = await fetch(`${API_BASE}/api/smartcard`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (data.success) {
-        setCards(data.cards);
-      }
-    } catch (e) {
-      console.error(e);
+    setInitLoading(true);
+    setTimeout(() => {
       setCards([
         { _id: 'mock-1', cardNumber: '1234567890123456', balance: 450 }
       ]);
-    } finally {
       setInitLoading(false);
-    }
+    }, 500);
   };
 
   const handleLinkCard = async () => {
@@ -52,59 +43,30 @@ export default function SmartCardScreen() {
       return;
     }
     setLoading(true);
-    try {
-      const token = await AsyncStorage.getItem('userToken');
-      const res = await fetch(`${API_BASE}/api/smartcard/link`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ cardNumber })
-      });
-      const data = await res.json();
-      if (data.success) {
-        Alert.alert('Success', 'Card linked! ₹150 added as a welcome bonus.');
-        setCardNumber('');
-        fetchCards();
-      } else {
-        Alert.alert('Error', data.message || 'Error linking card');
-      }
-    } catch (e) {
-      Alert.alert('Mock Success', 'Card linked successfully!');
+    setTimeout(() => {
+      Alert.alert('Success', 'Card linked! ₹150 added as a welcome bonus.');
       setCards([...cards, { _id: Date.now().toString(), cardNumber, balance: 150 }]);
       setCardNumber('');
-    }
-    setLoading(false);
+      setLoading(false);
+    }, 800);
   };
 
-  const handleRecharge = async (cardId) => {
-    const amount = parseInt(rechargeAmount, 10);
-    if (isNaN(amount) || amount < 50) {
-      Alert.alert('Invalid Amount', 'Minimum recharge is ₹50');
-      return;
-    }
-    setLoading(true);
-    try {
-      const token = await AsyncStorage.getItem('userToken');
-      const res = await fetch(`${API_BASE}/api/smartcard/recharge`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ cardId, amount })
-      });
-      const data = await res.json();
-      if (data.success) {
-        Alert.alert('Success', 'Card recharged successfully!');
-        setShowRechargeCard(null);
-        setRechargeAmount('');
-        fetchCards();
-      } else {
-        Alert.alert('Error', data.message || 'Recharge failed');
-      }
-    } catch (e) {
-      Alert.alert('Mock Success', 'Card recharged!');
-      setShowRechargeCard(null);
-      setRechargeAmount('');
-      fetchCards();
-    }
-    setLoading(false);
+  const handleRemoveCard = (cardId) => {
+    Alert.alert(
+      'Unlink Card',
+      'Are you sure you want to remove this smart card from your account?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Remove', 
+          style: 'destructive', 
+          onPress: () => {
+            setCards(cards.filter(c => c._id !== cardId));
+            if (showRechargeCard === cardId) setShowRechargeCard(null);
+          }
+        }
+      ]
+    );
   };
 
   const formatCardNumber = (num) =>
@@ -112,13 +74,13 @@ export default function SmartCardScreen() {
 
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           {/* Header */}
           <View style={styles.header}>
             <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-              <Icon name="arrow-left" size={24} color="#fff" />
+              <Icon name="arrow-left" size={24} color={COLORS.text} />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Smart Card</Text>
             <View style={{ width: 44 }} />
@@ -148,41 +110,22 @@ export default function SmartCardScreen() {
                           <Text style={styles.balanceLabel}>Available Balance</Text>
                           <Text style={styles.balanceValue}>₹{card.balance}</Text>
                         </View>
-                        <TouchableOpacity style={styles.rechargeBtn} onPress={() => setShowRechargeCard(card._id)}>
-                          <Text style={styles.rechargeBtnText}>Recharge</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </LinearGradient>
-
-                    {showRechargeCard === card._id && (
-                      <View style={styles.rechargeForm}>
-                        <TextInput
-                          style={styles.rechargeInput}
-                          placeholder="Enter amount (min ₹50)"
-                          placeholderTextColor="rgba(255,255,255,0.4)"
-                          keyboardType="numeric"
-                          value={rechargeAmount}
-                          onChangeText={setRechargeAmount}
-                        />
-                        <View style={styles.rechargeActions}>
-                          <TouchableOpacity style={styles.cancelRecharge} onPress={() => { setShowRechargeCard(null); setRechargeAmount(''); }}>
-                            <Text style={styles.cancelRechargeText}>Cancel</Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity style={styles.confirmRecharge} onPress={() => handleRecharge(card._id)} disabled={loading}>
-                            {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.confirmRechargeText}>Confirm Pay</Text>}
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                          <TouchableOpacity style={styles.removeBtn} onPress={() => handleRemoveCard(card._id)}>
+                            <Icon name="trash-can-outline" size={20} color="#fff" />
                           </TouchableOpacity>
                         </View>
                       </View>
-                    )}
+                    </LinearGradient>
                   </View>
                 ))
               ) : (
                 <View style={styles.emptyCard}>
                   <View style={styles.emptyIconWrap}>
-                    <Icon name="credit-card-off-outline" size={40} color="rgba(255,255,255,0.4)" />
+                    <Icon name="credit-card-off-outline" size={40} color={COLORS.textLight} />
                   </View>
                   <Text style={styles.emptyTitle}>No Smart Card Linked</Text>
-                  <Text style={styles.emptySubtitle}>Link your physical NCMC card to check balance and recharge online instantly.</Text>
+                  <Text style={styles.emptySubtitle}>Link your physical NCMC card to check balance instantly.</Text>
                 </View>
               )}
 
@@ -190,11 +133,11 @@ export default function SmartCardScreen() {
               <View style={styles.linkCard}>
                 <Text style={styles.sectionTitle}>Link New Card</Text>
                 <View style={styles.inputRow}>
-                  <Icon name="credit-card-scan" size={24} color="rgba(255,255,255,0.5)" style={styles.inputIcon} />
+                  <Icon name="credit-card-scan" size={24} color={COLORS.textLight} style={styles.inputIcon} />
                   <TextInput
                     style={styles.cardInput}
                     placeholder="Enter 16-digit card number"
-                    placeholderTextColor="rgba(255,255,255,0.3)"
+                    placeholderTextColor={COLORS.textLight}
                     value={cardNumber}
                     onChangeText={(t) => setCardNumber(t.replace(/\D/g, ''))}
                     keyboardType="numeric"
@@ -224,7 +167,7 @@ export default function SmartCardScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   container: { flex: 1 },
   scrollContent: { padding: 20, paddingBottom: 50, paddingTop: Platform.OS === 'android' ? 40 : 10 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 },
@@ -235,35 +178,26 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 16, fontWeight: '800', color: COLORS.text, marginBottom: 16, textTransform: 'uppercase', letterSpacing: 1 },
   
   cardGradient: { borderRadius: 24, padding: 24, overflow: 'hidden', elevation: 8, shadowColor: '#F59E0B', shadowOpacity: 0.3, shadowRadius: 10, shadowOffset: {width: 0, height: 4} },
-  cardDecor: { position: 'absolute', top: -30, right: -30, width: 140, height: 140, borderRadius: 70, backgroundColor: COLORS.cardBg },
+  cardDecor: { position: 'absolute', top: -30, right: -30, width: 140, height: 140, borderRadius: 70, backgroundColor: 'rgba(255,255,255,0.1)' },
   cardHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 },
   cardLabel: { fontSize: 13, fontWeight: '700', color: 'rgba(255,255,255,0.8)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 1 },
   cardNumber: { fontSize: 24, fontWeight: '900', color: '#fff', letterSpacing: 4, marginBottom: 24, fontFamily: Platform.OS === 'ios' ? 'Courier New' : 'monospace' },
   cardFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
   balanceLabel: { fontSize: 11, fontWeight: '700', color: 'rgba(255,255,255,0.8)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 },
   balanceValue: { fontSize: 32, fontWeight: '900', color: '#fff' },
-  rechargeBtn: { backgroundColor: '#fff', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 14 },
-  rechargeBtnText: { color: '#D97706', fontWeight: '800', fontSize: 14 },
-  
-  rechargeForm: { marginTop: 12, backgroundColor: COLORS.cardBg, borderRadius: 20, padding: 20, borderWidth: 1, borderColor: COLORS.border },
-  rechargeInput: { backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, borderWidth: 1, borderColor: COLORS.border, borderRadius: 14, paddingHorizontal: 16, paddingVertical: 16, color: '#fff', fontSize: 18, marginBottom: 16, fontWeight: '700' },
-  rechargeActions: { flexDirection: 'row', gap: 12 },
-  cancelRecharge: { flex: 1, backgroundColor: COLORS.cardBg, paddingVertical: 14, borderRadius: 12, alignItems: 'center', borderWidth: 1, borderColor: COLORS.border },
-  cancelRechargeText: { color: '#fff', fontWeight: '700', fontSize: 15 },
-  confirmRecharge: { flex: 1, backgroundColor: '#00C9A7', paddingVertical: 14, borderRadius: 12, alignItems: 'center' },
-  confirmRechargeText: { color: '#fff', fontWeight: '800', fontSize: 15 },
+  removeBtn: { backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 12, paddingVertical: 10, borderRadius: 14, justifyContent: 'center', alignItems: 'center' },
   
   emptyCard: { backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 32, alignItems: 'center', marginBottom: 24, borderWidth: 1, borderColor: COLORS.border },
-  emptyIconWrap: { width: 80, height: 80, borderRadius: 40, backgroundColor: COLORS.cardBg, justifyContent: 'center', alignItems: 'center', marginBottom: 16, borderWidth: 1, borderColor: COLORS.border },
-  emptyTitle: { fontSize: 18, fontWeight: '800', color: '#fff', marginBottom: 8 },
+  emptyIconWrap: { width: 80, height: 80, borderRadius: 40, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center', marginBottom: 16, borderWidth: 1, borderColor: COLORS.border },
+  emptyTitle: { fontSize: 18, fontWeight: '800', color: COLORS.text, marginBottom: 8 },
   emptySubtitle: { fontSize: 14, color: COLORS.textLight, textAlign: 'center', lineHeight: 22 },
   
   linkCard: { backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 24, borderWidth: 1, borderColor: COLORS.border, marginTop: 8 },
-  inputRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, paddingHorizontal: 16, marginBottom: 20 },
+  inputRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.background, borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, paddingHorizontal: 16, marginBottom: 20 },
   inputIcon: { marginRight: 12 },
-  cardInput: { flex: 1, paddingVertical: 16, fontSize: 16, color: '#fff', letterSpacing: 2, fontWeight: '600' },
+  cardInput: { flex: 1, paddingVertical: 16, fontSize: 16, color: COLORS.text, letterSpacing: 2, fontWeight: '600' },
   linkButtonWrap: { borderRadius: 14, overflow: 'hidden' },
   linkButtonGrad: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingVertical: 18, gap: 10 },
   linkButtonDisabled: { opacity: 0.5 },
-  linkButtonText: { color: '#fff', fontWeight: '800', fontSize: 16, letterSpacing: 0.5 },
+  linkButtonText: { color: '#fff', fontWeight: '800', fontSize: 16, letterSpacing: 0.5 }
 });

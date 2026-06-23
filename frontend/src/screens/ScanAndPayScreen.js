@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import COLORS from '../constants/colors';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ActivityIndicator, Alert, SafeAreaView, KeyboardAvoidingView, Platform, StatusBar } from 'react-native';
+import { useTheme } from '../context/ThemeContext';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ActivityIndicator, Alert, SafeAreaView, KeyboardAvoidingView, Platform, StatusBar, Modal } from 'react-native';
 import { useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { RNCamera } from 'react-native-camera'; // Note: Ensure linked correctly
@@ -10,11 +10,14 @@ import { ticketAPI } from '../api/ticketAPI';
 import RazorpayCheckout from 'react-native-razorpay';
 
 export default function ScanAndPayScreen({ route, navigation }) {
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
   const [scanned, setScanned] = useState(!!route.params?.shopId);
   const [merchantData, setMerchantData] = useState(route.params?.shopId ? { shopId: route.params.shopId, businessName: route.params.shopName } : null);
   const [amount, setAmount] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingMethod, setProcessingMethod] = useState(null);
   const [token, setToken] = useState(null);
+  const [successData, setSuccessData] = useState(null);
 
   const user = useSelector((state) => state.auth.user);
 
@@ -78,7 +81,7 @@ export default function ScanAndPayScreen({ route, navigation }) {
       return;
     }
 
-    setIsProcessing(true);
+    setProcessingMethod('razorpay');
 
     try {
       // 1. Create Razorpay order on backend
@@ -102,6 +105,12 @@ export default function ScanAndPayScreen({ route, navigation }) {
         theme: { color: '#00C9A7' },
       };
 
+      // If backend gave a mock order (due to test keys), delete the fake order_id 
+      // so Razorpay SDK opens normally in test mode without failing validation.
+      if (orderData.orderId && orderData.orderId.startsWith('order_mock_')) {
+        delete options.order_id;
+      }
+
       console.log('Razorpay Options:', JSON.stringify(options));
       const razorpayResult = await RazorpayCheckout.open(options);
       console.log('Razorpay Success:', JSON.stringify(razorpayResult));
@@ -115,14 +124,14 @@ export default function ScanAndPayScreen({ route, navigation }) {
         paymentId
       );
 
-      setIsProcessing(false);
-      Alert.alert(
-        'Payment Successful! ✅',
-        `₹${amt} paid to ${merchantData.businessName || 'Merchant'} successfully!`,
-        [{ text: 'OK', onPress: () => navigation.navigate('Home') }]
-      );
+      setProcessingMethod(null);
+      setSuccessData({
+        amount: amt,
+        merchant: merchantData.businessName || 'Merchant',
+        method: 'Razorpay Gateway'
+      });
     } catch (error) {
-      setIsProcessing(false);
+      setProcessingMethod(null);
       console.log('Razorpay Error:', JSON.stringify(error));
       // Razorpay cancelled or failed
       const errDesc = error?.error?.description || error?.description || '';
@@ -141,6 +150,39 @@ export default function ScanAndPayScreen({ route, navigation }) {
     }
   };
 
+  const handleWalletPayment = async () => {
+    if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
+      Alert.alert('Invalid Amount', 'Please enter a valid amount.');
+      return;
+    }
+
+    const amt = parseFloat(amount);
+    setProcessingMethod('wallet');
+
+    try {
+      await shopAPI.payShop(
+        merchantData.shopId,
+        amt,
+        'wallet',
+        `WALLET-PAY-${Date.now()}`
+      );
+
+      setProcessingMethod(null);
+      setSuccessData({
+        amount: amt,
+        merchant: merchantData.businessName || 'Merchant',
+        method: 'Metro Wallet'
+      });
+    } catch (error) {
+      setProcessingMethod(null);
+      Alert.alert(
+        'Payment Failed',
+        error?.response?.data?.message || 'Could not process wallet payment. Please check your balance.',
+        [{ text: 'OK' }]
+      );
+    }
+  };
+
   // Token success UI removed as payment is now direct
 
   return (
@@ -149,7 +191,7 @@ export default function ScanAndPayScreen({ route, navigation }) {
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <Icon name="arrow-left" size={24} color="#fff" />
+            <Icon name="arrow-left" size={24} color={COLORS.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Scan & Pay</Text>
           <View style={{ width: 40 }} />
@@ -183,7 +225,7 @@ export default function ScanAndPayScreen({ route, navigation }) {
               <TextInput
                 style={styles.amountInput}
                 placeholder="0.00"
-                placeholderTextColor="rgba(255,255,255,0.3)"
+                placeholderTextColor="#AAAAAA"
                 keyboardType="number-pad"
                 value={amount}
                 onChangeText={setAmount}
@@ -194,10 +236,20 @@ export default function ScanAndPayScreen({ route, navigation }) {
             <TouchableOpacity 
               style={styles.primaryButton}
               onPress={handlePayment}
-              disabled={isProcessing}
+              disabled={!!processingMethod}
             >
-              <LinearGradient colors={isProcessing ? ['#555', '#444'] : [COLORS.secondary, COLORS.secondary]} style={styles.primaryButtonGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-                {isProcessing ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Pay Securely</Text>}
+              <LinearGradient colors={processingMethod === 'razorpay' ? ['#555', '#444'] : [COLORS.secondary, COLORS.secondary]} style={styles.primaryButtonGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                {processingMethod === 'razorpay' ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Pay with Razorpay</Text>}
+              </LinearGradient>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.walletButton}
+              onPress={handleWalletPayment}
+              disabled={!!processingMethod}
+            >
+              <LinearGradient colors={processingMethod === 'wallet' ? ['#555', '#444'] : ['#8E44AD', '#9B59B6']} style={styles.primaryButtonGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                {processingMethod === 'wallet' ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Pay with Wallet</Text>}
               </LinearGradient>
             </TouchableOpacity>
 
@@ -208,18 +260,52 @@ export default function ScanAndPayScreen({ route, navigation }) {
                 setMerchantData(null);
                 setAmount('');
               }}
-              disabled={isProcessing}
+              disabled={!!processingMethod}
             >
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>
           </KeyboardAvoidingView>
         )}
+        
+        {/* Premium Success Modal */}
+        <Modal visible={!!successData} transparent animationType="fade">
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalIconWrap}>
+                <Icon name="check-decagram" size={70} color="#00C9A7" />
+              </View>
+              <Text style={styles.modalTitle}>Payment Successful!</Text>
+              <Text style={styles.modalAmount}>₹{successData?.amount?.toFixed(2)}</Text>
+              <Text style={styles.modalMessage}>Paid to {successData?.merchant}</Text>
+              
+              <View style={styles.modalDivider} />
+              <View style={styles.modalRow}>
+                 <Text style={styles.modalLabel}>Method:</Text>
+                 <Text style={styles.modalValue}>{successData?.method}</Text>
+              </View>
+              <View style={styles.modalRow}>
+                 <Text style={styles.modalLabel}>Date:</Text>
+                 <Text style={styles.modalValue}>{new Date().toLocaleString()}</Text>
+              </View>
+
+              <TouchableOpacity style={styles.modalBtn} onPress={() => {
+                setSuccessData(null);
+                navigation.navigate('Home');
+              }}>
+                <LinearGradient colors={['#00C9A7', '#00A88F']} style={styles.modalBtnGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                   <Text style={styles.modalBtnText}>Back to Dashboard</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
       </SafeAreaView>
     </LinearGradient>
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 40 : 20, paddingBottom: 16 },
   backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
@@ -234,25 +320,43 @@ const styles = StyleSheet.create({
   paymentContainer: { flex: 1, padding: 20, justifyContent: 'center' },
   merchantCard: { backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 32, alignItems: 'center', marginBottom: 30, borderWidth: 1, borderColor: COLORS.border },
   merchantIconWrap: { width: 80, height: 80, borderRadius: 40, backgroundColor: 'rgba(155,89,182,0.15)', justifyContent: 'center', alignItems: 'center', marginBottom: 16 },
-  merchantName: { fontSize: 24, fontWeight: '900', color: '#fff', textAlign: 'center' },
+  merchantName: { fontSize: 24, fontWeight: '900', color: COLORS.text, textAlign: 'center' },
   merchantId: { fontSize: 14, color: COLORS.textLight, marginTop: 6 },
   
   amountInputContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 20, paddingHorizontal: 20, height: 80, marginBottom: 30, borderWidth: 1, borderColor: COLORS.border },
   currencySymbol: { fontSize: 40, color: '#00C9A7', fontWeight: '900', marginRight: 15 },
-  amountInput: { flex: 1, fontSize: 40, color: '#fff', fontWeight: 'bold' },
+  amountInput: { flex: 1, fontSize: 36, color: COLORS.text, fontWeight: 'bold' },
   
-  primaryButton: { borderRadius: 16, overflow: 'hidden', marginBottom: 20 },
+  primaryButton: { borderRadius: 16, overflow: 'hidden', marginBottom: 15 },
+  walletButton: { borderRadius: 16, overflow: 'hidden', marginBottom: 20 },
   primaryButtonGrad: { height: 60, justifyContent: 'center', alignItems: 'center' },
   buttonText: { color: '#fff', fontSize: 18, fontWeight: '800', letterSpacing: 1 },
   
   cancelButton: { height: 50, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(239,68,68,0.1)', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(239,68,68,0.2)' },
-  cancelButtonText: { color: '#EF4444', fontSize: 16, fontWeight: '700' },
+  cancelButtonText: { color: COLORS.textLight, fontWeight: '700', fontSize: 16 },
+
+  // Modal Styles
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+  modalContent: { width: '100%', backgroundColor: '#ffffff', borderRadius: 28, padding: 30, alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.25, shadowRadius: 20, elevation: 15 },
+  modalIconWrap: { width: 100, height: 100, borderRadius: 50, backgroundColor: 'rgba(0,201,167,0.15)', justifyContent: 'center', alignItems: 'center', marginBottom: 20 },
+  modalTitle: { fontSize: 24, fontWeight: '900', color: '#111', marginBottom: 10 },
+  modalAmount: { fontSize: 40, fontWeight: '900', color: '#00C9A7', marginBottom: 10 },
+  modalMessage: { fontSize: 16, color: '#555', marginBottom: 25, textAlign: 'center', fontWeight: '600' },
+  
+  modalDivider: { width: '100%', height: 1, backgroundColor: '#eee', marginBottom: 20 },
+  modalRow: { flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginBottom: 12 },
+  modalLabel: { fontSize: 14, color: '#888', fontWeight: '600' },
+  modalValue: { fontSize: 14, color: '#333', fontWeight: '800' },
+  
+  modalBtn: { width: '100%', borderRadius: 16, overflow: 'hidden', marginTop: 30 },
+  modalBtnGrad: { paddingVertical: 16, alignItems: 'center' },
+  modalBtnText: { color: '#fff', fontSize: 16, fontWeight: '800', letterSpacing: 0.5 },
   
   successContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
   successIconWrap: { width: 140, height: 140, borderRadius: 70, backgroundColor: 'rgba(0,201,167,0.15)', justifyContent: 'center', alignItems: 'center', marginBottom: 24 },
   successTitle: { fontSize: 28, fontWeight: '900', color: '#00C9A7', marginBottom: 12 },
   successDesc: { fontSize: 16, color: COLORS.textLight, textAlign: 'center', marginBottom: 40, paddingHorizontal: 20 },
   tokenBox: { backgroundColor: COLORS.cardBg, paddingVertical: 24, paddingHorizontal: 40, borderRadius: 24, borderWidth: 2, borderColor: '#00C9A7', borderStyle: 'dashed', marginBottom: 40 },
-  tokenText: { fontSize: 48, fontWeight: '900', color: '#fff', letterSpacing: 12 },
+  tokenText: { fontSize: 48, fontWeight: '900', color: COLORS.text, letterSpacing: 12 },
   homeBtn: { width: '100%', borderRadius: 16, overflow: 'hidden' }
 });

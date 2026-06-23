@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import COLORS from '../../constants/colors';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, RefreshControl, TextInput, ActivityIndicator, Alert, Modal, StatusBar, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -7,8 +6,12 @@ import LinearGradient from 'react-native-linear-gradient';
 import api from '../../api/axiosConfig';
 import EmptyState from '../../components/EmptyState';
 import ToastMessage from '../../components/ToastMessage';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function MerchantManagementScreen({ route, navigation }) {
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
+  
   const [merchants, setMerchants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState(route.params?.filter ? (route.params.filter.charAt(0).toUpperCase() + route.params.filter.slice(1)) : 'All');
@@ -86,24 +89,24 @@ export default function MerchantManagementScreen({ route, navigation }) {
 
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         {toast.visible && <ToastMessage message={toast.message} type={toast.type} onHide={() => setToast({ ...toast, visible: false })} />}
         
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack?.()}>
-            <MaterialCommunityIcons name="arrow-left" size={24} color="#fff" />
+            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Merchant Config</Text>
           <View style={{ width: 44 }} />
         </View>
 
         <View style={styles.searchContainer}>
-          <MaterialCommunityIcons name="magnify" size={24} color="rgba(255,255,255,0.5)" />
+          <MaterialCommunityIcons name="magnify" size={24} color={COLORS.textLight} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search business name..."
-            placeholderTextColor="rgba(255,255,255,0.4)"
+            placeholderTextColor="#AAAAAA"
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -144,8 +147,8 @@ export default function MerchantManagementScreen({ route, navigation }) {
                 </View>
 
                 <View style={styles.actionRow}>
-                  <TouchableOpacity style={[styles.actionBtn, { backgroundColor: COLORS.cardBg }]} onPress={() => setSelectedMerchantDetails(m)}>
-                    <Text style={styles.actionText}>Details</Text>
+                  <TouchableOpacity style={[styles.actionBtn, { backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.border }]} onPress={() => setSelectedMerchantDetails(m)}>
+                    <Text style={[styles.actionText, { color: COLORS.text }]}>Details</Text>
                   </TouchableOpacity>
 
                   {m.status === 'pending' && (
@@ -182,7 +185,7 @@ export default function MerchantManagementScreen({ route, navigation }) {
               <View style={styles.modalHeaderRow}>
                 <Text style={styles.modalTitle}>Merchant Details</Text>
                 <TouchableOpacity style={styles.closeBtn} onPress={() => setSelectedMerchantDetails(null)}>
-                  <MaterialCommunityIcons name="close" size={24} color="#fff" />
+                  <MaterialCommunityIcons name="close" size={24} color={COLORS.text} />
                 </TouchableOpacity>
               </View>
               
@@ -240,7 +243,7 @@ export default function MerchantManagementScreen({ route, navigation }) {
               <TextInput
                 style={styles.modalInput}
                 placeholder="Reason for rejection (required)"
-                placeholderTextColor="rgba(255,255,255,0.4)"
+                placeholderTextColor="#AAAAAA"
                 value={rejectReason}
                 onChangeText={setRejectReason}
                 multiline
@@ -267,14 +270,14 @@ export default function MerchantManagementScreen({ route, navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 20 : 10, paddingBottom: 16 },
   backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
   headerTitle: { fontSize: 20, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
   
-  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, marginHorizontal: 20, marginVertical: 10, paddingHorizontal: 16, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border },
-  searchInput: { flex: 1, paddingVertical: 14, marginLeft: 10, fontSize: 16, color: '#fff' },
+  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.inputBg, borderWidth: 1, borderColor: COLORS.inputBorder, marginHorizontal: 20, marginVertical: 10, paddingHorizontal: 16, borderRadius: 16 },
+  searchInput: { flex: 1, fontSize: 15, color: COLORS.inputText, paddingVertical: 12, marginLeft: 8 },
   
   filterTabs: { paddingVertical: 10, marginBottom: 5 },
   tab: { paddingHorizontal: 20, paddingVertical: 10, borderRadius: 20, marginHorizontal: 6, backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.border },
@@ -286,7 +289,7 @@ const styles = StyleSheet.create({
   
   merchantCard: { backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: COLORS.border },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
-  businessName: { fontSize: 18, fontWeight: '800', color: '#fff', marginBottom: 6 },
+  businessName: { fontSize: 18, fontWeight: '800', color: COLORS.text, marginBottom: 6 },
   ownerName: { fontSize: 14, color: COLORS.textLight, fontWeight: '500' },
   
   badge: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, borderWidth: 1, alignSelf: 'flex-start' },
@@ -299,22 +302,22 @@ const styles = StyleSheet.create({
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'center', alignItems: 'center', padding: 20 },
   modalContent: { backgroundColor: COLORS.cardBg, width: '100%', borderRadius: 24, padding: 24, borderWidth: 1, borderColor: COLORS.border },
   modalHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-  modalTitle: { fontSize: 20, fontWeight: '900', color: '#fff' },
+  modalTitle: { fontSize: 20, fontWeight: '900', color: COLORS.text },
   closeBtn: { padding: 4, backgroundColor: COLORS.cardBg, borderRadius: 20 },
   
-  detailRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)', alignItems: 'center' },
+  detailRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: COLORS.border, alignItems: 'center' },
   detailLabel: { fontSize: 14, color: COLORS.textLight, fontWeight: '600', flex: 1 },
-  detailValue: { fontSize: 15, color: '#fff', fontWeight: '800', flex: 1.5, textAlign: 'right' },
+  detailValue: { fontSize: 15, color: COLORS.text, fontWeight: '800', flex: 1.5, textAlign: 'right' },
   
-  modalInput: { backgroundColor: 'rgba(0,0,0,0.3)', borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, padding: 16, height: 120, textAlignVertical: 'top', color: '#fff', fontSize: 16, marginBottom: 24, marginTop: 16 },
+  modalInput: { backgroundColor: COLORS.inputBg, borderRadius: 12, padding: 14, color: COLORS.inputText, fontSize: 16, marginBottom: 24, marginTop: 16, borderWidth: 1, borderColor: COLORS.inputBorder },
   modalActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 12 },
   modalCancel: { paddingVertical: 12, paddingHorizontal: 20, borderRadius: 12, backgroundColor: COLORS.cardBg },
-  modalCancelText: { color: '#fff', fontWeight: '700' },
+  modalCancelText: { color: COLORS.text, fontWeight: '700' },
   modalSubmit: { backgroundColor: '#EF4444', paddingVertical: 12, paddingHorizontal: 20, borderRadius: 12 },
   modalSubmitText: { color: '#fff', fontWeight: '800' },
   
   emptyContainer: { alignItems: 'center', justifyContent: 'center', marginTop: 40 },
   iconCircle: { width: 100, height: 100, borderRadius: 50, backgroundColor: 'rgba(0,201,167,0.1)', alignItems: 'center', justifyContent: 'center', marginBottom: 20, borderWidth: 1, borderColor: 'rgba(0,201,167,0.3)' },
-  emptyTitle: { fontSize: 22, fontWeight: '900', color: '#fff', marginBottom: 8 },
+  emptyTitle: { fontSize: 22, fontWeight: '900', color: COLORS.text, marginBottom: 8 },
   emptySubtitle: { fontSize: 15, color: COLORS.textLight, textAlign: 'center' }
 });

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import COLORS from '../../constants/colors';
+import { useTheme } from '../../context/ThemeContext';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator, StatusBar, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -9,6 +9,8 @@ import EmptyState from '../../components/EmptyState';
 import ToastMessage from '../../components/ToastMessage';
 
 export default function AdminNotificationScreen({ navigation }) {
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
@@ -53,13 +55,13 @@ export default function AdminNotificationScreen({ navigation }) {
 
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         {toast.visible && <ToastMessage message={toast.message} type={toast.type} onHide={() => setToast({ ...toast, visible: false })} />}
         
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack?.()}>
-            <MaterialCommunityIcons name="arrow-left" size={24} color="#fff" />
+            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Admin Alerts</Text>
           <TouchableOpacity onPress={markAllRead} style={styles.markAllBtn}>
@@ -82,7 +84,7 @@ export default function AdminNotificationScreen({ navigation }) {
             notifications.map(n => (
               <TouchableOpacity key={n._id} style={[styles.card, !n.isRead && styles.unreadCard]} onPress={() => markAsRead(n._id)}>
                 <View style={[styles.iconContainer, !n.isRead && { backgroundColor: 'rgba(0,201,167,0.15)' }]}>
-                  <MaterialCommunityIcons name="shield-alert-outline" size={24} color={!n.isRead ? '#00C9A7' : 'rgba(255,255,255,0.4)'} />
+                  <MaterialCommunityIcons name="shield-alert-outline" size={24} color={!n.isRead ? '#00C9A7' : COLORS.textLight} />
                 </View>
                 <View style={styles.cardContent}>
                   <Text style={[styles.title, !n.isRead && styles.unreadText]}>{n.title}</Text>
@@ -99,7 +101,7 @@ export default function AdminNotificationScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 20 : 10, paddingBottom: 16 },
   backButton: { padding: 10, backgroundColor: COLORS.cardBg, borderRadius: 20, borderWidth: 1, borderColor: COLORS.border },
@@ -122,6 +124,6 @@ const styles = StyleSheet.create({
   
   emptyContainer: { alignItems: 'center', justifyContent: 'center', marginTop: -50 },
   iconCircle: { width: 100, height: 100, borderRadius: 50, backgroundColor: 'rgba(0,201,167,0.1)', alignItems: 'center', justifyContent: 'center', marginBottom: 20, borderWidth: 1, borderColor: 'rgba(0,201,167,0.3)' },
-  emptyTitle: { fontSize: 22, fontWeight: '900', color: '#fff', marginBottom: 8 },
+  emptyTitle: { fontSize: 22, fontWeight: '900', color: COLORS.text, marginBottom: 8 },
   emptySubtitle: { fontSize: 15, color: COLORS.textLight, textAlign: 'center' }
 });

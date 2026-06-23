@@ -91,7 +91,17 @@ const createRazorpayOrder = async (req, res) => {
       receipt: `receipt_ticket_${Date.now()}`
     };
 
-    const order = await razorpay.orders.create(options);
+    let order;
+    if (process.env.RAZORPAY_KEY_SECRET === 'puneMetroRazorSecret123') {
+      // Mock order creation for development/testing if dummy secret is used
+      order = {
+        id: `order_mock_${Date.now()}`,
+        amount: options.amount,
+        currency: options.currency
+      };
+    } else {
+      order = await razorpay.orders.create(options);
+    }
 
     res.status(200).json({
       success: true,
@@ -237,7 +247,8 @@ const processPayment = async (req, res) => {
 // @access  Private
 const getTicketHistory = async (req, res) => {
   try {
-    const tickets = await Ticket.find({ userId: req.user.id }).sort({ createdAt: -1 });
+    // Only fetch tickets where payment was successful — excludes pending/failed attempts
+    const tickets = await Ticket.find({ userId: req.user.id, paymentStatus: 'success' }).sort({ createdAt: -1 });
 
     const currentDateString = new Date().toDateString();
     

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import COLORS from '../../constants/colors';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, RefreshControl, TextInput, ActivityIndicator, Alert, StatusBar, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -7,8 +6,12 @@ import LinearGradient from 'react-native-linear-gradient';
 import api from '../../api/axiosConfig';
 import EmptyState from '../../components/EmptyState';
 import ToastMessage from '../../components/ToastMessage';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function UserManagementScreen({ navigation }) {
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
+  
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -16,7 +19,7 @@ export default function UserManagementScreen({ navigation }) {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-
+  
   const fetchUsers = async (pageNum = 1, append = false) => {
     if (pageNum === 1) setLoading(true);
     else setLoadingMore(true);
@@ -70,24 +73,24 @@ export default function UserManagementScreen({ navigation }) {
 
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         {toast.visible && <ToastMessage message={toast.message} type={toast.type} onHide={() => setToast({ ...toast, visible: false })} />}
         
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack?.()}>
-            <MaterialCommunityIcons name="arrow-left" size={24} color="#fff" />
+            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Users Config</Text>
           <View style={{ width: 44 }} />
         </View>
 
         <View style={styles.searchContainer}>
-          <MaterialCommunityIcons name="magnify" size={24} color="rgba(255,255,255,0.5)" />
+          <MaterialCommunityIcons name="magnify" size={24} color={COLORS.textLight} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search by name, phone, or email..."
-            placeholderTextColor="rgba(255,255,255,0.4)"
+            placeholderTextColor="#AAAAAA"
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -148,14 +151,14 @@ export default function UserManagementScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 20 : 10, paddingBottom: 16 },
   backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
   headerTitle: { fontSize: 20, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
   
-  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, marginHorizontal: 20, marginVertical: 10, paddingHorizontal: 16, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border },
-  searchInput: { flex: 1, paddingVertical: 14, marginLeft: 10, fontSize: 16, color: '#fff' },
+  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.inputBg, borderWidth: 1, borderColor: COLORS.inputBorder, marginHorizontal: 20, marginVertical: 10, paddingHorizontal: 16, borderRadius: 16 },
+  searchInput: { flex: 1, fontSize: 15, color: COLORS.inputText, paddingVertical: 12, marginLeft: 8 },
   
   scrollContent: { padding: 20, paddingBottom: 50 },
   
@@ -169,9 +172,9 @@ const styles = StyleSheet.create({
   
   deleteBtn: { padding: 10, backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(239, 68, 68, 0.3)' },
   
-  balancesContainer: { flexDirection: 'row', backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: COLORS.border },
+  balancesContainer: { flexDirection: 'row', backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, padding: 16, marginBottom: 16 },
   balanceBox: { flex: 1, alignItems: 'center' },
-  divider: { width: 1, backgroundColor: COLORS.cardBg },
+  divider: { width: 1, backgroundColor: COLORS.border },
   balanceLabel: { fontSize: 12, color: COLORS.textLight, marginBottom: 6, fontWeight: '600' },
   balanceValue: { fontSize: 18, fontWeight: '900', color: '#00C9A7' },
   
@@ -182,6 +185,6 @@ const styles = StyleSheet.create({
 
   emptyContainer: { alignItems: 'center', justifyContent: 'center', marginTop: 40 },
   iconCircle: { width: 100, height: 100, borderRadius: 50, backgroundColor: 'rgba(0,201,167,0.1)', alignItems: 'center', justifyContent: 'center', marginBottom: 20, borderWidth: 1, borderColor: 'rgba(0,201,167,0.3)' },
-  emptyTitle: { fontSize: 22, fontWeight: '900', color: '#fff', marginBottom: 8 },
+  emptyTitle: { fontSize: 22, fontWeight: '900', color: COLORS.text, marginBottom: 8 },
   emptySubtitle: { fontSize: 15, color: COLORS.textLight, textAlign: 'center' }
 });

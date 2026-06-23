@@ -8,49 +8,43 @@ export const calculateDistance = (source, destination) => {
   if (!source || !destination) return 0;
   if (source === destination) return 0;
 
-  const purpleStations = METRO_LINES.purple.stations;
-  const aquaStations = METRO_LINES.aqua.stations;
+  // 1. Build Adjacency List for the metro graph
+  const graph = {};
+  const addEdge = (u, v) => {
+    if (!graph[u]) graph[u] = [];
+    if (!graph[v]) graph[v] = [];
+    if (!graph[u].includes(v)) graph[u].push(v);
+    if (!graph[v].includes(u)) graph[v].push(u);
+  };
 
-  const inPurpleSrc = purpleStations.indexOf(source);
-  const inPurpleDest = purpleStations.indexOf(destination);
-  const inAquaSrc = aquaStations.indexOf(source);
-  const inAquaDest = aquaStations.indexOf(destination);
+  Object.values(METRO_LINES).forEach(line => {
+    const stations = line.stations;
+    for (let i = 0; i < stations.length - 1; i++) {
+      addEdge(stations[i], stations[i+1]);
+    }
+  });
 
-  // 1. Same line: Purple
-  if (inPurpleSrc !== -1 && inPurpleDest !== -1) {
-    return Math.abs(inPurpleSrc - inPurpleDest) * 1.4; // 1.4 km average station gap
+  // 2. BFS to find shortest path (fewest edges)
+  const queue = [{ station: source, dist: 0 }];
+  const visited = new Set([source]);
+
+  while (queue.length > 0) {
+    const { station, dist } = queue.shift();
+
+    if (station === destination) {
+      // Assuming average 1.4 km gap between any adjacent stations
+      return parseFloat((dist * 1.4).toFixed(1));
+    }
+
+    for (const neighbor of (graph[station] || [])) {
+      if (!visited.has(neighbor)) {
+        visited.add(neighbor);
+        queue.push({ station: neighbor, dist: dist + 1 });
+      }
+    }
   }
 
-  // 2. Same line: Aqua
-  if (inAquaSrc !== -1 && inAquaDest !== -1) {
-    return Math.abs(inAquaSrc - inAquaDest) * 1.4;
-  }
-
-  // 3. Different lines: Route through Swargate (interchange in our lists)
-  // Find distance from Source to Swargate + Swargate to Destination
-  let distToInterchange = 0;
-  let distFromInterchange = 0;
-
-  // Source part
-  if (inPurpleSrc !== -1) {
-    const swargateIdx = purpleStations.indexOf('Swargate');
-    distToInterchange = Math.abs(inPurpleSrc - swargateIdx) * 1.4;
-  } else if (inAquaSrc !== -1) {
-    const swargateIdx = aquaStations.indexOf('Swargate');
-    distToInterchange = Math.abs(inAquaSrc - swargateIdx) * 1.4;
-  }
-
-  // Destination part
-  if (inPurpleDest !== -1) {
-    const swargateIdx = purpleStations.indexOf('Swargate');
-    distFromInterchange = Math.abs(inPurpleDest - swargateIdx) * 1.4;
-  } else if (inAquaDest !== -1) {
-    const swargateIdx = aquaStations.indexOf('Swargate');
-    distFromInterchange = Math.abs(inAquaDest - swargateIdx) * 1.4;
-  }
-
-  const totalDist = distToInterchange + distFromInterchange;
-  return parseFloat(totalDist.toFixed(1));
+  return 0; // If no path found
 };
 
 /**

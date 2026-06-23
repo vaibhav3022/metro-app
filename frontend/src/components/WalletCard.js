@@ -2,9 +2,12 @@ import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import COLORS from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 
 export default function WalletCard({ balance = 0, onAddMoney, onScanQR }) {
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
+
   return (
     <LinearGradient
       colors={[COLORS.primary, '#004A99']}
@@ -51,7 +54,7 @@ export default function WalletCard({ balance = 0, onAddMoney, onScanQR }) {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   card: {
     borderRadius: 20,
     padding: 24,

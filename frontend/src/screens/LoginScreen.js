@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import COLORS from '../constants/colors';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   ActivityIndicator, Alert, KeyboardAvoidingView, Platform,
@@ -11,6 +10,7 @@ import { authStart, authSuccess, authFailure, clearError } from '../redux/slices
 import api from '../api/axiosConfig';
 import { storage } from '../utils/storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useTheme } from '../context/ThemeContext';
 
 const TABS = [
   { key: 'passenger', label: 'Passenger', icon: 'account-outline' },
@@ -18,6 +18,9 @@ const TABS = [
 ];
 
 export default function LoginScreen({ navigation }) {
+  const { theme: COLORS, isDark, toggleTheme } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
+  
   const [activeTab, setActiveTab] = useState('passenger');
   const [isRegister, setIsRegister] = useState(false); // Toggle between Login and Register
   
@@ -99,7 +102,12 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.gradient}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
+      
+      <TouchableOpacity style={styles.themeToggle} onPress={toggleTheme}>
+        <Icon name={isDark ? 'weather-sunny' : 'weather-night'} size={22} color={COLORS.text} />
+      </TouchableOpacity>
+
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
 
@@ -131,7 +139,7 @@ export default function LoginScreen({ navigation }) {
                   style={[styles.tab, activeTab === tab.key && styles.tabActive]}
                   onPress={() => { setActiveTab(tab.key); setIsRegister(false); }}
                 >
-                  <Icon name={tab.icon} size={16} color={activeTab === tab.key ? '#fff' : 'rgba(255,255,255,0.5)'} />
+                  <Icon name={tab.icon} size={16} color={activeTab === tab.key ? '#00897B' : '#888888'} />
                   <Text style={[styles.tabText, activeTab === tab.key && styles.tabTextActive]}>
                     {tab.label}
                   </Text>
@@ -157,7 +165,7 @@ export default function LoginScreen({ navigation }) {
               <TextInput
                 style={styles.input}
                 placeholder="Enter your email"
-                placeholderTextColor="rgba(255,255,255,0.4)"
+                placeholderTextColor="#AAAAAA"
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
@@ -174,7 +182,7 @@ export default function LoginScreen({ navigation }) {
                   <TextInput
                     style={styles.input}
                     placeholder="Enter your name"
-                    placeholderTextColor="rgba(255,255,255,0.4)"
+                    placeholderTextColor="#AAAAAA"
                     value={name}
                     onChangeText={setName}
                   />
@@ -186,7 +194,7 @@ export default function LoginScreen({ navigation }) {
                   <TextInput
                     style={styles.input}
                     placeholder="Enter mobile number"
-                    placeholderTextColor="rgba(255,255,255,0.4)"
+                    placeholderTextColor="#AAAAAA"
                     value={phone}
                     onChangeText={setPhone}
                     keyboardType="phone-pad"
@@ -199,13 +207,13 @@ export default function LoginScreen({ navigation }) {
                   <TextInput
                     style={styles.input}
                     placeholder="Create a password"
-                    placeholderTextColor="rgba(255,255,255,0.4)"
+                    placeholderTextColor={COLORS.textLight}
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry={!showPassword}
                   />
                   <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                    <Icon name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color="rgba(255,255,255,0.5)" />
+                    <Icon name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color={COLORS.textLight} />
                   </TouchableOpacity>
                 </View>
               </>
@@ -217,28 +225,28 @@ export default function LoginScreen({ navigation }) {
                 <Text style={styles.label}>Full Name</Text>
                 <View style={styles.inputRow}>
                   <Icon name="account-outline" size={20} color="#3498DB" />
-                  <TextInput style={styles.input} placeholder="Owner Name" placeholderTextColor="rgba(255,255,255,0.4)" value={name} onChangeText={setName} />
+                  <TextInput style={styles.input} placeholder="Owner Name" placeholderTextColor="#AAAAAA" value={name} onChangeText={setName} />
                 </View>
                 <Text style={styles.label}>Shop Name</Text>
                 <View style={styles.inputRow}>
                   <Icon name="storefront-outline" size={20} color="#3498DB" />
-                  <TextInput style={styles.input} placeholder="Business Name" placeholderTextColor="rgba(255,255,255,0.4)" value={shopName} onChangeText={setShopName} />
+                  <TextInput style={styles.input} placeholder="Business Name" placeholderTextColor="#AAAAAA" value={shopName} onChangeText={setShopName} />
                 </View>
                 <Text style={styles.label}>Phone Number</Text>
                 <View style={styles.inputRow}>
                   <Icon name="phone-outline" size={20} color="#3498DB" />
-                  <TextInput style={styles.input} placeholder="Phone" placeholderTextColor="rgba(255,255,255,0.4)" keyboardType="phone-pad" value={phone} onChangeText={setPhone} />
+                  <TextInput style={styles.input} placeholder="Phone" placeholderTextColor="#AAAAAA" keyboardType="phone-pad" value={phone} onChangeText={setPhone} />
                 </View>
                 <Text style={styles.label}>Set Password</Text>
                 <View style={styles.inputRow}>
                   <Icon name="lock-outline" size={20} color="#3498DB" />
-                  <TextInput style={styles.input} placeholder="Create password" placeholderTextColor="rgba(255,255,255,0.4)" secureTextEntry={!showPassword} value={password} onChangeText={setPassword} />
-                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}><Icon name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color="rgba(255,255,255,0.5)" /></TouchableOpacity>
+                  <TextInput style={styles.input} placeholder="Create password" placeholderTextColor={COLORS.textLight} secureTextEntry={!showPassword} value={password} onChangeText={setPassword} />
+                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}><Icon name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color={COLORS.textLight} /></TouchableOpacity>
                 </View>
                 <Text style={styles.label}>Address (Optional)</Text>
                 <View style={styles.inputRow}>
                   <Icon name="map-marker-outline" size={20} color="#3498DB" />
-                  <TextInput style={styles.input} placeholder="Shop Address" placeholderTextColor="rgba(255,255,255,0.4)" value={address} onChangeText={setAddress} />
+                  <TextInput style={styles.input} placeholder="Shop Address" placeholderTextColor="#AAAAAA" value={address} onChangeText={setAddress} />
                 </View>
               </>
             )}
@@ -252,13 +260,13 @@ export default function LoginScreen({ navigation }) {
                   <TextInput
                     style={styles.input}
                     placeholder="Enter password"
-                    placeholderTextColor="rgba(255,255,255,0.4)"
+                    placeholderTextColor={COLORS.textLight}
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry={!showPassword}
                   />
                   <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                    <Icon name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color="rgba(255,255,255,0.5)" />
+                    <Icon name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color={COLORS.textLight} />
                   </TouchableOpacity>
                 </View>
               </>
@@ -298,14 +306,14 @@ export default function LoginScreen({ navigation }) {
             <Text style={styles.label}>Admin Email</Text>
             <View style={styles.inputRow}>
               <Icon name="email-outline" size={20} color="#9B59B6" />
-              <TextInput style={styles.input} placeholder="admin@metro.com" placeholderTextColor="rgba(255,255,255,0.4)" value={email} onChangeText={setEmail} autoCapitalize="none" />
+              <TextInput style={styles.input} placeholder="admin@metro.com" placeholderTextColor="#AAAAAA" value={email} onChangeText={setEmail} autoCapitalize="none" />
             </View>
             <Text style={styles.label}>Password</Text>
             <View style={styles.inputRow}>
               <Icon name="lock-outline" size={20} color="#9B59B6" />
-              <TextInput style={styles.input} placeholder="Enter admin password" placeholderTextColor="rgba(255,255,255,0.4)" value={password} onChangeText={setPassword} secureTextEntry={!showPassword} />
+              <TextInput style={styles.input} placeholder="Enter admin password" placeholderTextColor={COLORS.textLight} value={password} onChangeText={setPassword} secureTextEntry={!showPassword} />
               <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <Icon name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color="rgba(255,255,255,0.5)" />
+                <Icon name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color={COLORS.textLight} />
               </TouchableOpacity>
             </View>
             <TouchableOpacity style={styles.btn} onPress={() => handlePasswordLogin('admin')} disabled={loading}>
@@ -321,37 +329,56 @@ export default function LoginScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   gradient: { flex: 1 },
-  scrollContainer: { flexGrow: 1, paddingHorizontal: 24, paddingTop: 60, paddingBottom: 30 },
+  scrollContainer: { flexGrow: 1, paddingHorizontal: 24, paddingTop: 65, paddingBottom: 30 },
+  themeToggle: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 55 : 35,
+    right: 20,
+    zIndex: 100,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: COLORS.cardBg,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 }
+  },
   logoArea: { alignItems: 'center', marginBottom: 32 },
   iconCircle: { width: 90, height: 90, borderRadius: 45, justifyContent: 'center', alignItems: 'center', marginBottom: 14, elevation: 12 },
   title: { fontSize: 28, fontWeight: '900', color: COLORS.text, letterSpacing: 3 },
   subtitle: { fontSize: 14, color: COLORS.textLight, marginTop: 4, letterSpacing: 0.5 },
-  card: { backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 22, borderWidth: 1, borderColor: COLORS.border },
-  cardTitle: { fontSize: 22, fontWeight: '900', color: '#fff', marginBottom: 18, textAlign: 'center', letterSpacing: 0.5 },
-  tabRow: { flexDirection: 'row', backgroundColor: COLORS.cardBg, borderRadius: 12, marginBottom: 20, overflow: 'hidden', borderWidth: 1, borderColor: COLORS.border },
+  card: { backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 22, borderWidth: 1, borderColor: COLORS.border, elevation: 6, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 12, shadowOffset: { width: 0, height: 4 } },
+  cardTitle: { fontSize: 22, fontWeight: '900', color: COLORS.text, marginBottom: 18, textAlign: 'center', letterSpacing: 0.5 },
+  tabRow: { flexDirection: 'row', backgroundColor: COLORS.inputBg, borderRadius: 12, marginBottom: 20, overflow: 'hidden', borderWidth: 1, borderColor: COLORS.border },
   tab: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 12, gap: 5 },
-  tabActive: { backgroundColor: 'rgba(0,201,167,0.2)' },
+  tabActive: { backgroundColor: 'rgba(0,137,123,0.15)' },
   tabText: { fontSize: 13, color: COLORS.textLight, fontWeight: '700' },
-  tabTextActive: { color: '#00C9A7' },
+  tabTextActive: { color: COLORS.secondary },
   
   toggleRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 20, gap: 15 },
   toggleText: { fontSize: 15, color: COLORS.textLight, fontWeight: '700' },
-  toggleTextActive: { color: '#fff', fontWeight: '900' },
-  toggleDivider: { width: 2, height: 16, backgroundColor: 'rgba(255,255,255,0.2)' },
+  toggleTextActive: { color: COLORS.text, fontWeight: '900' },
+  toggleDivider: { width: 2, height: 16, backgroundColor: COLORS.border },
 
   label: { fontSize: 13, color: COLORS.textLight, marginBottom: 6, marginTop: 14, fontWeight: '600' },
-  inputRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, borderRadius: 12, paddingHorizontal: 14, height: 52, borderWidth: 1, borderColor: COLORS.border, gap: 10 },
-  input: { flex: 1, fontSize: 15, color: '#fff' },
+  inputRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.inputBg, borderWidth: 1, borderColor: COLORS.inputBorder, borderRadius: 12, paddingHorizontal: 14, height: 52, gap: 10 },
+  input: { flex: 1, fontSize: 15, color: COLORS.inputText },
   btn: { marginTop: 24, borderRadius: 14, overflow: 'hidden', elevation: 5 },
   btnGrad: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 16, gap: 8 },
   btnText: { color: '#fff', fontSize: 16, fontWeight: '800', letterSpacing: 0.5 },
-  footer: { textAlign: 'center', color: 'rgba(255,255,255,0.3)', marginTop: 28, fontSize: 12, fontWeight: '600' },
+  footer: { textAlign: 'center', color: COLORS.textLight, marginTop: 28, fontSize: 12, fontWeight: '600' },
   
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', alignItems: 'center', padding: 20 },
   adminCard: { width: '100%', backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 24, borderWidth: 1, borderColor: 'rgba(155,89,182,0.3)', position: 'relative' },
   closeAdmin: { position: 'absolute', top: 15, right: 15, zIndex: 10, padding: 5 },
   adminHeader: { alignItems: 'center', marginBottom: 20 },
-  adminTitle: { fontSize: 20, fontWeight: '900', color: '#fff', marginTop: 10, letterSpacing: 1 }
+  adminTitle: { fontSize: 20, fontWeight: '900', color: COLORS.text, marginTop: 10, letterSpacing: 1 }
 });

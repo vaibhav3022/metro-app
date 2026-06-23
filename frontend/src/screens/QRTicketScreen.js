@@ -1,24 +1,30 @@
-import React from 'react';
-import COLORS from '../constants/colors';
+import React, { useState, useRef } from 'react';
+import { useTheme } from '../context/ThemeContext';
 import {
-  View, Text, StyleSheet, TouchableOpacity, Image, SafeAreaView, ScrollView, Platform, StatusBar, BackHandler
+  View, Text, StyleSheet, TouchableOpacity, Image, SafeAreaView, FlatList, Dimensions, StatusBar, BackHandler
 } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
 
+const { width } = Dimensions.get('window');
+
 export default function QRTicketScreen() {
   const navigation = useNavigation();
   const ticket = useSelector((state) => state.tickets.currentTicket);
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS, isDark), [COLORS, isDark]);
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const flatListRef = useRef(null);
 
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
         navigation.navigate('HomeTab');
-        return true; // prevent default behavior
+        return true;
       };
-
       BackHandler.addEventListener('hardwareBackPress', onBackPress);
       return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
     }, [navigation])
@@ -26,9 +32,9 @@ export default function QRTicketScreen() {
 
   if (!ticket) {
     return (
-      <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.safeArea}>
-        <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
-        <SafeAreaView style={{ flex: 1 }}>
+    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.safeArea}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
+      <SafeAreaView style={{ flex: 1 }}>
           <View style={styles.centered}>
             <Icon name="ticket-confirmation-outline" size={70} color="rgba(255,255,255,0.2)" style={{ marginBottom: 20 }} />
             <Text style={styles.noTicketText}>No active ticket selected.</Text>
@@ -43,128 +49,175 @@ export default function QRTicketScreen() {
     );
   }
 
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${ticket.ticketId || ticket.id}&color=0A0A1A&bgcolor=FFFFFF`;
   const isInvalid = ['expired', 'used', 'failed'].includes(ticket.ticketStatus?.toLowerCase());
+  const passengersCount = ticket.passengers || 1;
+  const ticketsArray = Array.from({ length: passengersCount });
+  const isReturn = ticket.isReturn;
 
-  return (
-    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
-      <SafeAreaView style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-          {/* Header */}
-          <View style={styles.header}>
-            <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('HomeTab')}>
-              <Icon name="arrow-left" size={24} color="#fff" />
+  const handleScroll = (event) => {
+    const xOffset = event.nativeEvent.contentOffset.x;
+    const index = Math.round(xOffset / width);
+    setCurrentIndex(index);
+  };
+
+  const renderTicketCard = ({ item, index }) => {
+    // Unique QR for each passenger
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${ticket.ticketId || ticket.id}_${index + 1}&color=000000&bgcolor=FFFFFF`;
+
+    return (
+      <View style={{ width: width, alignItems: 'center', paddingHorizontal: 20 }}>
+        <View style={styles.card}>
+          
+          {/* Top Row: Price, Type, Close */}
+          <View style={styles.cardTopRow}>
+            <Text style={styles.priceText}>₹{ticket.totalAmount || ticket.fare}</Text>
+            <View style={styles.typeChip}>
+              <Text style={styles.typeChipText}>{isReturn ? 'Return' : 'Outward'}</Text>
+            </View>
+            <TouchableOpacity onPress={() => navigation.navigate('HomeTab')} style={styles.closeBtn}>
+              <Icon name="close" size={20} color="#777" />
             </TouchableOpacity>
-            <Text style={styles.headerTitle}>Digital Ticket</Text>
-            <View style={{ width: 44 }} />
           </View>
 
-          <View style={styles.card}>
-            {/* Icon */}
-            <View style={styles.iconWrap}>
-              <Icon name="qrcode-scan" size={36} color="#9B59B6" />
-            </View>
-            <Text style={styles.cardTitle}>Ready to Scan</Text>
-            <Text style={styles.cardSubtitle}>Scan this QR code at the AFC gate</Text>
+          {/* Ticket Counter */}
+          <View style={styles.counterRow}>
+            {passengersCount > 1 ? (
+              <TouchableOpacity 
+                disabled={index === 0} 
+                onPress={() => flatListRef.current?.scrollToOffset({ offset: (index - 1) * width, animated: true })}
+                style={{ padding: 10, opacity: index === 0 ? 0.3 : 1 }}
+              >
+                <Icon name="chevron-left-circle" size={32} color="#00C9A7" />
+              </TouchableOpacity>
+            ) : <View style={{ width: 52 }} />}
+            
+            <Text style={styles.counterText}>Ticket {index + 1} of {passengersCount}</Text>
 
-            {/* QR Code */}
-            <View style={[styles.qrWrapper, isInvalid && { borderColor: '#EF4444', opacity: 0.5 }]}>
-              <Image
-                source={{ uri: qrUrl }}
-                style={styles.qrImage}
-                resizeMode="contain"
-              />
-              {isInvalid && (
-                <View style={styles.invalidOverlay}>
-                   <Icon name="close-octagon-outline" size={60} color="#EF4444" />
-                   <Text style={styles.invalidOverlayText}>{ticket.ticketStatus?.toUpperCase()}</Text>
-                </View>
-              )}
-            </View>
+            {passengersCount > 1 ? (
+              <TouchableOpacity 
+                disabled={index === passengersCount - 1} 
+                onPress={() => flatListRef.current?.scrollToOffset({ offset: (index + 1) * width, animated: true })}
+                style={{ padding: 10, opacity: index === passengersCount - 1 ? 0.3 : 1 }}
+              >
+                <Icon name="chevron-right-circle" size={32} color="#00C9A7" />
+              </TouchableOpacity>
+            ) : <View style={{ width: 52 }} />}
+          </View>
 
-            {/* Ticket ID */}
-            <Text style={styles.ticketId}>TICKET ID: {ticket.ticketId || ticket.id}</Text>
+          {/* QR Code */}
+          <View style={styles.qrWrapper}>
+            <Image
+              source={{ uri: qrUrl }}
+              style={styles.qrImage}
+              resizeMode="contain"
+            />
+            {isInvalid && (
+              <View style={styles.invalidOverlay}>
+                 <Text style={styles.invalidOverlayText}>{ticket.ticketStatus?.charAt(0).toUpperCase() + ticket.ticketStatus?.slice(1)}</Text>
+              </View>
+            )}
+          </View>
 
-            {/* Route Info */}
-            <View style={styles.routeRow}>
-              <View style={styles.stationInfo}>
+          {/* Eco-Friendly Badge */}
+          <View style={styles.ecoBadge}>
+            <Icon name="leaf" size={16} color="#22c55e" />
+            <Text style={styles.ecoText}>You saved ~{(ticket.distance * 0.14 || 1.2).toFixed(2)} kg of CO₂</Text>
+          </View>
+
+          {/* Ticket ID */}
+          <Text style={styles.ticketId}>Ticket No: {ticket.ticketId || ticket.id}-{index + 1}</Text>
+
+          {/* From -> To */}
+          <View style={styles.routeRow}>
+             <View style={styles.stationInfo}>
                 <Text style={styles.stationLabel}>From</Text>
                 <Text style={styles.stationName}>{ticket.source || ticket.sourceStation}</Text>
-              </View>
-              <View style={styles.routeArrow}>
-                <Icon name="arrow-right-thick" size={20} color="#00C9A7" />
-              </View>
-              <View style={[styles.stationInfo, { alignItems: 'flex-end' }]}>
+             </View>
+             <Icon name="arrow-right" size={24} color="#777" style={{ marginHorizontal: 10 }} />
+             <View style={styles.stationInfo}>
                 <Text style={styles.stationLabel}>To</Text>
                 <Text style={styles.stationName}>{ticket.destination || ticket.destinationStation}</Text>
-              </View>
-            </View>
-
-            {/* Ticket Details */}
-            <View style={styles.detailsRow}>
-              {ticket.passengers && (
-                <View style={styles.detailChip}>
-                  <Icon name="account-group" size={18} color="#00C9A7" />
-                  <Text style={styles.detailText}>{ticket.passengers} Pax</Text>
-                </View>
-              )}
-              {ticket.totalAmount && (
-                <View style={styles.detailChip}>
-                  <Icon name="currency-inr" size={18} color="#00C9A7" />
-                  <Text style={styles.detailText}>{ticket.totalAmount}</Text>
-                </View>
-              )}
-              {ticket.ticketStatus && (
-                <View style={[styles.detailChip, ticket.ticketStatus === 'active' && styles.activeChip, isInvalid && styles.invalidChip]}>
-                  <Icon name={isInvalid ? "alert-circle" : "check-decagram"} size={18} color={ticket.ticketStatus === 'active' ? '#22c55e' : (isInvalid ? '#EF4444' : 'rgba(255,255,255,0.4)')} />
-                  <Text style={[styles.detailText, ticket.ticketStatus === 'active' && { color: '#22c55e', fontWeight: '800' }, isInvalid && { color: '#EF4444', fontWeight: '900' }]}>
-                    {ticket.ticketStatus?.toUpperCase()}
-                  </Text>
-                </View>
-              )}
-            </View>
+             </View>
           </View>
-        </ScrollView>
+
+        </View>
+      </View>
+    );
+  };
+
+  return (
+    <LinearGradient colors={isDark ? ['#1a1a2e', '#16213e'] : ['#5b2c6f', '#8e44ad']} style={styles.safeArea}>
+      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <SafeAreaView style={{ flex: 1, justifyContent: 'center' }}>
+        
+        <View style={{ height: 600, justifyContent: 'center' }}>
+          <FlatList
+            ref={flatListRef}
+            data={ticketsArray}
+            keyExtractor={(_, index) => index.toString()}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onMomentumScrollEnd={handleScroll}
+            renderItem={renderTicketCard}
+            getItemLayout={(data, index) => ({ length: width, offset: width * index, index })}
+          />
+        </View>
+
       </SafeAreaView>
     </LinearGradient>
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS, isDark) => StyleSheet.create({
   safeArea: { flex: 1 },
-  container: { padding: 20, paddingBottom: 50, paddingTop: Platform.OS === 'android' ? 40 : 10 },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
   noTicketText: { fontSize: 18, color: COLORS.textLight, marginBottom: 24, fontWeight: '600' },
   homeBtn: { borderRadius: 16, overflow: 'hidden' },
   homeBtnGrad: { paddingHorizontal: 30, paddingVertical: 14, justifyContent: 'center', alignItems: 'center' },
   homeBtnText: { color: '#fff', fontWeight: '800', fontSize: 16 },
   
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 30 },
-  backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
-  headerTitle: { fontSize: 22, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
+  card: { 
+    backgroundColor: '#ffffff', 
+    borderRadius: 20, 
+    padding: 20, 
+    alignItems: 'center', 
+    width: '100%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.2,
+    shadowRadius: 15,
+    elevation: 10
+  },
   
-  card: { backgroundColor: COLORS.cardBg, borderRadius: 32, padding: 24, alignItems: 'center', borderWidth: 1, borderColor: COLORS.border },
-  iconWrap: { width: 70, height: 70, borderRadius: 35, backgroundColor: 'rgba(155,89,182,0.15)', justifyContent: 'center', alignItems: 'center', marginBottom: 16, borderWidth: 1, borderColor: 'rgba(155,89,182,0.3)' },
-  cardTitle: { fontSize: 24, fontWeight: '900', color: '#fff', marginBottom: 6 },
-  cardSubtitle: { fontSize: 14, color: COLORS.textLight, marginBottom: 24, fontWeight: '500' },
+  cardTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: 15 },
+  priceText: { fontSize: 20, fontWeight: '900', color: '#111' },
+  typeChip: { paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12, borderWidth: 1, borderColor: '#ccc' },
+  typeChipText: { color: '#333', fontWeight: '700', fontSize: 13 },
+  closeBtn: { width: 30, height: 30, borderRadius: 15, backgroundColor: '#cbd5e1', justifyContent: 'center', alignItems: 'center' },
+
+  counterRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
+  counterText: { fontSize: 16, fontWeight: '800', color: '#111', marginHorizontal: 15 },
   
-  qrWrapper: { backgroundColor: '#fff', borderWidth: 3, borderColor: '#00C9A7', borderStyle: 'dashed', borderRadius: 24, padding: 20, marginBottom: 16 },
-  qrImage: { width: 220, height: 220 },
-  invalidOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(255,255,255,0.8)', justifyContent: 'center', alignItems: 'center', borderRadius: 20 },
-  invalidOverlayText: { color: '#EF4444', fontWeight: '900', fontSize: 24, marginTop: 10, letterSpacing: 2 },
+  qrWrapper: { position: 'relative', width: 250, height: 250, marginBottom: 15, borderRadius: 12, overflow: 'hidden' },
+  qrImage: { width: '100%', height: '100%' },
   
-  ticketId: { fontSize: 12, color: COLORS.textLight, marginBottom: 24, fontWeight: '700', letterSpacing: 1 },
+  invalidOverlay: { 
+    position: 'absolute', 
+    top: 0, left: 0, right: 0, bottom: 0, 
+    backgroundColor: 'rgba(0, 0, 0, 0.75)', 
+    justifyContent: 'center', 
+    alignItems: 'center' 
+  },
+  invalidOverlayText: { color: '#ffffff', fontWeight: '900', fontSize: 32, letterSpacing: 1 },
   
-  routeRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, borderRadius: 20, padding: 20, width: '100%', marginBottom: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
-  stationInfo: { flex: 1 },
-  stationLabel: { fontSize: 11, color: COLORS.textLight, marginBottom: 4, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1 },
-  stationName: { fontSize: 17, fontWeight: '800', color: '#fff' },
-  routeArrow: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(0,201,167,0.15)', justifyContent: 'center', alignItems: 'center' },
+  ecoBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(34, 197, 94, 0.1)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, marginBottom: 20, borderWidth: 1, borderColor: 'rgba(34, 197, 94, 0.3)' },
+  ecoText: { color: '#22c55e', fontWeight: '800', fontSize: 13, marginLeft: 6 },
+
+  ticketId: { fontSize: 13, color: '#3b82f6', marginBottom: 25, fontWeight: '700' },
   
-  detailsRow: { flexDirection: 'row', gap: 10, flexWrap: 'wrap', justifyContent: 'center' },
-  detailChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.cardBg, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12, gap: 6, borderWidth: 1, borderColor: COLORS.border },
-  activeChip: { backgroundColor: 'rgba(34,197,94,0.1)', borderColor: 'rgba(34,197,94,0.2)' },
-  invalidChip: { backgroundColor: 'rgba(239,68,68,0.15)', borderColor: 'rgba(239,68,68,0.3)' },
-  detailText: { fontSize: 13, color: 'rgba(255,255,255,0.8)', fontWeight: '700' },
+  routeRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%', paddingHorizontal: 10, paddingBottom: 25 },
+  stationInfo: { flex: 1, alignItems: 'center' },
+  stationLabel: { fontSize: 11, color: '#888', marginBottom: 4, fontWeight: '600' },
+  stationName: { fontSize: 14, fontWeight: '800', color: '#222' }
 });

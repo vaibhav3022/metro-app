@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Modal, FlatList, Dimensions } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import COLORS from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 
 const { height } = Dimensions.get('window');
 
 export default function CustomDropdown({ data, selectedValue, onValueChange, placeholder }) {
   const [modalVisible, setModalVisible] = useState(false);
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
 
   return (
     <View>
@@ -76,12 +78,12 @@ export default function CustomDropdown({ data, selectedValue, onValueChange, pla
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   dropdownBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.background,
     borderWidth: 1.5,
     borderColor: 'rgba(0, 102, 204, 0.2)', // Light primary color
     borderRadius: 12,
@@ -99,7 +101,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   dropdownContainer: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.cardBg,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     maxHeight: height * 0.6,
@@ -117,7 +119,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    borderBottomColor: COLORS.border,
   },
   dropdownTitle: {
     fontSize: 18,
@@ -131,7 +133,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#F9FAFB',
+    borderBottomColor: COLORS.border,
   },
   optionBtnSelected: {
     backgroundColor: 'rgba(0, 102, 204, 0.05)',

@@ -40,13 +40,43 @@ export const METRO_LINES = {
       'Kalyani Nagar',
       'Ramwadi'
     ]
+  },
+  line3: {
+    name: 'Line 3 (Hinjewadi to Civil Court)',
+    color: '#E53935',
+    stations: [
+      'Megapolis Circle',
+      'Embassy Quadron Business Park',
+      'Dohler',
+      'Infosys Phase II',
+      'Wipro Phase II',
+      'Pall India',
+      'Shivaji Chowk',
+      'Hinjawadi',
+      'Wakad Chowk',
+      'Balewadi Stadium',
+      'NICMAR',
+      'Ram Nagar',
+      'Laxmi Nagar',
+      'Balewadi Phata',
+      'Baner Gaon',
+      'Baner',
+      'Krushi Anusadhan',
+      'Sakal Nagar',
+      'University',
+      'R.B.I.',
+      'Agriculture College',
+      'Shivajinagar',
+      'Civil Court'
+    ]
   }
 };
 
 export const ALL_STATIONS = [
   ...new Set([
     ...METRO_LINES.purple.stations,
-    ...METRO_LINES.aqua.stations
+    ...METRO_LINES.aqua.stations,
+    ...METRO_LINES.line3.stations
   ])
 ];
 

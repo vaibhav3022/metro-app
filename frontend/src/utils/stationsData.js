@@ -9,12 +9,10 @@ export const STATIONS = [
 
 // Helper mapping to check lines of a station
 export const getStationLine = (stationName) => {
-  const isPurple = METRO_LINES.purple.stations.includes(stationName);
-  const isAqua = METRO_LINES.aqua.stations.includes(stationName);
-  
-  if (isPurple && isAqua) return 'both'; // Interchange station
-  if (isPurple) return 'purple';
-  if (isAqua) return 'aqua';
-  return null;
+  const lines = [];
+  if (METRO_LINES.purple.stations.includes(stationName)) lines.push('purple');
+  if (METRO_LINES.aqua.stations.includes(stationName)) lines.push('aqua');
+  if (METRO_LINES.line3.stations.includes(stationName)) lines.push('line3');
+  return lines;
 };
 export default STATIONS;

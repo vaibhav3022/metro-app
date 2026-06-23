@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import COLORS from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView,
   ActivityIndicator, Alert, StatusBar, Platform
@@ -12,6 +12,8 @@ import StationPicker from '../components/StationPicker';
 
 export default function FareCalculatorScreen() {
   const navigation = useNavigation();
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
   const [source, setSource] = useState(ALL_STATIONS[0]);
   const [destination, setDestination] = useState(ALL_STATIONS[10]);
   const [fareInfo, setFareInfo] = useState(null);
@@ -43,11 +45,11 @@ export default function FareCalculatorScreen() {
 
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.gradient}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Icon name="arrow-left" size={24} color="#fff" />
+            <Icon name="arrow-left" size={24} color={COLORS.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Fare Calculator</Text>
           <View style={{ width: 40 }} />
@@ -119,7 +121,7 @@ export default function FareCalculatorScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   gradient: { flex: 1 },
   container: { padding: 20, paddingBottom: 50, paddingTop: Platform.OS === 'android' ? 50 : 20 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 },
@@ -135,7 +137,7 @@ const styles = StyleSheet.create({
   calcButtonText: { color: '#fff', fontSize: 16, fontWeight: '800', letterSpacing: 1 },
   
   resultCard: { backgroundColor: COLORS.cardBg, borderRadius: 28, padding: 24, borderWidth: 1, borderColor: COLORS.border },
-  resultTitle: { fontSize: 16, fontWeight: '800', color: '#fff', textAlign: 'center', marginBottom: 20, letterSpacing: 0.5 },
+  resultTitle: { fontSize: 16, fontWeight: '800', color: COLORS.text, textAlign: 'center', marginBottom: 20, letterSpacing: 0.5 },
   resultGrid: { flexDirection: 'row', justifyContent: 'space-between' },
   resultItem: { flex: 1, alignItems: 'center' },
   resultItemBorder: { borderLeftWidth: 1, borderRightWidth: 1, borderColor: COLORS.border },

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import COLORS from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView,
   ActivityIndicator, Alert, StatusBar, Platform
@@ -15,6 +15,8 @@ import RazorpayCheckout from 'react-native-razorpay';
 export default function FareScreen() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
 
   const bookingDetails = useSelector((state) => state.tickets.bookingDetails);
   const user = useSelector((state) => state.auth.user);
@@ -25,7 +27,7 @@ export default function FareScreen() {
   if (!bookingDetails) {
     return (
       <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.gradient}>
-        <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+        <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
         <View style={styles.centered}>
           <Icon name="ticket-outline" size={60} color="rgba(255,255,255,0.2)" />
           <Text style={styles.emptyText}>No booking details found.</Text>
@@ -89,6 +91,12 @@ export default function FareScreen() {
         theme: { color: '#00C9A7' }
       };
 
+      // If backend gave a mock order (due to test keys), delete the fake order_id 
+      // so Razorpay SDK opens normally in test mode without failing validation.
+      if (orderRes.orderId.startsWith('order_mock_')) {
+        delete options.order_id;
+      }
+
       RazorpayCheckout.open(options).then((data) => {
         handlePaymentSuccess(data.razorpay_payment_id, 'razorpay', data);
       }).catch((error) => {
@@ -105,7 +113,7 @@ export default function FareScreen() {
 
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.gradient}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
       {loading && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color="#00C9A7" />
@@ -115,7 +123,7 @@ export default function FareScreen() {
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Icon name="arrow-left" size={24} color="#fff" />
+            <Icon name="arrow-left" size={24} color={COLORS.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Fare Breakdown</Text>
           <View style={{ width: 40 }} />
@@ -146,10 +154,6 @@ export default function FareScreen() {
         {/* Fare Breakdown */}
         <View style={styles.card}>
           <Text style={styles.sectionLabel}>Fare Calculation</Text>
-          <View style={styles.fareRow}>
-            <Text style={styles.fareItemLabel}>Journey Type</Text>
-            <Text style={styles.fareItemValue}>{isReturn ? 'Return (Round Trip)' : 'One-Way'}</Text>
-          </View>
           <View style={styles.fareRow}>
             <Text style={styles.fareItemLabel}>Fare (Per Passenger)</Text>
             <Text style={styles.fareItemValue}>₹{farePerPerson}</Text>
@@ -184,7 +188,7 @@ export default function FareScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   gradient: { flex: 1 },
   container: { padding: 20, paddingBottom: 50, paddingTop: Platform.OS === 'android' ? 50 : 20 },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
@@ -204,19 +208,19 @@ const styles = StyleSheet.create({
   
   journeyRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   stationInfo: { flex: 1 },
-  dot: { width: 14, height: 14, borderRadius: 7, backgroundColor: '#00C9A7', marginBottom: 8, borderWidth: 2, borderColor: '#fff' },
+  dot: { width: 14, height: 14, borderRadius: 7, backgroundColor: '#00C9A7', marginBottom: 8, borderWidth: 2, borderColor: COLORS.cardBg },
   stationLabel: { fontSize: 12, fontWeight: '700', color: COLORS.textLight, marginBottom: 4 },
-  stationName: { fontSize: 16, fontWeight: '800', color: '#fff' },
+  stationName: { fontSize: 16, fontWeight: '800', color: COLORS.text },
   
   distanceWrap: { alignItems: 'center', paddingHorizontal: 12, gap: 4 },
   distanceText: { fontSize: 12, fontWeight: '800', color: '#00C9A7' },
   distanceLine: { height: 2, width: 40, backgroundColor: 'rgba(0,201,167,0.3)', borderRadius: 1 },
   
-  fareRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)' },
+  fareRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: COLORS.border },
   fareItemLabel: { fontSize: 15, color: COLORS.textLight, fontWeight: '600' },
-  fareItemValue: { fontSize: 15, fontWeight: '800', color: '#fff' },
+  fareItemValue: { fontSize: 15, fontWeight: '800', color: COLORS.text },
   
-  totalLabel: { fontSize: 18, fontWeight: '800', color: '#fff' },
+  totalLabel: { fontSize: 18, fontWeight: '800', color: COLORS.text },
   totalValue: { fontSize: 28, fontWeight: '900', color: '#00C9A7' },
   
   paymentActions: { marginTop: 8 },

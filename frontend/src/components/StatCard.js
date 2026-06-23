@@ -1,10 +1,12 @@
 import React from 'react';
-import COLORS from '../constants/colors';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useTheme } from '../context/ThemeContext';
 
 export default function StatCard({ title, value, iconName, iconColor = '#0066CC', bgColor = '#EFF6FF', subtitle, onPress }) {
   const Wrapper = onPress ? TouchableOpacity : View;
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
+
   return (
     <Wrapper
       onPress={onPress}
@@ -23,11 +25,11 @@ export default function StatCard({ title, value, iconName, iconColor = '#0066CC'
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.cardBg,
     padding: 16,
     borderRadius: 20,
     shadowColor: '#000',
@@ -35,6 +37,8 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 2,
     flex: 1,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   iconWrap: {
     width: 48,
@@ -45,7 +49,7 @@ const styles = StyleSheet.create({
     marginRight: 14,
   },
   content: { flex: 1 },
-  title: { fontSize: 11, fontWeight: '700', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 4 },
-  value: { fontSize: 24, fontWeight: '800', color: '#111' },
+  title: { fontSize: 11, fontWeight: '700', color: COLORS.textLight, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 4 },
+  value: { fontSize: 24, fontWeight: '800', color: COLORS.text },
   subtitle: { fontSize: 12, fontWeight: '600', color: '#22c55e', marginTop: 2 },
 });

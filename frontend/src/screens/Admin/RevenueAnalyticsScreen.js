@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import COLORS from '../../constants/colors';
+import { useTheme } from '../../context/ThemeContext';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator, Dimensions, StatusBar, Modal, FlatList, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -11,7 +11,7 @@ import ToastMessage from '../../components/ToastMessage';
 const { width } = Dimensions.get('window');
 
 // Simple local StatCard to replace imported one and inject dark mode styles
-const StatCard = ({ title, value, icon, color }) => (
+const StatCard = ({ title, value, icon, color, styles }) => (
   <View style={styles.statCard}>
     <View style={[styles.statIconWrap, { backgroundColor: `${color}20` }]}>
       <MaterialCommunityIcons name={icon} size={24} color={color} />
@@ -24,7 +24,7 @@ const StatCard = ({ title, value, icon, color }) => (
 );
 
 // Simple local ChartCard
-const ChartCard = ({ title, children }) => (
+const ChartCard = ({ title, children, styles }) => (
   <View style={styles.chartCard}>
     <Text style={styles.chartTitle}>{title}</Text>
     <View style={styles.chartWrapper}>
@@ -34,6 +34,9 @@ const ChartCard = ({ title, children }) => (
 );
 
 export default function RevenueAnalyticsScreen({ navigation }) {
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
+
   const [loading, setLoading] = useState(true);
   const [chartLoading, setChartLoading] = useState(false);
   const [summary, setSummary] = useState({});
@@ -116,13 +119,13 @@ export default function RevenueAnalyticsScreen({ navigation }) {
 
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         {toast.visible && <ToastMessage message={toast.message} type={toast.type} onHide={() => setToast({ ...toast, visible: false })} />}
         
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack?.()}>
-            <MaterialCommunityIcons name="arrow-left" size={24} color="#fff" />
+            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Revenue Analytics</Text>
           <View style={{ width: 44 }} />
@@ -131,12 +134,12 @@ export default function RevenueAnalyticsScreen({ navigation }) {
         <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={fetchData} tintColor="#00C9A7" />} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           
           <View style={styles.summaryRow}>
-            <StatCard title="Total Revenue" value={`₹${summary.totalRevenue || 0}`} icon="cash-multiple" color="#00C9A7" />
-            <StatCard title="Token Sales" value={`₹${summary.tokenSalesRevenue || 0}`} icon="ticket" color="#9B59B6" />
+            <StatCard styles={styles} title="Total Revenue" value={`₹${summary.totalRevenue || 0}`} icon="cash-multiple" color="#00C9A7" />
+            <StatCard styles={styles} title="Token Sales" value={`₹${summary.tokenSalesRevenue || 0}`} icon="ticket" color="#9B59B6" />
           </View>
           <View style={styles.summaryRow}>
-            <StatCard title="Commission" value={`₹${summary.platformCommission || 0}`} icon="percent" color="#F59E0B" />
-            <StatCard title="Payouts" value={`₹${summary.merchantPayouts || 0}`} icon="bank-transfer-out" color="#EF4444" />
+            <StatCard styles={styles} title="Commission" value={`₹${summary.platformCommission || 0}`} icon="percent" color="#F59E0B" />
+            <StatCard styles={styles} title="Payouts" value={`₹${summary.merchantPayouts || 0}`} icon="bank-transfer-out" color="#EF4444" />
           </View>
 
           <View style={styles.toggleRow}>
@@ -150,7 +153,7 @@ export default function RevenueAnalyticsScreen({ navigation }) {
 
           {chartLoading ? <ActivityIndicator size="large" color="#00C9A7" style={{ marginVertical: 30 }} /> : (
             <>
-              <ChartCard title="Revenue Growth">
+              <ChartCard styles={styles} title="Revenue Over Time (Last 7 Days)">
                 {chartData.labels?.length > 0 ? (
                   <LineChart
                     data={{ 
@@ -209,7 +212,7 @@ export default function RevenueAnalyticsScreen({ navigation }) {
                 <View style={styles.modalHeader}>
                   <Text style={styles.modalTitle}>{selectedMerchant.businessName} Orders</Text>
                   <TouchableOpacity onPress={() => setSelectedMerchant(null)} style={{ padding: 5, backgroundColor: COLORS.cardBg, borderRadius: 20 }}>
-                    <MaterialCommunityIcons name="close" size={24} color="#fff" />
+                    <MaterialCommunityIcons name="close" size={24} color={COLORS.text} />
                   </TouchableOpacity>
                 </View>
 
@@ -245,7 +248,7 @@ export default function RevenueAnalyticsScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 20 : 10, paddingBottom: 16 },
   backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
@@ -256,18 +259,18 @@ const styles = StyleSheet.create({
   statCard: { flex: 1, backgroundColor: COLORS.cardBg, borderRadius: 20, padding: 16, marginHorizontal: 6, borderWidth: 1, borderColor: COLORS.border },
   statIconWrap: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
   statTitle: { fontSize: 13, color: COLORS.textLight, fontWeight: '600', marginBottom: 4 },
-  statValue: { fontSize: 20, color: '#fff', fontWeight: '900' },
+  statValue: { fontSize: 20, color: COLORS.text, fontWeight: '900' },
   
   summaryRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12, marginHorizontal: -6 },
   
-  toggleRow: { flexDirection: 'row', backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, padding: 6, marginVertical: 20, borderWidth: 1, borderColor: COLORS.border },
+  toggleRow: { flexDirection: 'row', backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, padding: 6, marginVertical: 20 },
   toggleBtn: { flex: 1, paddingVertical: 12, alignItems: 'center', borderRadius: 12 },
-  toggleBtnActive: { backgroundColor: COLORS.cardBg },
+  toggleBtnActive: { backgroundColor: COLORS.primary },
   toggleBtnText: { color: COLORS.textLight, fontWeight: '700' },
-  toggleBtnTextActive: { color: '#fff' },
+  toggleBtnTextActive: { color: COLORS.white },
   
   chartCard: { backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 20, marginBottom: 20, borderWidth: 1, borderColor: COLORS.border },
-  chartTitle: { fontSize: 16, color: '#fff', fontWeight: '800', marginBottom: 20, letterSpacing: 0.5 },
+  chartTitle: { fontSize: 16, color: COLORS.text, fontWeight: '800', marginBottom: 20, letterSpacing: 0.5 },
   chartWrapper: { alignItems: 'center' },
   
   noDataText: { marginVertical: 40, color: COLORS.textLight, fontStyle: 'italic', textAlign: 'center' },
@@ -278,17 +281,17 @@ const styles = StyleSheet.create({
   rankBadge: { width: 44, alignItems: 'center' },
   rankNum: { fontSize: 20, fontWeight: '900', color: COLORS.textLight },
   rankInfo: { flex: 1, marginLeft: 12 },
-  rankName: { fontSize: 16, fontWeight: '800', color: '#fff' },
+  rankName: { fontSize: 16, fontWeight: '800', color: COLORS.text },
   rankSubtitle: { fontSize: 13, color: COLORS.textLight, marginTop: 4, fontWeight: '600' },
   rankRevenue: { fontSize: 18, fontWeight: '900', color: '#00C9A7' },
   
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'flex-end' },
   modalContent: { backgroundColor: COLORS.cardBg, borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, height: '75%', borderWidth: 1, borderColor: COLORS.border },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
-  modalTitle: { fontSize: 20, fontWeight: '900', color: '#fff' },
+  modalTitle: { fontSize: 20, fontWeight: '900', color: COLORS.text },
   
   orderCard: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: COLORS.cardBg, padding: 16, borderRadius: 16, marginBottom: 12, borderWidth: 1, borderColor: COLORS.border },
-  orderUser: { fontSize: 15, fontWeight: '800', color: '#fff', marginBottom: 6 },
+  orderUser: { fontSize: 15, fontWeight: '800', color: COLORS.text, marginBottom: 6 },
   orderDate: { fontSize: 12, color: COLORS.textLight, fontWeight: '600' },
   orderAmount: { fontSize: 18, fontWeight: '900' }
 });

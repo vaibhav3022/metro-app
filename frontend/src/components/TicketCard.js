@@ -1,9 +1,11 @@
 import React from 'react';
-import COLORS from '../constants/colors';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useTheme } from '../context/ThemeContext';
 
 export default function TicketCard({ ticket, onPress }) {
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
+
   if (!ticket) return null;
 
   const { ticketId, source, destination, passengers, totalAmount, ticketStatus, travelDate } = ticket;
@@ -76,22 +78,22 @@ export default function TicketCard({ ticket, onPress }) {
   );
 }
 
-const styles = StyleSheet.create({
-  card: { backgroundColor: '#fff', borderRadius: 20, padding: 18, marginBottom: 14, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 3, borderWidth: 1, borderColor: '#F3F4F6' },
+const getStyles = (COLORS) => StyleSheet.create({
+  card: { backgroundColor: COLORS.cardBg, borderRadius: 20, padding: 18, marginBottom: 14, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 3, borderWidth: 1, borderColor: COLORS.border },
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
   idRow: { flexDirection: 'row', alignItems: 'center', flex: 1 },
-  ticketId: { fontSize: 13, fontWeight: '700', color: '#111', maxWidth: 160 },
+  ticketId: { fontSize: 13, fontWeight: '700', color: COLORS.text, maxWidth: 160 },
   statusBadge: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 },
   statusText: { fontSize: 11, fontWeight: '700' },
   routeRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
   stationWrap: { flex: 1 },
-  stationLabel: { fontSize: 10, fontWeight: '700', color: '#9ca3af', letterSpacing: 1, marginBottom: 4 },
-  stationName: { fontSize: 18, fontWeight: '800', color: '#111' },
+  stationLabel: { fontSize: 10, fontWeight: '700', color: COLORS.textLight, letterSpacing: 1, marginBottom: 4 },
+  stationName: { fontSize: 18, fontWeight: '800', color: COLORS.text },
   arrowWrap: { alignItems: 'center', paddingHorizontal: 10 },
-  passengersText: { fontSize: 10, color: '#6b7280', marginTop: 4, fontWeight: '500' },
-  divider: { borderTopWidth: 1, borderTopColor: '#F3F4F6', borderStyle: 'dashed', marginBottom: 14 },
+  passengersText: { fontSize: 10, color: COLORS.textLight, marginTop: 4, fontWeight: '500' },
+  divider: { borderTopWidth: 1, borderTopColor: COLORS.border, borderStyle: 'dashed', marginBottom: 14 },
   bottomRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
-  bottomLabel: { fontSize: 10, fontWeight: '700', color: '#9ca3af', letterSpacing: 1, marginBottom: 4 },
-  dateText: { fontSize: 13, fontWeight: '600', color: '#374151' },
+  bottomLabel: { fontSize: 10, fontWeight: '700', color: COLORS.textLight, letterSpacing: 1, marginBottom: 4 },
+  dateText: { fontSize: 13, fontWeight: '600', color: COLORS.textLight },
   fareText: { fontSize: 18, fontWeight: '800', color: '#0066CC' },
 });

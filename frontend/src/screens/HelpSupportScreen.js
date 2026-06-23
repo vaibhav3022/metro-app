@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import COLORS from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import {
   View, Text, StyleSheet, TouchableOpacity, TextInput,
   ScrollView, ActivityIndicator, Alert, SafeAreaView, Platform, StatusBar
@@ -15,6 +15,8 @@ const CATEGORIES = ['Grievance', 'Lost & Found', 'Suggestion', 'Other'];
 
 export default function HelpSupportScreen() {
   const navigation = useNavigation();
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
   const [tab, setTab] = useState('New');
   const [category, setCategory] = useState(CATEGORIES[0]);
   const [description, setDescription] = useState('');
@@ -78,11 +80,11 @@ export default function HelpSupportScreen() {
 
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Icon name="arrow-left" size={24} color="#fff" />
+            <Icon name="arrow-left" size={24} color={COLORS.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Help & Support</Text>
           <View style={{ width: 44 }} />
@@ -144,7 +146,7 @@ export default function HelpSupportScreen() {
                 multiline
                 numberOfLines={6}
                 placeholder="Describe your issue, suggestion, or what you lost in detail..."
-                placeholderTextColor="rgba(255,255,255,0.3)"
+                placeholderTextColor="#AAAAAA"
                 value={description}
                 onChangeText={setDescription}
                 textAlignVertical="top"
@@ -203,7 +205,7 @@ export default function HelpSupportScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 40 : 10, paddingBottom: 16 },
   backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
@@ -219,18 +221,18 @@ const styles = StyleSheet.create({
   scrollContent: { padding: 20, paddingBottom: 40 },
   card: { backgroundColor: COLORS.cardBg, borderRadius: 28, padding: 24, borderWidth: 1, borderColor: COLORS.border },
   headerIconWrap: { width: 64, height: 64, borderRadius: 32, backgroundColor: 'rgba(155,89,182,0.15)', justifyContent: 'center', alignItems: 'center', marginBottom: 16, borderWidth: 1, borderColor: 'rgba(155,89,182,0.3)' },
-  cardTitle: { fontSize: 24, fontWeight: '900', color: '#fff', marginBottom: 24 },
+  cardTitle: { fontSize: 24, fontWeight: '900', color: COLORS.text, marginBottom: 24 },
   
   fieldLabel: { fontSize: 12, fontWeight: '800', color: COLORS.textLight, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 },
-  categorySelector: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)', borderRadius: 16, paddingHorizontal: 16, paddingVertical: 16 },
-  categorySelectorText: { fontSize: 16, color: '#fff', fontWeight: '600' },
-  categoryOptions: { backgroundColor: 'rgba(10,10,26,0.95)', borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, marginTop: 8, overflow: 'hidden' },
-  categoryOption: { padding: 16, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)' },
+  categorySelector: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: COLORS.background, borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, paddingHorizontal: 16, paddingVertical: 16 },
+  categorySelectorText: { fontSize: 16, color: COLORS.text, fontWeight: '600' },
+  categoryOptions: { backgroundColor: COLORS.background, borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, marginTop: 8, overflow: 'hidden' },
+  categoryOption: { padding: 16, borderBottomWidth: 1, borderBottomColor: COLORS.border },
   categoryOptionActive: { backgroundColor: 'rgba(0,201,167,0.15)' },
   categoryOptionText: { fontSize: 15, color: COLORS.textLight },
   categoryOptionTextActive: { color: '#00C9A7', fontWeight: '800' },
   
-  textArea: { backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)', borderRadius: 16, padding: 16, fontSize: 16, color: '#fff', height: 150, marginBottom: 24 },
+  textArea: { backgroundColor: COLORS.background, borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, padding: 16, fontSize: 16, color: COLORS.text, height: 150, marginBottom: 24 },
   submitBtnWrap: { borderRadius: 16, overflow: 'hidden' },
   submitBtnGrad: { paddingVertical: 18, alignItems: 'center', justifyContent: 'center' },
   submitBtnDisabled: { opacity: 0.6 },
@@ -243,10 +245,10 @@ const styles = StyleSheet.create({
   complaintCard: { backgroundColor: COLORS.cardBg, borderRadius: 20, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: COLORS.border },
   complaintHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 },
   categoryBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.cardBg, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, borderWidth: 1, borderColor: COLORS.border },
-  categoryBadgeText: { fontSize: 12, fontWeight: '800', color: 'rgba(255,255,255,0.8)' },
+  categoryBadgeText: { fontSize: 12, fontWeight: '800', color: COLORS.text },
   statusBadge: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
   statusBadgeText: { fontSize: 12, fontWeight: '800', textTransform: 'uppercase' },
-  complaintDesc: { fontSize: 15, color: '#fff', marginBottom: 16, lineHeight: 22 },
-  complaintFooter: { flexDirection: 'row', alignItems: 'center', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.08)', paddingTop: 12 },
+  complaintDesc: { fontSize: 15, color: COLORS.text, marginBottom: 16, lineHeight: 22 },
+  complaintFooter: { flexDirection: 'row', alignItems: 'center', borderTopWidth: 1, borderTopColor: COLORS.border, paddingTop: 12 },
   complaintDate: { fontSize: 12, color: COLORS.textLight, fontWeight: '600' },
 });

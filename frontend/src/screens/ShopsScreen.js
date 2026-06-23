@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import COLORS from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, TextInput, StatusBar, ActivityIndicator, Modal, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import api from '../api/axiosConfig';
 
 export default function ShopsScreen({ navigation }) {
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
   const [search, setSearch] = useState('');
   const [shops, setShops] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -92,10 +94,10 @@ export default function ShopsScreen({ navigation }) {
 
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Icon name="arrow-left" size={24} color="#fff" />
+          <Icon name="arrow-left" size={24} color={COLORS.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Station Shops</Text>
         <View style={{ width: 40 }} />
@@ -106,7 +108,7 @@ export default function ShopsScreen({ navigation }) {
         <TextInput
           style={styles.searchInput}
           placeholder="Search by shop name or station..."
-          placeholderTextColor="rgba(255,255,255,0.35)"
+          placeholderTextColor="#AAAAAA"
           value={search}
           onChangeText={setSearch}
         />
@@ -153,7 +155,7 @@ export default function ShopsScreen({ navigation }) {
                 source={{ uri: selectedShop.imageUrl || selectedShop.image || 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80' }} 
                 style={styles.modalImage} 
               />
-              <LinearGradient colors={['transparent', '#141432']} style={styles.modalImageGrad} />
+              <LinearGradient colors={['transparent', COLORS.cardBg]} style={styles.modalImageGrad} />
 
               <ScrollView style={styles.modalBody}>
                 <View style={styles.modalHeaderInfo}>
@@ -227,7 +229,7 @@ export default function ShopsScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   container: { flex: 1 },
   header: {
     flexDirection: 'row',
@@ -261,7 +263,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   searchIcon: { marginRight: 10 },
-  searchInput: { flex: 1, fontSize: 15, color: '#fff' },
+  searchInput: { flex: 1, fontSize: 15, color: COLORS.text, marginLeft: 4 },
   listContent: { paddingHorizontal: 20, paddingBottom: 40 },
   card: {
     backgroundColor: COLORS.cardBg,
@@ -278,7 +280,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(10,10,26,0.2)',
   },
   cardContent: { padding: 18 },
-  shopName: { fontSize: 18, fontWeight: '800', color: '#fff', marginBottom: 4 },
+  shopName: { fontSize: 18, fontWeight: '800', color: COLORS.text, marginBottom: 4 },
   shopCategory: { fontSize: 13, color: '#00C9A7', marginBottom: 12, fontWeight: '700' },
   locationRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
   shopLocation: { fontSize: 13, color: COLORS.textLight, marginLeft: 6, fontWeight: '500' },
@@ -311,14 +313,14 @@ const styles = StyleSheet.create({
   modalImageGrad: { position: 'absolute', top: 0, width: '100%', height: 250 },
   modalBody: { padding: 24 },
   modalHeaderInfo: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
-  modalTitle: { fontSize: 26, fontWeight: '900', color: '#fff', flex: 1, marginRight: 10 },
+  modalTitle: { fontSize: 26, fontWeight: '900', color: COLORS.text, flex: 1, marginRight: 10 },
   modalCategory: { fontSize: 15, color: '#00C9A7', fontWeight: '700', marginBottom: 24 },
-  modalInfoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16, backgroundColor: COLORS.cardBg, padding: 14, borderRadius: 16 },
-  modalInfoText: { color: 'rgba(255,255,255,0.8)', fontSize: 14, marginLeft: 12, fontWeight: '600' },
-  modalDescWrap: { marginTop: 10, marginBottom: 40, backgroundColor: 'rgba(255,255,255,0.03)', padding: 16, borderRadius: 16 },
-  modalDescTitle: { color: '#fff', fontSize: 16, fontWeight: '800', marginBottom: 8 },
+  modalInfoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16, backgroundColor: COLORS.background, padding: 14, borderRadius: 16 },
+  modalInfoText: { color: COLORS.text, fontSize: 14, marginLeft: 12, fontWeight: '600' },
+  modalDescWrap: { marginTop: 10, marginBottom: 40, backgroundColor: COLORS.background, padding: 16, borderRadius: 16 },
+  modalDescTitle: { color: COLORS.text, fontSize: 16, fontWeight: '800', marginBottom: 8 },
   modalDesc: { color: COLORS.textLight, fontSize: 14, lineHeight: 22 },
-  modalFooter: { flexDirection: 'row', padding: 20, paddingBottom: 30, backgroundColor: 'rgba(25,25,50,0.9)', gap: 12 },
+  modalFooter: { flexDirection: 'row', padding: 20, paddingBottom: 30, backgroundColor: COLORS.cardBg, borderTopWidth: 1, borderTopColor: COLORS.border, gap: 12 },
   modalActionBtn: { flex: 1, borderRadius: 16, overflow: 'hidden' },
   modalActionGrad: { paddingVertical: 16, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
   modalActionText: { color: '#fff', fontSize: 16, fontWeight: '800' },

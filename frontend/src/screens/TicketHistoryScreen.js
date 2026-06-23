@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import COLORS from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
   ActivityIndicator, StatusBar, ScrollView, Platform
@@ -15,6 +15,8 @@ export default function TicketHistoryScreen() {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const history = useSelector((state) => state.tickets.history);
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
 
   const [filter, setFilter] = useState('all');
   const [loading, setLoading] = useState(false);
@@ -87,11 +89,11 @@ export default function TicketHistoryScreen() {
 
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.gradient}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
       <View style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Icon name="arrow-left" size={24} color="#fff" />
+            <Icon name="arrow-left" size={24} color={COLORS.text} />
           </TouchableOpacity>
           <Text style={styles.screenTitle}>My Tickets</Text>
           <View style={{ width: 40 }} />
@@ -148,12 +150,12 @@ export default function TicketHistoryScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   gradient: { flex: 1 },
   container: { flex: 1, padding: 20, paddingTop: Platform.OS === 'android' ? 40 : 20 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 },
   backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
-  screenTitle: { fontSize: 24, fontWeight: '900', color: '#fff' },
+  screenTitle: { fontSize: 24, fontWeight: '900', color: COLORS.text },
   
   filterScroll: { flex: 1 },
   filterContainer: { gap: 10, paddingHorizontal: 4, alignItems: 'center' },
@@ -167,12 +169,12 @@ const styles = StyleSheet.create({
   ticketHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
   ticketIconWrap: { width: 50, height: 50, borderRadius: 16, backgroundColor: 'rgba(0,201,167,0.15)', justifyContent: 'center', alignItems: 'center', marginRight: 14 },
   ticketInfo: { flex: 1 },
-  ticketRoute: { fontSize: 16, fontWeight: '800', color: '#fff', marginBottom: 4 },
+  ticketRoute: { fontSize: 16, fontWeight: '800', color: COLORS.text, marginBottom: 4 },
   ticketId: { fontSize: 12, color: COLORS.textLight },
   statusBadge: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, borderWidth: 1 },
   statusText: { fontSize: 11, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5 },
   
-  ticketFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.08)', paddingTop: 14 },
+  ticketFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, borderTopColor: COLORS.border, paddingTop: 14 },
   ticketFare: { fontSize: 18, fontWeight: '900', color: '#00C9A7' },
   ticketDate: { fontSize: 13, color: COLORS.textLight, fontWeight: '500' },
   
@@ -181,7 +183,7 @@ const styles = StyleSheet.create({
   
   emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
   emptyIconWrap: { width: 90, height: 90, borderRadius: 45, backgroundColor: COLORS.cardBg, justifyContent: 'center', alignItems: 'center', marginBottom: 20, borderWidth: 1, borderColor: COLORS.border },
-  emptyTitle: { fontSize: 22, fontWeight: '900', color: '#fff', marginBottom: 10 },
+  emptyTitle: { fontSize: 22, fontWeight: '900', color: COLORS.text, marginBottom: 10 },
   emptySubtitle: { fontSize: 15, color: COLORS.textLight, textAlign: 'center', marginBottom: 30, lineHeight: 22 },
   bookBtn: { borderRadius: 16, overflow: 'hidden' },
   bookButtonGrad: { paddingHorizontal: 30, paddingVertical: 14, justifyContent: 'center', alignItems: 'center' },

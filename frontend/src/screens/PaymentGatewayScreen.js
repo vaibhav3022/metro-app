@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import COLORS from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import {
   StyleSheet, Text, View, TouchableOpacity, SafeAreaView,
   TextInput, ActivityIndicator, Alert, StatusBar, Platform
@@ -17,6 +17,8 @@ export default function PaymentGatewayScreen({ route, navigation }) {
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
 
   const handleProcessPayment = async (status) => {
     if (status === 'success' && otp.length < 4) {
@@ -67,11 +69,11 @@ export default function PaymentGatewayScreen({ route, navigation }) {
 
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.header}>
           <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-            <Icon name="arrow-left" size={24} color="#fff" />
+            <Icon name="arrow-left" size={24} color={COLORS.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Secure Payment Gateway</Text>
           <View style={{ width: 40 }} />
@@ -94,7 +96,7 @@ export default function PaymentGatewayScreen({ route, navigation }) {
             <TextInput
               style={styles.otpInput}
               placeholder="Enter OTP (e.g. 1234)"
-              placeholderTextColor="rgba(255,255,255,0.3)"
+              placeholderTextColor="#AAAAAA"
               keyboardType="number-pad"
               maxLength={6}
               value={otp}
@@ -127,21 +129,21 @@ export default function PaymentGatewayScreen({ route, navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 40 : 10, paddingBottom: 16 },
   backBtn: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
   headerTitle: { fontSize: 20, fontWeight: '800', color: COLORS.text, letterSpacing: 0.5 },
   
   card: { backgroundColor: COLORS.cardBg, margin: 20, borderRadius: 28, padding: 24, borderWidth: 1, borderColor: COLORS.border },
-  merchantInfo: { alignItems: 'center', marginBottom: 24, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)', paddingBottom: 24 },
+  merchantInfo: { alignItems: 'center', marginBottom: 24, borderBottomWidth: 1, borderBottomColor: COLORS.border, paddingBottom: 24 },
   iconCircle: { width: 70, height: 70, borderRadius: 35, backgroundColor: 'rgba(0,201,167,0.15)', alignItems: 'center', justifyContent: 'center', marginBottom: 16, borderWidth: 1, borderColor: 'rgba(0,201,167,0.3)' },
   merchantName: { fontSize: 16, fontWeight: '700', color: COLORS.textLight },
-  amountText: { fontSize: 36, fontWeight: '900', color: '#fff', marginTop: 8 },
+  amountText: { fontSize: 36, fontWeight: '900', color: COLORS.text, marginTop: 8 },
   
   instruction: { fontSize: 14, color: COLORS.textLight, textAlign: 'center', lineHeight: 22, marginBottom: 24, paddingHorizontal: 10 },
   inputContainer: { marginBottom: 32 },
-  otpInput: { borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.15)', borderRadius: 16, height: 60, fontSize: 24, textAlign: 'center', letterSpacing: 8, backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, color: '#00C9A7', fontWeight: '900' },
+  otpInput: { borderRadius: 16, height: 60, fontSize: 24, textAlign: 'center', letterSpacing: 8, backgroundColor: COLORS.background, borderWidth: 1, borderColor: COLORS.border, color: '#00C9A7', fontWeight: '900' },
   
   actions: { flexDirection: 'row', justifyContent: 'space-between', gap: 12 },
   btn: { flex: 1, height: 56, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },

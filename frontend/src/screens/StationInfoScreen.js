@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import COLORS from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import { StyleSheet, View, Text, TouchableOpacity, StatusBar, ScrollView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -34,16 +34,18 @@ const getFacilities = (stationName) => {
 export default function StationInfoScreen({ navigation }) {
   const { t } = useTranslation();
   const [station, setStation] = useState(STATIONS[10]);
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
 
   const facilities = getFacilities(station);
 
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <MaterialCommunityIcons name="arrow-left" size={24} color="#fff" />
+            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>{t('home.stationInfo') || 'Station Info'}</Text>
           <View style={{ width: 44 }} />
@@ -89,7 +91,7 @@ export default function StationInfoScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 40 : 10, paddingBottom: 16 },
   headerTitle: { fontSize: 20, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
@@ -101,14 +103,14 @@ const styles = StyleSheet.create({
   cardHeaderRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
   iconCircle: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(155,89,182,0.15)', justifyContent: 'center', alignItems: 'center', marginRight: 12, borderWidth: 1, borderColor: 'rgba(155,89,182,0.3)' },
   label: { fontSize: 16, fontWeight: '800', color: COLORS.text },
-  dropdownWrap: { backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border },
+  dropdownWrap: { backgroundColor: COLORS.background, borderWidth: 1, borderColor: COLORS.border, borderRadius: 16 },
   
   sectionTitle: { fontSize: 18, fontWeight: '800', color: COLORS.text, marginBottom: 20, letterSpacing: 0.5 },
   
   facilitiesGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
   facCard: { width: '47%', backgroundColor: COLORS.cardBg, padding: 20, borderRadius: 24, alignItems: 'center', marginBottom: 16, borderWidth: 1, borderColor: COLORS.border },
   facIconBg: { width: 64, height: 64, borderRadius: 32, backgroundColor: 'rgba(0,201,167,0.1)', justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
-  facText: { fontSize: 13, fontWeight: '700', color: '#fff', textAlign: 'center', lineHeight: 18 },
+  facText: { fontSize: 13, fontWeight: '700', color: COLORS.text, textAlign: 'center', lineHeight: 18 },
   
   notAvailableBadge: { backgroundColor: 'rgba(239,68,68,0.15)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, marginTop: 8, borderWidth: 1, borderColor: 'rgba(239,68,68,0.3)' },
   notAvailable: { fontSize: 10, color: '#EF4444', fontWeight: '800', textTransform: 'uppercase' }

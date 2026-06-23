@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Provider, useSelector } from 'react-redux';
 import { store } from './redux/store';
@@ -54,9 +54,18 @@ const Stack = createNativeStackNavigator();
 
 function AppNavigator() {
   const { user, token, loading } = useSelector((state) => state.auth);
+  const { isDark, theme: COLORS } = useTheme();
+
+  const navigationTheme = isDark ? {
+    ...DarkTheme,
+    colors: { ...DarkTheme.colors, background: COLORS.background, card: COLORS.cardBg, text: COLORS.text, border: COLORS.border }
+  } : {
+    ...DefaultTheme,
+    colors: { ...DefaultTheme.colors, background: COLORS.background, card: COLORS.cardBg, text: COLORS.text, border: COLORS.border }
+  };
 
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={navigationTheme}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {!token ? (
           // Auth Stack
@@ -118,10 +127,14 @@ function AppNavigator() {
   );
 }
 
+import { ThemeProvider, useTheme } from './context/ThemeContext';
+
 export default function App() {
   return (
     <Provider store={store}>
-      <AppNavigator />
+      <ThemeProvider>
+        <AppNavigator />
+      </ThemeProvider>
     </Provider>
   );
 }

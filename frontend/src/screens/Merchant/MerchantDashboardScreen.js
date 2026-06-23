@@ -5,14 +5,14 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import LinearGradient from 'react-native-linear-gradient';
 import { LineChart } from 'react-native-chart-kit';
 import { useDispatch } from 'react-redux';
-import COLORS from '../../constants/colors';
 import api from '../../api/axiosConfig';
 import { logout } from '../../redux/slices/authSlice';
 import QRCode from 'react-native-qrcode-svg';
+import { useTheme } from '../../context/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
-const StatCard = ({ title, value, icon, color, onPress }) => (
+const StatCard = ({ title, value, icon, color, onPress, styles }) => (
   <TouchableOpacity style={styles.statCard} onPress={onPress}>
     <View style={[styles.statIconWrap, { backgroundColor: color + '20' }]}>
       <MaterialCommunityIcons name={icon} size={28} color={color} />
@@ -22,7 +22,7 @@ const StatCard = ({ title, value, icon, color, onPress }) => (
   </TouchableOpacity>
 );
 
-const EmptyState = ({ icon, title, message }) => (
+const EmptyState = ({ icon, title, message, styles }) => (
   <View style={styles.emptyBox}>
     <MaterialCommunityIcons name={icon} size={48} color="rgba(255,255,255,0.15)" style={{ marginBottom: 12 }} />
     <Text style={styles.emptyBoxTitle}>{title}</Text>
@@ -31,6 +31,9 @@ const EmptyState = ({ icon, title, message }) => (
 );
 
 export default function MerchantDashboardScreen({ navigation }) {
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
+  
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState('pending');
@@ -71,7 +74,7 @@ export default function MerchantDashboardScreen({ navigation }) {
 
   const renderStatusScreen = (icon, title, message, color) => (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Merchant Portal</Text>
@@ -98,7 +101,7 @@ export default function MerchantDashboardScreen({ navigation }) {
   if (loading) {
     return (
       <LinearGradient colors={[COLORS.background, COLORS.background]} style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+        <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
         <ActivityIndicator size="large" color="#00C9A7" />
       </LinearGradient>
     );
@@ -115,13 +118,13 @@ export default function MerchantDashboardScreen({ navigation }) {
   // Approved Dashboard
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Merchant Portal</Text>
           <View style={styles.headerActions}>
             <TouchableOpacity style={styles.iconBtn} onPress={() => navigation.navigate('MerchantNotification')}>
-              <MaterialCommunityIcons name="bell-outline" size={24} color="#fff" />
+              <MaterialCommunityIcons name="bell-outline" size={24} color={COLORS.text} />
               {unreadCount > 0 && (
                 <View style={styles.badge}>
                   <Text style={styles.badgeText}>{unreadCount}</Text>
@@ -137,12 +140,12 @@ export default function MerchantDashboardScreen({ navigation }) {
         <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={fetchData} tintColor="#00C9A7" colors={['#00C9A7']} />} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           
           <View style={styles.statsRow}>
-            <StatCard title="Total Sales" value={`₹${dashboardData?.stats?.totalSales || 0}`} icon="currency-inr" color="#00C9A7" onPress={() => setTxModalVisible(true)} />
-            <StatCard title="Total Orders" value={dashboardData?.stats?.totalOrders || 0} icon="shopping-outline" color="#3498DB" onPress={() => setTxModalVisible(true)} />
+            <StatCard styles={styles} title="Total Sales" value={`₹${dashboardData?.stats?.totalSales || 0}`} icon="currency-inr" color="#00C9A7" onPress={() => setTxModalVisible(true)} />
+            <StatCard styles={styles} title="Total Orders" value={dashboardData?.stats?.totalOrders || 0} icon="shopping-outline" color="#3498DB" onPress={() => setTxModalVisible(true)} />
           </View>
           <View style={styles.statsRow}>
-            <StatCard title="Customers" value={dashboardData?.stats?.totalCustomers || 0} icon="account-group-outline" color="#9B59B6" onPress={() => setTxModalVisible(true)} />
-            <StatCard title="Tokens Accepted" value={dashboardData?.stats?.tokensAccepted || 0} icon="ticket-percent-outline" color="#F39C12" onPress={() => setTxModalVisible(true)} />
+            <StatCard styles={styles} title="Customers" value={dashboardData?.stats?.totalCustomers || 0} icon="account-group-outline" color="#9B59B6" onPress={() => setTxModalVisible(true)} />
+            <StatCard styles={styles} title="Tokens Accepted" value={dashboardData?.stats?.tokensAccepted || 0} icon="ticket-percent-outline" color="#F39C12" onPress={() => setTxModalVisible(true)} />
           </View>
 
           <View style={styles.qrContainer}>
@@ -188,7 +191,7 @@ export default function MerchantDashboardScreen({ navigation }) {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Recent Transactions</Text>
             {transactions.length === 0 ? (
-              <EmptyState icon="history" title="No Transactions" message="You haven't received any orders yet." />
+              <EmptyState styles={styles} icon="history" title="No Transactions" message="You haven't received any orders yet." />
             ) : (
               transactions.slice(0, 5).map((tx, idx) => (
                 <View key={tx._id || idx} style={styles.txCard}>
@@ -220,7 +223,7 @@ export default function MerchantDashboardScreen({ navigation }) {
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>All Transactions</Text>
                 <TouchableOpacity onPress={() => setTxModalVisible(false)} style={styles.modalCloseBtn}>
-                  <MaterialCommunityIcons name="close" size={24} color="#fff" />
+                  <MaterialCommunityIcons name="close" size={24} color={COLORS.text} />
                 </TouchableOpacity>
               </View>
               <FlatList
@@ -242,7 +245,7 @@ export default function MerchantDashboardScreen({ navigation }) {
                     <Text style={styles.txAmount}>+{tx.paymentMethod === 'Token' ? `Rs. ${tx.amount}` : `₹${tx.amount}`}</Text>
                   </View>
                 )}
-                ListEmptyComponent={<EmptyState icon="history" title="No Transactions" message="You haven't received any orders yet." />}
+                ListEmptyComponent={<EmptyState styles={styles} icon="history" title="No Transactions" message="You haven't received any orders yet." />}
               />
             </View>
           </View>
@@ -253,7 +256,7 @@ export default function MerchantDashboardScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 20 : 10, paddingBottom: 20 },
   headerTitle: { fontSize: 24, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
@@ -266,7 +269,7 @@ const styles = StyleSheet.create({
   statsRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 },
   statCard: { flex: 1, marginHorizontal: 6, backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 20, borderWidth: 1, borderColor: COLORS.border, alignItems: 'flex-start' },
   statIconWrap: { width: 50, height: 50, borderRadius: 16, justifyContent: 'center', alignItems: 'center', marginBottom: 16 },
-  statValue: { fontSize: 24, fontWeight: '900', color: '#fff', marginBottom: 4 },
+  statValue: { fontSize: 24, fontWeight: '900', color: COLORS.text, marginBottom: 4 },
   statTitle: { fontSize: 13, color: COLORS.textLight, fontWeight: '600' },
   
   statusContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 },
@@ -279,20 +282,20 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 18, fontWeight: '900', color: COLORS.text, marginBottom: 20 },
   chartWrapper: { alignItems: 'center', marginLeft: -20 },
   
-  txCard: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)' },
+  txCard: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: COLORS.border },
   txLeft: { flexDirection: 'row', alignItems: 'center', flex: 1 },
   txDetails: { marginLeft: 14, flex: 1 },
-  txType: { fontSize: 15, fontWeight: '800', color: '#fff', marginBottom: 2 },
+  txType: { fontSize: 15, fontWeight: '800', color: COLORS.text, marginBottom: 2 },
   txDate: { fontSize: 12, color: COLORS.textLight },
   txAmount: { fontSize: 16, fontWeight: '900', color: '#00C9A7' },
   
   qrContainer: { backgroundColor: COLORS.cardBg, padding: 24, borderRadius: 24, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center', marginBottom: 20, marginTop: 10 },
-  qrTitle: { fontSize: 20, fontWeight: '900', color: '#fff', marginBottom: 6 },
+  qrTitle: { fontSize: 20, fontWeight: '900', color: COLORS.text, marginBottom: 6 },
   qrSubtitle: { fontSize: 14, color: COLORS.textLight, marginBottom: 24, textAlign: 'center' },
   qrWrapper: { padding: 16, backgroundColor: '#fff', borderRadius: 20, elevation: 8 },
   
   emptyBox: { alignItems: 'center', paddingVertical: 30 },
-  emptyBoxTitle: { fontSize: 16, fontWeight: '800', color: '#fff', marginBottom: 4 },
+  emptyBoxTitle: { fontSize: 16, fontWeight: '800', color: COLORS.text, marginBottom: 4 },
   emptyBoxText: { fontSize: 13, color: COLORS.textLight, textAlign: 'center' },
   
   viewAllBtn: { marginTop: 16, paddingVertical: 12, backgroundColor: COLORS.cardBg, borderRadius: 16, alignItems: 'center' },
@@ -300,7 +303,7 @@ const styles = StyleSheet.create({
   
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'flex-end' },
   modalContent: { backgroundColor: COLORS.cardBg, width: '100%', height: '80%', borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, borderWidth: 1, borderColor: COLORS.border },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)' },
-  modalTitle: { fontSize: 22, fontWeight: '900', color: '#fff' },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: COLORS.border },
+  modalTitle: { fontSize: 22, fontWeight: '900', color: COLORS.text },
   modalCloseBtn: { backgroundColor: COLORS.cardBg, borderRadius: 16, padding: 8 }
 });

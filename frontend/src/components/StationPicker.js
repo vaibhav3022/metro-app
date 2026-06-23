@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import COLORS from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import {
   View, Text, StyleSheet, TouchableOpacity, TextInput,
   Modal, FlatList, SafeAreaView
@@ -13,6 +13,8 @@ export default function StationPicker({
   stations = [],
   placeholder = 'Select Station',
 }) {
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
 
@@ -38,7 +40,7 @@ export default function StationPicker({
         <Text style={[styles.selectorText, !value && styles.placeholderText]}>
           {value || placeholder}
         </Text>
-        <Icon name="chevron-down" size={20} color="rgba(255,255,255,0.5)" />
+        <Icon name="chevron-down" size={20} color={COLORS.textLight} />
       </TouchableOpacity>
 
       <Modal
@@ -52,7 +54,7 @@ export default function StationPicker({
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>{label}</Text>
               <TouchableOpacity onPress={() => { setIsOpen(false); setSearch(''); }}>
-                <Icon name="close" size={24} color="#555" />
+                <Icon name="close" size={24} color={COLORS.text} />
               </TouchableOpacity>
             </View>
 
@@ -61,7 +63,7 @@ export default function StationPicker({
               <TextInput
                 style={styles.searchInput}
                 placeholder="Search station..."
-                placeholderTextColor="rgba(255,255,255,0.4)"
+                placeholderTextColor="#AAAAAA"
                 value={search}
                 onChangeText={setSearch}
                 autoFocus
@@ -84,7 +86,7 @@ export default function StationPicker({
                   <Icon
                     name={value === item ? 'radiobox-marked' : 'radiobox-blank'}
                     size={18}
-                    color={value === item ? '#00C9A7' : 'rgba(255,255,255,0.4)'}
+                    color={value === item ? '#00C9A7' : COLORS.textLight}
                     style={{ marginRight: 12 }}
                   />
                   <Text style={[styles.stationName, value === item && styles.stationNameActive]}>
@@ -106,22 +108,22 @@ export default function StationPicker({
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   wrapper: { marginBottom: 8 },
   label: { fontSize: 13, fontWeight: '600', color: COLORS.textLight, marginBottom: 8 },
   selector: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.border, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12 },
   selectorOpen: { borderColor: '#00C9A7' },
-  selectorText: { flex: 1, fontSize: 15, fontWeight: '600', color: '#fff' },
+  selectorText: { flex: 1, fontSize: 15, fontWeight: '600', color: COLORS.text },
   placeholderText: { color: COLORS.textLight, fontWeight: '400' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
-  modalContainer: { backgroundColor: '#1A0A3E', borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '80%' },
+  modalContainer: { backgroundColor: COLORS.background, borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '80%' },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, borderBottomWidth: 1, borderBottomColor: COLORS.border },
-  modalTitle: { fontSize: 18, fontWeight: '700', color: '#fff' },
+  modalTitle: { fontSize: 18, fontWeight: '700', color: COLORS.text },
   searchWrap: { flexDirection: 'row', alignItems: 'center', margin: 16, backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.border, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10 },
-  searchInput: { flex: 1, fontSize: 15, color: '#fff' },
-  stationItem: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)' },
+  searchInput: { flex: 1, fontSize: 15, color: COLORS.text, paddingVertical: 12, marginLeft: 8 },
+  stationItem: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: COLORS.border },
   stationItemActive: { backgroundColor: 'rgba(0,201,167,0.1)' },
-  stationName: { fontSize: 15, color: 'rgba(255,255,255,0.8)', fontWeight: '500' },
+  stationName: { fontSize: 15, color: COLORS.text, fontWeight: '500' },
   stationNameActive: { color: '#00C9A7', fontWeight: '800' },
   emptyItem: { padding: 32, alignItems: 'center' },
   emptyText: { color: COLORS.textLight, fontSize: 14 },

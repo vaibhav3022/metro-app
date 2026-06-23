@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import COLORS from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView,
   Alert, ActivityIndicator, SafeAreaView, Platform, StatusBar
@@ -16,6 +16,8 @@ import StationPicker from '../components/StationPicker';
 export default function RouteSelectionScreen() {
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
 
   const [source, setSource] = useState('');
   const [destination, setDestination] = useState('');
@@ -61,13 +63,13 @@ export default function RouteSelectionScreen() {
 
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           {/* Header */}
           <View style={styles.header}>
             <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-              <Icon name="arrow-left" size={24} color="#fff" />
+              <Icon name="arrow-left" size={24} color={COLORS.text} />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Book Ticket</Text>
             <View style={{ width: 44 }} />
@@ -130,30 +132,6 @@ export default function RouteSelectionScreen() {
               </View>
             </View>
 
-            <View style={styles.divider} />
-
-            {/* Journey Type */}
-            <View style={styles.rowBetween}>
-              <View>
-                <Text style={styles.rowLabel}>Journey Type</Text>
-                <Text style={styles.rowSub}>One-way or Return trip</Text>
-              </View>
-              <View style={styles.journeyTypeWrap}>
-                <TouchableOpacity
-                  style={[styles.journeyBtn, !isReturn && styles.journeyBtnActive]}
-                  onPress={() => setIsReturn(false)}
-                >
-                  <Text style={[styles.journeyBtnText, !isReturn && styles.journeyBtnTextActive]}>One-Way</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.journeyBtn, isReturn && styles.journeyBtnActive]}
-                  onPress={() => setIsReturn(true)}
-                >
-                  <Text style={[styles.journeyBtnText, isReturn && styles.journeyBtnTextActive]}>Return</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
             <TouchableOpacity
               style={[styles.calcButtonContainer, loading && styles.calcButtonDisabled]}
               onPress={handleCalculateFare}
@@ -177,7 +155,7 @@ export default function RouteSelectionScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   container: { flex: 1 },
   scrollContent: { padding: 20, paddingBottom: 50, paddingTop: Platform.OS === 'android' ? 40 : 10 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 },
@@ -195,14 +173,14 @@ const styles = StyleSheet.create({
   divider: { borderBottomWidth: 1, borderBottomColor: COLORS.border, marginVertical: 20 },
   
   rowBetween: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
-  rowLabel: { fontSize: 16, fontWeight: '800', color: '#fff' },
+  rowLabel: { fontSize: 16, fontWeight: '800', color: COLORS.text },
   rowSub: { fontSize: 13, color: COLORS.textLight, marginTop: 4, fontWeight: '500' },
   
   counterWrap: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border, padding: 6 },
   counterBtn: { width: 44, height: 44, backgroundColor: COLORS.cardBg, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
   counterBtnDisabled: { backgroundColor: 'rgba(255,255,255,0.02)', opacity: 0.5 },
-  counterBtnText: { fontSize: 24, fontWeight: '700', color: '#fff', marginTop: -2 },
-  counterValue: { width: 40, textAlign: 'center', fontSize: 20, fontWeight: '800', color: '#fff' },
+  counterBtnText: { fontSize: 24, fontWeight: '700', color: COLORS.text, marginTop: -2 },
+  counterValue: { width: 40, textAlign: 'center', fontSize: 20, fontWeight: '800', color: COLORS.text },
   
   journeyTypeWrap: { flexDirection: 'row', backgroundColor: COLORS.cardBg, padding: 6, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border },
   journeyBtn: { paddingHorizontal: 20, paddingVertical: 12, borderRadius: 12 },

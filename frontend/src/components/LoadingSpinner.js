@@ -1,8 +1,11 @@
 import React from 'react';
 import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
-import COLORS from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 
 export default function LoadingSpinner({ visible = false, message = 'Loading...' }) {
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
+
   if (!visible) return null;
 
   return (
@@ -15,7 +18,7 @@ export default function LoadingSpinner({ visible = false, message = 'Loading...'
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   overlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
@@ -24,7 +27,7 @@ const styles = StyleSheet.create({
     zIndex: 9999,
   },
   container: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.cardBg,
     padding: 24,
     borderRadius: 16,
     alignItems: 'center',

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import COLORS from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import {
   View, Text, StyleSheet, TouchableOpacity, ActivityIndicator,
   Alert, SafeAreaView, StatusBar, Platform
@@ -16,6 +16,8 @@ export default function QRScannerScreen() {
   const [error, setError] = useState(null);
   const [processing, setProcessing] = useState(false);
   const navigation = useNavigation();
+  const { theme: COLORS, isDark } = useTheme();
+  const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
 
   const handleManualScan = async (code) => {
     if (processing || scannedResult) return;
@@ -42,11 +44,11 @@ export default function QRScannerScreen() {
 
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeBtn}>
-            <Icon name="close" size={24} color="#fff" />
+            <Icon name="close" size={24} color={COLORS.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Scan Ticket QR</Text>
           <View style={{ width: 44 }} />
@@ -101,7 +103,7 @@ export default function QRScannerScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 40 : 10, paddingBottom: 16 },
   headerTitle: { fontSize: 20, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
@@ -113,12 +115,12 @@ const styles = StyleSheet.create({
   iconCircleRed: { width: 90, height: 90, borderRadius: 45, backgroundColor: 'rgba(239,68,68,0.15)', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: 'rgba(239,68,68,0.3)' },
   iconCircleBlue: { width: 90, height: 90, borderRadius: 45, backgroundColor: 'rgba(0,201,167,0.15)', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: 'rgba(0,201,167,0.3)' },
   
-  statusTitle: { fontSize: 26, fontWeight: '900', color: '#fff', textAlign: 'center' },
+  statusTitle: { fontSize: 26, fontWeight: '900', color: COLORS.text, textAlign: 'center' },
   statusSubtitle: { fontSize: 15, color: COLORS.textLight, textAlign: 'center', paddingHorizontal: 24, lineHeight: 22 },
   
   actionButton: { borderRadius: 16, overflow: 'hidden', marginTop: 10, width: '100%' },
   actionBtnGrad: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 18, gap: 10, borderWidth: 1, borderColor: COLORS.border, borderRadius: 16 },
-  actionButtonText: { color: '#fff', fontWeight: '800', fontSize: 16 },
+  actionButtonText: { color: COLORS.text, fontWeight: '800', fontSize: 16 },
   
   scannerPlaceholder: { width: 280, height: 280, borderRadius: 32, backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: 'center', alignItems: 'center', position: 'relative', marginBottom: 20 },
   scannerCorner1: { position: 'absolute', top: 20, left: 20, width: 40, height: 40, borderTopWidth: 5, borderLeftWidth: 5, borderColor: '#00C9A7', borderRadius: 8 },
