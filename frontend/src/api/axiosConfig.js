@@ -2,9 +2,8 @@ import axios from 'axios';
 import { storage } from '../utils/storage';
 import { updateToken, logout } from '../redux/slices/authSlice';
 
-// Use LAN IP address for testing on physical devices
-// PC WiFi IP: 192.168.32.104 (update this if IP changes)
-const API_BASE_URL = 'http://10.89.234.113:5001/api';
+// Use live Render URL for backend API
+const API_BASE_URL = 'https://metro-app-1-vt0n.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,

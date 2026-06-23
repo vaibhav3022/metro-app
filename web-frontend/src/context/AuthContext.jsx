@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const AuthContext = createContext(null);
 
-export const API_BASE_URL = 'http://localhost:5001/api';
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://metro-app-1-vt0n.onrender.com/api';
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
