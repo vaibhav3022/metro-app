@@ -4,6 +4,7 @@ const Shop = require('../models/Shop');
 const Notification = require('../models/Notification');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
+const dns = require('dns');
 const { generateAccessToken, generateRefreshToken } = require('../utils/generateToken');
 
 const transporter = nodemailer.createTransport({
@@ -12,7 +13,9 @@ const transporter = nodemailer.createTransport({
   secure: false, // false for 587 (STARTTLS)
   requireTLS: true,
   auth: { user: process.env.GMAIL_USER || 'dhotrev384@gmail.com', pass: process.env.GMAIL_APP_PASSWORD || 'uqvjsavnkzrxreen' },
-  family: 4 // Force IPv4 to prevent ENETUNREACH error on Render
+  dnsLookup: (hostname, options, callback) => {
+    dns.lookup(hostname, { family: 4 }, callback);
+  }
 });
 
 const sendOTP = async (req, res) => {
