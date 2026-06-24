@@ -38,18 +38,18 @@ const sendOTP = async (req, res) => {
     user.otp = otp; user.otpExpiry = otpExpiry;
     await user.save();
 
-    try {
-      await transporter.sendMail({
-        from: `"Pune Metro" <${process.env.GMAIL_USER || 'dhotrev384@gmail.com'}>`,
-        to: normalizedEmail,
-        subject: 'Pune Metro OTP',
-        html: `<h2>OTP: ${otp}</h2><p>Valid for 5 minutes.</p>`
-      });
-      console.log(`[OTP] ${normalizedEmail}: ${otp}`);
-    } catch (mailError) {
+    // Send email asynchronously in the background to prevent blocking the HTTP response
+    transporter.sendMail({
+      from: `"Pune Metro" <${process.env.GMAIL_USER || 'dhotrev384@gmail.com'}>`,
+      to: normalizedEmail,
+      subject: 'Pune Metro OTP',
+      html: `<h2>OTP: ${otp}</h2><p>Valid for 5 minutes.</p>`
+    }).then(() => {
+      console.log(`[OTP] ${normalizedEmail}: ${otp} (Email sent successfully)`);
+    }).catch((mailError) => {
       console.error('[Mail Send Warning] SMTP failed:', mailError.message);
       console.log(`[OTP DEV FALLBACK] ${normalizedEmail}: ${otp} (Master OTP 123456 is also active)`);
-    }
+    });
 
     res.status(200).json({ success: true, message: 'OTP sent' });
   } catch (error) {
