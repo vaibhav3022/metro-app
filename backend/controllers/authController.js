@@ -8,8 +8,9 @@ const { generateAccessToken, generateRefreshToken } = require('../utils/generate
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
-  port: 465,
-  secure: true, // use SSL
+  port: 587,
+  secure: false, // false for 587 (STARTTLS)
+  requireTLS: true,
   auth: { user: process.env.GMAIL_USER || 'dhotrev384@gmail.com', pass: process.env.GMAIL_APP_PASSWORD || 'uqvjsavnkzrxreen' },
   family: 4 // Force IPv4 to prevent ENETUNREACH error on Render
 });
