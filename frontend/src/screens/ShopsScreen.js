@@ -4,10 +4,12 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, TextInput, S
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import api from '../api/axiosConfig';
+import { useTranslation } from 'react-i18next';
 
 export default function ShopsScreen({ navigation }) {
   const { theme: COLORS, isDark } = useTheme();
   const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
+  const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const [shops, setShops] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,15 +53,15 @@ export default function ShopsScreen({ navigation }) {
       <View style={styles.cardContent}>
         <Text style={styles.shopName}>{item.shopName || item.name}</Text>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <Text style={styles.shopCategory}>{item.category || 'Retail'}</Text>
+          <Text style={styles.shopCategory}>{item.category || t('shops.retail')}</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Icon name="email-outline" size={14} color="rgba(255,255,255,0.5)" />
-            <Text style={{ fontSize: 12, color: COLORS.textLight, marginLeft: 4 }}>{item.merchantId?.userId?.email || 'No email'}</Text>
+            <Icon name="email-outline" size={14} color={isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)'} />
+            <Text style={{ fontSize: 12, color: COLORS.textLight, marginLeft: 4 }}>{item.merchantId?.userId?.email || t('shops.noEmail')}</Text>
           </View>
         </View>
         <View style={styles.locationRow}>
-          <Icon name="map-marker-outline" size={16} color="rgba(255,255,255,0.5)" />
-          <Text style={styles.shopLocation}>{item.merchantId?.address || item.location || 'Metro Station'}</Text>
+          <Icon name="map-marker-outline" size={16} color={isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)'} />
+          <Text style={styles.shopLocation}>{item.merchantId?.address || item.location || t('shops.metroStation')}</Text>
         </View>
         <View style={styles.footerRow}>
           <View style={styles.ratingBox}>
@@ -73,7 +75,7 @@ export default function ShopsScreen({ navigation }) {
             >
               <LinearGradient colors={[COLORS.primary, COLORS.primary]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.payBtn}>
                 <Icon name="form-textbox" size={16} color="#fff" style={{ marginRight: 6 }} />
-                <Text style={styles.payBtnText}>Pay</Text>
+                <Text style={styles.payBtnText}>{t('shops.pay')}</Text>
               </LinearGradient>
             </TouchableOpacity>
             
@@ -83,7 +85,7 @@ export default function ShopsScreen({ navigation }) {
             >
               <LinearGradient colors={[COLORS.secondary, COLORS.secondary]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.payBtn}>
                 <Icon name="qrcode-scan" size={16} color="#fff" style={{ marginRight: 6 }} />
-                <Text style={styles.payBtnText}>Scan</Text>
+                <Text style={styles.payBtnText}>{t('shops.scan')}</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>
@@ -99,22 +101,22 @@ export default function ShopsScreen({ navigation }) {
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Icon name="arrow-left" size={24} color={COLORS.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Station Shops</Text>
+        <Text style={styles.headerTitle}>{t('shops.title')}</Text>
         <View style={{ width: 40 }} />
       </View>
 
       <View style={styles.searchContainer}>
-        <Icon name="magnify" size={22} color="rgba(255,255,255,0.4)" style={styles.searchIcon} />
+        <Icon name="magnify" size={22} color={isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.35)'} style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search by shop name or station..."
+          placeholder={t('shops.searchPlaceholder')}
           placeholderTextColor="#AAAAAA"
           value={search}
           onChangeText={setSearch}
         />
         {search.length > 0 && (
           <TouchableOpacity onPress={() => setSearch('')}>
-            <Icon name="close-circle" size={18} color="rgba(255,255,255,0.4)" />
+            <Icon name="close-circle" size={18} color={isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.35)'} />
           </TouchableOpacity>
         )}
       </View>
@@ -130,8 +132,8 @@ export default function ShopsScreen({ navigation }) {
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Icon name="store-off-outline" size={60} color="rgba(255,255,255,0.15)" />
-              <Text style={styles.emptyText}>No shops found.</Text>
+              <Icon name="store-off-outline" size={60} color={isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)'} />
+              <Text style={styles.emptyText}>{t('shops.noShops')}</Text>
             </View>
           }
         />
@@ -166,27 +168,27 @@ export default function ShopsScreen({ navigation }) {
                   </View>
                 </View>
 
-                <Text style={styles.modalCategory}>{selectedShop.category || 'Retail Store'}</Text>
+                <Text style={styles.modalCategory}>{selectedShop.category || t('shops.retailStore')}</Text>
 
                 <View style={styles.modalInfoRow}>
                   <Icon name="map-marker-outline" size={20} color="#00C9A7" />
-                  <Text style={styles.modalInfoText}>{selectedShop.merchantId?.address || selectedShop.location || 'Inside Metro Station'}</Text>
+                  <Text style={styles.modalInfoText}>{selectedShop.merchantId?.address || selectedShop.location || t('shops.insideMetro')}</Text>
                 </View>
                 
                 <View style={styles.modalInfoRow}>
                   <Icon name="email-outline" size={20} color="#3498DB" />
-                  <Text style={styles.modalInfoText}>{selectedShop.merchantId?.userId?.email || 'Contact unavailable'}</Text>
+                  <Text style={styles.modalInfoText}>{selectedShop.merchantId?.userId?.email || t('shops.contactUnavail')}</Text>
                 </View>
 
                 <View style={styles.modalInfoRow}>
                   <Icon name="clock-outline" size={20} color="#F39C12" />
-                  <Text style={styles.modalInfoText}>Open: 08:00 AM - 10:00 PM</Text>
+                  <Text style={styles.modalInfoText}>{t('shops.openHours')}</Text>
                 </View>
 
                 <View style={styles.modalDescWrap}>
-                  <Text style={styles.modalDescTitle}>About the Shop</Text>
+                  <Text style={styles.modalDescTitle}>{t('shops.aboutShop')}</Text>
                   <Text style={styles.modalDesc}>
-                    {selectedShop.description || `Welcome to ${selectedShop.shopName || selectedShop.name}! We provide top quality products and services to metro passengers. Visit us for an excellent experience right inside the station.`}
+                    {selectedShop.description || t('shops.welcomeDesc', { name: selectedShop.shopName || selectedShop.name })}
                   </Text>
                 </View>
               </ScrollView>
@@ -203,7 +205,7 @@ export default function ShopsScreen({ navigation }) {
                 >
                   <LinearGradient colors={[COLORS.primary, COLORS.primary]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.modalActionGrad}>
                     <Icon name="form-textbox" size={20} color="#fff" style={{ marginRight: 8 }} />
-                    <Text style={styles.modalActionText}>Pay Bill</Text>
+                    <Text style={styles.modalActionText}>{t('shops.payBill')}</Text>
                   </LinearGradient>
                 </TouchableOpacity>
 
@@ -216,7 +218,7 @@ export default function ShopsScreen({ navigation }) {
                 >
                   <LinearGradient colors={[COLORS.secondary, COLORS.secondary]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.modalActionGrad}>
                     <Icon name="qrcode-scan" size={20} color="#fff" style={{ marginRight: 8 }} />
-                    <Text style={styles.modalActionText}>Scan QR</Text>
+                    <Text style={styles.modalActionText}>{t('shops.scanQr')}</Text>
                   </LinearGradient>
                 </TouchableOpacity>
               </View>

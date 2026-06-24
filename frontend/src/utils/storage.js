@@ -65,7 +65,25 @@ export const storage = {
     } catch (e) {
       console.error('Error clearing storage', e);
     }
-  }
+  },
+
+  saveString: async (key, value) => {
+    try {
+      await AsyncStorage.setItem(key, value);
+    } catch (e) {
+      console.error('Error saving string', e);
+    }
+  },
+
+  getString: async (key) => {
+    try {
+      return await AsyncStorage.getItem(key);
+    } catch (e) {
+      console.error('Error getting string', e);
+      return null;
+    }
+  },
+
 };
 
 export default storage;

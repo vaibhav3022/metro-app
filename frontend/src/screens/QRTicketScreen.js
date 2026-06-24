@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 
@@ -14,6 +15,7 @@ export default function QRTicketScreen() {
   const navigation = useNavigation();
   const ticket = useSelector((state) => state.tickets.currentTicket);
   const { theme: COLORS, isDark } = useTheme();
+  const { t } = useTranslation();
   const styles = React.useMemo(() => getStyles(COLORS, isDark), [COLORS, isDark]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -36,11 +38,11 @@ export default function QRTicketScreen() {
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
           <View style={styles.centered}>
-            <Icon name="ticket-confirmation-outline" size={70} color="rgba(255,255,255,0.2)" style={{ marginBottom: 20 }} />
-            <Text style={styles.noTicketText}>No active ticket selected.</Text>
+            <Icon name="ticket-confirmation-outline" size={70} color={isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)'} style={{ marginBottom: 20 }} />
+            <Text style={styles.noTicketText}>{t('qrticket.noActiveTicket')}</Text>
             <TouchableOpacity style={styles.homeBtn} onPress={() => navigation.navigate('HomeTab')}>
               <LinearGradient colors={[COLORS.secondary, COLORS.secondary]} style={styles.homeBtnGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-                <Text style={styles.homeBtnText}>Go to Dashboard</Text>
+                <Text style={styles.homeBtnText}>{t('qrticket.goToDash')}</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>
@@ -54,114 +56,117 @@ export default function QRTicketScreen() {
   const ticketsArray = Array.from({ length: passengersCount });
   const isReturn = ticket.isReturn;
 
+  const QR_SIZE = 240;
+
   const handleScroll = (event) => {
     const xOffset = event.nativeEvent.contentOffset.x;
-    const index = Math.round(xOffset / width);
-    setCurrentIndex(index);
+    const index = Math.round(xOffset / QR_SIZE);
+    if (index >= 0 && index < passengersCount) {
+      setCurrentIndex(index);
+    }
   };
 
-  const renderTicketCard = ({ item, index }) => {
-    // Unique QR for each passenger
+  const renderQRItem = ({ index }) => {
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${ticket.ticketId || ticket.id}_${index + 1}&color=000000&bgcolor=FFFFFF`;
 
     return (
-      <View style={{ width: width, alignItems: 'center', paddingHorizontal: 20 }}>
-        <View style={styles.card}>
-          
-          {/* Top Row: Price, Type, Close */}
-          <View style={styles.cardTopRow}>
-            <Text style={styles.priceText}>₹{ticket.totalAmount || ticket.fare}</Text>
-            <View style={styles.typeChip}>
-              <Text style={styles.typeChipText}>{isReturn ? 'Return' : 'Outward'}</Text>
-            </View>
-            <TouchableOpacity onPress={() => navigation.navigate('HomeTab')} style={styles.closeBtn}>
-              <Icon name="close" size={20} color="#777" />
-            </TouchableOpacity>
+      <View style={{ width: QR_SIZE, height: QR_SIZE, position: 'relative', overflow: 'hidden', borderRadius: 12 }}>
+        <Image
+          source={{ uri: qrUrl }}
+          style={styles.qrImage}
+          resizeMode="contain"
+        />
+        {isInvalid && (
+          <View style={styles.invalidOverlay}>
+             <Text style={styles.invalidOverlayText}>{ticket.ticketStatus?.charAt(0).toUpperCase() + ticket.ticketStatus?.slice(1)}</Text>
           </View>
-
-          {/* Ticket Counter */}
-          <View style={styles.counterRow}>
-            {passengersCount > 1 ? (
-              <TouchableOpacity 
-                disabled={index === 0} 
-                onPress={() => flatListRef.current?.scrollToOffset({ offset: (index - 1) * width, animated: true })}
-                style={{ padding: 10, opacity: index === 0 ? 0.3 : 1 }}
-              >
-                <Icon name="chevron-left-circle" size={32} color="#00C9A7" />
-              </TouchableOpacity>
-            ) : <View style={{ width: 52 }} />}
-            
-            <Text style={styles.counterText}>Ticket {index + 1} of {passengersCount}</Text>
-
-            {passengersCount > 1 ? (
-              <TouchableOpacity 
-                disabled={index === passengersCount - 1} 
-                onPress={() => flatListRef.current?.scrollToOffset({ offset: (index + 1) * width, animated: true })}
-                style={{ padding: 10, opacity: index === passengersCount - 1 ? 0.3 : 1 }}
-              >
-                <Icon name="chevron-right-circle" size={32} color="#00C9A7" />
-              </TouchableOpacity>
-            ) : <View style={{ width: 52 }} />}
-          </View>
-
-          {/* QR Code */}
-          <View style={styles.qrWrapper}>
-            <Image
-              source={{ uri: qrUrl }}
-              style={styles.qrImage}
-              resizeMode="contain"
-            />
-            {isInvalid && (
-              <View style={styles.invalidOverlay}>
-                 <Text style={styles.invalidOverlayText}>{ticket.ticketStatus?.charAt(0).toUpperCase() + ticket.ticketStatus?.slice(1)}</Text>
-              </View>
-            )}
-          </View>
-
-          {/* Eco-Friendly Badge */}
-          <View style={styles.ecoBadge}>
-            <Icon name="leaf" size={16} color="#22c55e" />
-            <Text style={styles.ecoText}>You saved ~{(ticket.distance * 0.14 || 1.2).toFixed(2)} kg of CO₂</Text>
-          </View>
-
-          {/* Ticket ID */}
-          <Text style={styles.ticketId}>Ticket No: {ticket.ticketId || ticket.id}-{index + 1}</Text>
-
-          {/* From -> To */}
-          <View style={styles.routeRow}>
-             <View style={styles.stationInfo}>
-                <Text style={styles.stationLabel}>From</Text>
-                <Text style={styles.stationName}>{ticket.source || ticket.sourceStation}</Text>
-             </View>
-             <Icon name="arrow-right" size={24} color="#777" style={{ marginHorizontal: 10 }} />
-             <View style={styles.stationInfo}>
-                <Text style={styles.stationLabel}>To</Text>
-                <Text style={styles.stationName}>{ticket.destination || ticket.destinationStation}</Text>
-             </View>
-          </View>
-
-        </View>
+        )}
       </View>
     );
   };
 
   return (
-    <LinearGradient colors={isDark ? ['#1a1a2e', '#16213e'] : ['#5b2c6f', '#8e44ad']} style={styles.safeArea}>
+    <LinearGradient colors={isDark ? ['#0B132B', '#1C2541'] : [COLORS.primary, '#1976D2']} style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
-      <SafeAreaView style={{ flex: 1, justifyContent: 'center' }}>
+      <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         
-        <View style={{ height: 600, justifyContent: 'center' }}>
-          <FlatList
-            ref={flatListRef}
-            data={ticketsArray}
-            keyExtractor={(_, index) => index.toString()}
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            onMomentumScrollEnd={handleScroll}
-            renderItem={renderTicketCard}
-            getItemLayout={(data, index) => ({ length: width, offset: width * index, index })}
-          />
+        <View style={styles.cardContainer}>
+          <View style={styles.card}>
+            
+            {/* Top Row: Price, Type, Close */}
+            <View style={styles.cardTopRow}>
+              <Text style={styles.priceText}>₹{ticket.totalAmount || ticket.fare}</Text>
+              <View style={styles.typeChip}>
+                <Text style={styles.typeChipText}>{isReturn ? t('qrticket.return') : t('qrticket.outward')}</Text>
+              </View>
+              <TouchableOpacity onPress={() => navigation.navigate('HomeTab')} style={styles.closeBtn}>
+                <Icon name="close" size={20} color="#777" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Ticket Counter */}
+            <View style={styles.counterRow}>
+              {passengersCount > 1 ? (
+                <TouchableOpacity 
+                  disabled={currentIndex === 0} 
+                  onPress={() => flatListRef.current?.scrollToIndex({ index: currentIndex - 1, animated: true })}
+                  style={{ padding: 10, opacity: currentIndex === 0 ? 0.3 : 1 }}
+                >
+                  <Icon name="chevron-left-circle" size={32} color="#00C9A7" />
+                </TouchableOpacity>
+              ) : <View style={{ width: 52 }} />}
+              
+              <Text style={styles.counterText}>{t('qrticket.ticketOf', { current: currentIndex + 1, total: passengersCount })}</Text>
+
+              {passengersCount > 1 ? (
+                <TouchableOpacity 
+                  disabled={currentIndex === passengersCount - 1} 
+                  onPress={() => flatListRef.current?.scrollToIndex({ index: currentIndex + 1, animated: true })}
+                  style={{ padding: 10, opacity: currentIndex === passengersCount - 1 ? 0.3 : 1 }}
+                >
+                  <Icon name="chevron-right-circle" size={32} color="#00C9A7" />
+                </TouchableOpacity>
+              ) : <View style={{ width: 52 }} />}
+            </View>
+
+            {/* QR Code */}
+            <View style={[styles.qrWrapper, { width: QR_SIZE, height: QR_SIZE, marginBottom: 20 }]}>
+              <FlatList
+                ref={flatListRef}
+                data={ticketsArray}
+                keyExtractor={(_, index) => index.toString()}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                onMomentumScrollEnd={handleScroll}
+                renderItem={renderQRItem}
+                getItemLayout={(data, index) => ({ length: QR_SIZE, offset: QR_SIZE * index, index })}
+              />
+            </View>
+
+            {/* Eco-Friendly Badge */}
+            <View style={styles.ecoBadge}>
+              <Icon name="leaf" size={16} color="#2E7D32" />
+              <Text style={styles.ecoText}>{t('qrticket.ecoFriendly', { co2: ((ticket.distance || 5) * 140).toFixed(0) })}</Text>
+            </View>
+
+            {/* Ticket ID */}
+            <Text style={[styles.ticketId, { color: COLORS.primary }]}>{t('qrticket.ticketNo')} {ticket.ticketId || ticket.id}-{currentIndex + 1}</Text>
+
+            {/* From -> To */}
+            <View style={styles.routeRow}>
+               <View style={styles.stationInfo}>
+                  <Text style={styles.stationLabel}>{t('qrticket.from')}</Text>
+                  <Text style={styles.stationName}>{ticket.source || ticket.sourceStation}</Text>
+               </View>
+               <Icon name="arrow-right" size={24} color="#777" style={{ marginHorizontal: 10 }} />
+               <View style={styles.stationInfo}>
+                  <Text style={styles.stationLabel}>{t('qrticket.to')}</Text>
+                  <Text style={styles.stationName}>{ticket.destination || ticket.destinationStation}</Text>
+               </View>
+            </View>
+
+          </View>
         </View>
 
       </SafeAreaView>
@@ -176,7 +181,10 @@ const getStyles = (COLORS, isDark) => StyleSheet.create({
   homeBtn: { borderRadius: 16, overflow: 'hidden' },
   homeBtnGrad: { paddingHorizontal: 30, paddingVertical: 14, justifyContent: 'center', alignItems: 'center' },
   homeBtnText: { color: '#fff', fontWeight: '800', fontSize: 16 },
-  
+  cardContainer: {
+    width: width - 40,
+    alignItems: 'center',
+  },
   card: { 
     backgroundColor: '#ffffff', 
     borderRadius: 20, 

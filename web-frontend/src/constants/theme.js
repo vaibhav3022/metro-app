@@ -1,5 +1,5 @@
-export const PRIMARY_COLOR = '#6A1B9A';   // Pune Metro Deep Purple (Purple Line)
-export const SECONDARY_COLOR = '#00897B'; // Pune Metro Teal/Aqua (Aqua Line)
+export const PRIMARY_COLOR = '#0D47A1';   // Pune Metro Royal Blue
+export const SECONDARY_COLOR = '#FF5722'; // Pune Metro Orange Accent
 export const BACKGROUND_COLOR = '#F5F5F5';// Light Grey background
 export const CARD_BG = '#FFFFFF';        // Card Background (White)
 export const TEXT_PRIMARY = '#212121';    // Dark Grey for main text

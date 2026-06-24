@@ -21,7 +21,7 @@
 
   --glass: #FFFFFF;
   --glass-border: #E0E0E0;
-  --glass-glow: rgba(0, 137, 123, 0.1);
+  --glass-glow: rgba(13, 71, 161, 0.08);
   --box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.06);
   
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -38,7 +38,7 @@
 
   --glass: #1E293B;
   --glass-border: #334155;
-  --glass-glow: rgba(0, 137, 123, 0.2);
+  --glass-glow: rgba(30, 136, 229, 0.15);
   --box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 

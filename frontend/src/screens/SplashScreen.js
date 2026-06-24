@@ -1,11 +1,9 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, Text, View, ActivityIndicator, StatusBar } from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator, StatusBar, Image } from 'react-native';
 import { useDispatch } from 'react-redux';
-import LinearGradient from 'react-native-linear-gradient';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTheme } from '../context/ThemeContext';
 import { storage } from '../utils/storage';
-import { authSuccess, logout } from '../redux/slices/authSlice';
+import { authSuccess } from '../redux/slices/authSlice';
 import { authAPI } from '../api/authAPI';
 
 export default function SplashScreen({ navigation }) {
@@ -20,9 +18,7 @@ export default function SplashScreen({ navigation }) {
         const refreshToken = await storage.getRefreshToken();
         const storedUser = await storage.getUser();
 
-
         if (token && storedUser) {
-          // Verify with backend
           try {
             const profileData = await authAPI.getProfile();
             const finalUser = profileData.user || storedUser;
@@ -41,7 +37,6 @@ export default function SplashScreen({ navigation }) {
             }
           } catch (apiError) {
             console.log('Profile fetch failed, trying token update', apiError);
-            // If it's a transient network error, we can still let them in using stored credentials
             dispatch(authSuccess({
               user: storedUser,
               token,
@@ -69,25 +64,26 @@ export default function SplashScreen({ navigation }) {
   }, [dispatch, navigation]);
 
   return (
-    <LinearGradient
-      colors={[COLORS.primary, '#00366C']}
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-    >
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
+    <View style={styles.container}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={COLORS.background} />
+      
       <View style={styles.logoContainer}>
         <View style={styles.logoBg}>
-          <MaterialCommunityIcons name="subway" size={54} color={COLORS.primary} />
+          <Image 
+            source={require('../assets/images/pune_metro_logo.png')} 
+            style={styles.logoImage} 
+            resizeMode="contain" 
+          />
         </View>
         <Text style={styles.title}>PUNE METRO</Text>
-        <Text style={styles.subtitle}>आली आपली मेट्रो!</Text>
+        <Text style={styles.subtitle}>आली आपली मेट्रो! 🚇</Text>
       </View>
+      
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={COLORS.white} />
+        <ActivityIndicator size="large" color={COLORS.primary} />
         <Text style={styles.loadingText}>Securing booking gateway...</Text>
       </View>
-    </LinearGradient>
+    </View>
   );
 }
 
@@ -97,6 +93,7 @@ const getStyles = (COLORS) => StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 60,
+    backgroundColor: COLORS.background,
   },
   logoContainer: {
     flex: 1,
@@ -105,39 +102,44 @@ const getStyles = (COLORS) => StyleSheet.create({
     marginTop: 80,
   },
   logoBg: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: COLORS.white,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.1,
     shadowRadius: 10,
-    elevation: 8,
-    marginBottom: 20,
+    elevation: 4,
+    marginBottom: 24,
+    padding: 10,
+  },
+  logoImage: {
+    width: '100%',
+    height: '100%',
   },
   title: {
     fontSize: 28,
-    fontWeight: '800',
-    color: COLORS.white,
+    fontWeight: '900',
+    color: COLORS.primary,
     letterSpacing: 2,
   },
   subtitle: {
-    fontSize: 14,
-    color: COLORS.white,
-    marginTop: 6,
-    fontWeight: '500',
+    fontSize: 15,
+    color: COLORS.secondary,
+    marginTop: 8,
+    fontWeight: '700',
     letterSpacing: 0.5,
   },
   loadingContainer: {
     alignItems: 'center',
   },
   loadingText: {
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: COLORS.textLight,
     marginTop: 12,
-    fontSize: 12,
-    fontWeight: '500',
+    fontSize: 13,
+    fontWeight: '600',
   },
 });

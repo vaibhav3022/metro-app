@@ -7,12 +7,14 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useTranslation } from 'react-i18next';
 import { ticketAPI } from '../api/ticketAPI';
 import { fetchHistorySuccess, setCurrentTicket } from '../redux/slices/ticketSlice';
 
 export default function HomeScreen({ navigation }) {
   const dispatch = useDispatch();
   const { theme: COLORS, isDark, toggleTheme } = useTheme();
+  const { t } = useTranslation();
   const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
   const { user } = useSelector((state) => state.auth);
   const { balance, loading: walletLoading } = useSelector((state) => state.wallet);
@@ -24,10 +26,10 @@ export default function HomeScreen({ navigation }) {
   const sliderWidth = screenWidth; // full width
 
   const sliderImages = [
-    { id: '1', source: require('../../assets/slider/metro_train.png'), title: 'Smart Metro Travel' },
-    { id: '2', source: require('../../assets/slider/station_shop.png'), title: 'Station Retail Shops' },
-    { id: '3', source: require('../../assets/slider/qr_payment.png'), title: 'Cashless Payments' },
-    { id: '4', source: require('../../assets/slider/digital_ticket.png'), title: 'Digital QR Tickets' },
+    { id: '1', source: require('../../assets/slider/metro_train.png'), title: t('home.slider1') },
+    { id: '2', source: require('../../assets/slider/station_shop.png'), title: t('home.slider2') },
+    { id: '3', source: require('../../assets/slider/qr_payment.png'), title: t('home.slider3') },
+    { id: '4', source: require('../../assets/slider/digital_ticket.png'), title: t('home.slider4') },
   ];
 
   const flatListRef = useRef(null);
@@ -44,9 +46,10 @@ export default function HomeScreen({ navigation }) {
 
   useEffect(() => {
     const hour = new Date().getHours();
-    if (hour < 12) setGreeting('Good Morning');
-    else if (hour < 18) setGreeting('Good Afternoon');
-    else setGreeting('Good Evening');
+    if (hour < 12) setGreeting(t('home.greeting_morning'));
+    else if (hour < 17) setGreeting(t('home.greeting_afternoon'));
+    else if (hour < 21) setGreeting(t('home.greeting_evening'));
+    else setGreeting(t('home.greeting_night'));
 
     // Auto-scroll slider every 3 seconds
     const autoScroll = setInterval(() => {
@@ -70,19 +73,20 @@ export default function HomeScreen({ navigation }) {
     fetchTickets();
 
     return () => clearInterval(autoScroll);
-  }, [dispatch]);
+  }, [dispatch, t]);
 
   const activeTicket = history?.find(t => t.ticketStatus === 'active' || t.ticketStatus === 'entered');
+  const firstName = user?.name ? user.name.split(' ')[0] : t('home.passenger');
 
   const quickActions = [
-    { title: 'Book Ticket', icon: 'ticket-outline', route: 'RouteSelection', color: '#00C9A7' },
-    { title: 'Recharge', icon: 'wallet-plus-outline', route: 'WalletTab', color: '#9B59B6' },
-    { title: 'Metro Map', icon: 'map-outline', route: 'MetroMap', color: '#3498DB' },
-    { title: 'Fare Calc', icon: 'calculator-variant-outline', route: 'FareCalculator', color: '#F39C12' },
-    { title: 'Shops', icon: 'storefront-outline', route: 'ShopsTab', color: '#E74C3C' },
-    { title: 'Scan & Pay', icon: 'qrcode-scan', route: 'ScanAndPay', color: '#1ABC9C' },
-    { title: 'Smart Card', icon: 'card-account-details-outline', route: 'SmartCard', color: '#E91E63' },
-    { title: 'Feeder Bus', icon: 'bus', route: 'Feeder', color: '#FF6B35' },
+    { title: t('home.bookTicket'), icon: 'ticket-outline', route: 'RouteSelection', color: '#FF5722' },
+    { title: t('home.viewTickets'), icon: 'ticket-confirmation-outline', route: 'TicketsTab', color: '#2E7D32' },
+    { title: t('home.fareCalc'), icon: 'calculator-variant-outline', route: 'FareCalculator', color: '#0D47A1' },
+    { title: t('home.feederBus'), icon: 'bus', route: 'Feeder', color: '#F57C00' },
+    { title: t('home.stationInfo'), icon: 'train', route: 'StationInfo', color: '#0288D1' },
+    { title: t('home.touristPlaces'), icon: 'compass-outline', route: 'TouristPlaces', color: '#9C27B0' },
+    { title: t('home.smartCard'), icon: 'card-account-details-outline', route: 'SmartCard', color: '#00796B' },
+    { title: t('home.metroMap'), icon: 'map-outline', route: 'MetroMap', color: '#E64A19' },
   ];
 
   return (
@@ -93,13 +97,20 @@ export default function HomeScreen({ navigation }) {
       <View style={styles.stickyTop}>
         {/* Header */}
         <View style={styles.header}>
-          <View>
-            <Text style={styles.greeting}>{greeting},</Text>
-            <Text style={styles.userName}>{user?.name || 'Passenger'}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1, marginRight: 15 }}>
+            <Image 
+              source={require('../assets/images/pune_metro_logo.png')} 
+              style={styles.headerLogo} 
+              resizeMode="contain" 
+            />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.headerTitle}>{t('home.puneMetro')}</Text>
+              <Text style={styles.greeting} numberOfLines={1} ellipsizeMode="tail">{greeting}, {firstName}</Text>
+            </View>
           </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <TouchableOpacity onPress={toggleTheme} style={[styles.themeToggle, { marginRight: 15 }]}>
-              <Icon name={isDark ? "weather-night" : "white-balance-sunny"} size={24} color={COLORS.text} />
+          <View style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 0 }}>
+            <TouchableOpacity onPress={toggleTheme} style={[styles.themeToggle, { marginRight: 10 }]}>
+              <Icon name={isDark ? "weather-night" : "white-balance-sunny"} size={22} color={COLORS.text} />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => navigation.navigate('ProfileTab')} style={styles.avatarWrap}>
               <LinearGradient colors={[COLORS.secondary, COLORS.primary]} style={styles.avatar}>
@@ -141,7 +152,7 @@ export default function HomeScreen({ navigation }) {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
 
         {/* Quick Actions */}
-        <Text style={styles.sectionTitle}>Quick Services</Text>
+        <Text style={styles.sectionTitle}>{t('home.quickServices')}</Text>
         <View style={styles.grid}>
           {quickActions.map((action, index) => (
             <TouchableOpacity
@@ -160,9 +171,9 @@ export default function HomeScreen({ navigation }) {
 
         {/* Recent Tickets */}
         <View style={styles.sectionRow}>
-          <Text style={styles.sectionTitle}>Recent Tickets</Text>
+          <Text style={styles.sectionTitle}>{t('home.recentTickets')}</Text>
           <TouchableOpacity onPress={() => navigation.navigate('TicketsTab')}>
-            <Text style={styles.viewAll}>View All →</Text>
+            <Text style={styles.viewAll}>{t('home.viewAll')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -178,22 +189,22 @@ export default function HomeScreen({ navigation }) {
               </View>
               <View style={styles.ticketInfo}>
                 <Text style={styles.ticketRoute}>{activeTicket.source} → {activeTicket.destination}</Text>
-                <Text style={styles.ticketStatusText}>{activeTicket.ticketStatus === 'entered' ? 'In Transit' : 'Active QR'}</Text>
+                <Text style={styles.ticketStatusText}>{activeTicket.ticketStatus === 'entered' ? t('home.inTransit') : t('home.activeQR')}</Text>
               </View>
               <Icon name="qrcode-scan" size={28} color="#00C9A7" />
             </View>
             <View style={styles.ticketFooter}>
-              <Text style={styles.ticketDetails}>{activeTicket.passengers} Passenger(s)</Text>
+              <Text style={styles.ticketDetails}>{activeTicket.passengers} {t('home.passengersCount')}</Text>
               <Text style={styles.ticketFare}>₹{activeTicket.totalAmount || activeTicket.fare}</Text>
             </View>
           </TouchableOpacity>
         ) : (
           <View style={styles.emptyCard}>
-            <Icon name="ticket-confirmation-outline" size={44} color="rgba(255,255,255,0.2)" />
-            <Text style={styles.emptyText}>No active tickets found</Text>
+            <Icon name="ticket-confirmation-outline" size={44} color={isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)'} />
+            <Text style={styles.emptyText}>{t('home.noActiveTickets')}</Text>
             <TouchableOpacity style={styles.bookBtn} onPress={() => navigation.navigate('RouteSelection')}>
               <LinearGradient colors={[COLORS.secondary, COLORS.secondary]} style={styles.bookBtnGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-                <Text style={styles.bookBtnText}>Book Now</Text>
+                <Text style={styles.bookBtnText}>{t('home.bookNow')}</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>
@@ -234,8 +245,8 @@ export default function HomeScreen({ navigation }) {
             <Icon name="bus" size={24} color="#fff" />
           </LinearGradient>
           <View style={{ flex: 1, marginLeft: 16 }}>
-            <Text style={styles.pmpmlTitle}>PMPML Bus Tickets</Text>
-            <Text style={styles.pmpmlSub}>Book city bus tickets seamlessly</Text>
+            <Text style={styles.pmpmlTitle}>{t('home.pmpmlTitle')}</Text>
+            <Text style={styles.pmpmlSub}>{t('home.pmpmlSub')}</Text>
           </View>
           <Icon name="chevron-right" size={22} color="#888" />
         </TouchableOpacity>
@@ -246,8 +257,8 @@ export default function HomeScreen({ navigation }) {
             <Icon name="car-electric" size={24} color="#fff" />
           </LinearGradient>
           <View style={{ flex: 1, marginLeft: 16 }}>
-            <Text style={styles.evAutoTitle}>EV Auto</Text>
-            <Text style={styles.evAutoSub}>Book shared EV autos to your destination</Text>
+            <Text style={styles.evAutoTitle}>{t('home.evAutoTitle')}</Text>
+            <Text style={styles.evAutoSub}>{t('home.evAutoSub')}</Text>
           </View>
           <Icon name="chevron-right" size={22} color="#888" />
         </TouchableOpacity>
@@ -256,8 +267,8 @@ export default function HomeScreen({ navigation }) {
         <TouchableOpacity style={styles.notifCard} onPress={() => navigation.navigate('Notifications')}>
           <Icon name="bell-outline" size={22} color="#00C9A7" />
           <View style={{ flex: 1, marginLeft: 12 }}>
-            <Text style={styles.notifTitle}>Notifications</Text>
-            <Text style={styles.notifSub}>Check your latest alerts & offers</Text>
+            <Text style={styles.notifTitle}>{t('home.notifShortcutTitle')}</Text>
+            <Text style={styles.notifSub}>{t('home.notifShortcutSub')}</Text>
           </View>
           <Icon name="chevron-right" size={20} color="#555" />
         </TouchableOpacity>
@@ -278,7 +289,9 @@ const getStyles = (COLORS) => StyleSheet.create({
   },
   scroll: { paddingTop: 10, paddingBottom: 30 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, marginBottom: 22 },
-  greeting: { fontSize: 14, color: COLORS.textLight },
+  headerLogo: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#FFFFFF', padding: 2, borderWidth: 1, borderColor: '#E0E0E0' },
+  headerTitle: { fontSize: 18, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
+  greeting: { fontSize: 13, color: COLORS.textLight, marginTop: 1 },
   userName: { fontSize: 22, fontWeight: '800', color: COLORS.text, marginTop: 2 },
   themeToggle: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.border },
   avatarWrap: { borderRadius: 28, overflow: 'hidden' },

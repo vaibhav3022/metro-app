@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import { BASE_URL } from '../api/axiosConfig';
+import { useTranslation } from 'react-i18next';
 
 const API_BASE = BASE_URL || 'http://10.0.2.2:5000';
 const CATEGORIES = ['Grievance', 'Lost & Found', 'Suggestion', 'Other'];
@@ -17,8 +18,18 @@ export default function HelpSupportScreen() {
   const navigation = useNavigation();
   const { theme: COLORS, isDark } = useTheme();
   const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
+  const { t } = useTranslation();
+  
+  // Localized categories
+  const localizedCategories = [
+    t('help.categories.grievance'),
+    t('help.categories.lostFound'),
+    t('help.categories.suggestion'),
+    t('help.categories.other')
+  ];
+
   const [tab, setTab] = useState('New');
-  const [category, setCategory] = useState(CATEGORIES[0]);
+  const [category, setCategory] = useState(localizedCategories[0]);
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [myComplaints, setMyComplaints] = useState([]);
@@ -46,7 +57,7 @@ export default function HelpSupportScreen() {
 
   const handleSubmit = async () => {
     if (!description.trim()) {
-      Alert.alert('Validation', 'Please enter a description');
+      Alert.alert(t('help.alert.validation'), t('help.alert.enterDesc'));
       return;
     }
     setLoading(true);
@@ -59,14 +70,14 @@ export default function HelpSupportScreen() {
       });
       const data = await res.json();
       if (data.success) {
-        Alert.alert('Success', data.message || 'Ticket Submitted Successfully');
+        Alert.alert(t('help.alert.success'), data.message || t('help.alert.submitted'));
         setDescription('');
         setTab('MyTickets');
       } else {
-        Alert.alert('Error', data.message || 'Failed to submit');
+        Alert.alert(t('help.alert.error'), data.message || t('help.alert.failedSubmit'));
       }
     } catch (e) {
-      Alert.alert('Success', 'Ticket Submitted! (Mock)');
+      Alert.alert(t('help.alert.success'), t('help.alert.mockSubmit'));
       setDescription('');
       setTab('MyTickets');
     }
@@ -86,21 +97,21 @@ export default function HelpSupportScreen() {
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <Icon name="arrow-left" size={24} color={COLORS.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Help & Support</Text>
+          <Text style={styles.headerTitle}>{t('help.title')}</Text>
           <View style={{ width: 44 }} />
         </View>
 
         {/* Tabs */}
         <View style={styles.tabsContainer}>
           <View style={styles.tabs}>
-            {['New', 'MyTickets'].map(t => (
+            {['New', 'MyTickets'].map(t_item => (
               <TouchableOpacity
-                key={t}
-                style={[styles.tab, tab === t && styles.tabActive]}
-                onPress={() => setTab(t)}
+                key={t_item}
+                style={[styles.tab, tab === t_item && styles.tabActive]}
+                onPress={() => setTab(t_item)}
               >
-                <Text style={[styles.tabText, tab === t && styles.tabTextActive]}>
-                  {t === 'New' ? 'New Ticket' : 'My Tickets'}
+                <Text style={[styles.tabText, tab === t_item && styles.tabTextActive]}>
+                  {t_item === 'New' ? t('help.newTicket') : t('help.myTickets')}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -113,20 +124,20 @@ export default function HelpSupportScreen() {
               <View style={styles.headerIconWrap}>
                 <Icon name="headset" size={32} color="#9B59B6" />
               </View>
-              <Text style={styles.cardTitle}>How can we help you?</Text>
+              <Text style={styles.cardTitle}>{t('help.howCanWeHelp')}</Text>
               
-              <Text style={styles.fieldLabel}>Select Category</Text>
+              <Text style={styles.fieldLabel}>{t('help.selectCategory')}</Text>
               <TouchableOpacity
                 style={styles.categorySelector}
                 onPress={() => setShowCategoryPicker(!showCategoryPicker)}
               >
                 <Text style={styles.categorySelectorText}>{category}</Text>
-                <Icon name={showCategoryPicker ? 'chevron-up' : 'chevron-down'} size={24} color="rgba(255,255,255,0.5)" />
+                <Icon name={showCategoryPicker ? 'chevron-up' : 'chevron-down'} size={24} color={COLORS.textLight} />
               </TouchableOpacity>
               
               {showCategoryPicker && (
                 <View style={styles.categoryOptions}>
-                  {CATEGORIES.map(cat => (
+                  {localizedCategories.map(cat => (
                     <TouchableOpacity
                       key={cat}
                       style={[styles.categoryOption, cat === category && styles.categoryOptionActive]}
@@ -140,12 +151,12 @@ export default function HelpSupportScreen() {
                 </View>
               )}
 
-              <Text style={[styles.fieldLabel, { marginTop: 24 }]}>Description</Text>
+              <Text style={[styles.fieldLabel, { marginTop: 24 }]}>{t('help.description')}</Text>
               <TextInput
                 style={styles.textArea}
                 multiline
                 numberOfLines={6}
-                placeholder="Describe your issue, suggestion, or what you lost in detail..."
+                placeholder={t('help.descriptionPlaceholder')}
                 placeholderTextColor="#AAAAAA"
                 value={description}
                 onChangeText={setDescription}
@@ -159,7 +170,7 @@ export default function HelpSupportScreen() {
               >
                 <LinearGradient colors={[COLORS.secondary, COLORS.secondary]} style={styles.submitBtnGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
                   {loading ? <ActivityIndicator color="#fff" /> : (
-                    <Text style={styles.submitBtnText}>Submit Ticket</Text>
+                    <Text style={styles.submitBtnText}>{t('help.submitTicket')}</Text>
                   )}
                 </LinearGradient>
               </TouchableOpacity>
@@ -169,9 +180,9 @@ export default function HelpSupportScreen() {
               {myComplaints.length === 0 ? (
                 <View style={styles.emptyState}>
                   <View style={styles.emptyIconWrap}>
-                    <Icon name="ticket-confirmation-outline" size={40} color="rgba(255,255,255,0.3)" />
+                    <Icon name="ticket-confirmation-outline" size={40} color={isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.15)'} />
                   </View>
-                  <Text style={styles.emptyText}>No support tickets found.</Text>
+                  <Text style={styles.emptyText}>{t('help.noTickets')}</Text>
                 </View>
               ) : (
                 myComplaints.map(c => (
@@ -183,13 +194,13 @@ export default function HelpSupportScreen() {
                       </View>
                       <View style={[styles.statusBadge, { backgroundColor: getStatusBg(c.status) }]}>
                         <Text style={[styles.statusBadgeText, { color: getStatusColor(c.status) }]}>
-                          {c.status || 'Pending'}
+                          {c.status || t('help.pending')}
                         </Text>
                       </View>
                     </View>
                     <Text style={styles.complaintDesc}>{c.description}</Text>
                     <View style={styles.complaintFooter}>
-                      <Icon name="clock-outline" size={14} color="rgba(255,255,255,0.4)" style={{marginRight: 6}} />
+                      <Icon name="clock-outline" size={14} color={isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.2)'} style={{marginRight: 6}} />
                       <Text style={styles.complaintDate}>
                         {new Date(c.createdAt).toLocaleDateString()} at {new Date(c.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                       </Text>

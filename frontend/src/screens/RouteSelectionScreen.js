@@ -8,7 +8,8 @@ import { useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
-import { ALL_STATIONS } from '../constants/metroLines';
+import { useTranslation } from 'react-i18next';
+import { ALL_STATIONS, METRO_LINES } from '../constants/metroLines';
 import { setBookingDetails } from '../redux/slices/ticketSlice';
 import { ticketAPI } from '../api/ticketAPI';
 import StationPicker from '../components/StationPicker';
@@ -17,6 +18,7 @@ export default function RouteSelectionScreen() {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const { theme: COLORS, isDark } = useTheme();
+  const { t } = useTranslation();
   const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
 
   const [source, setSource] = useState('');
@@ -34,11 +36,11 @@ export default function RouteSelectionScreen() {
 
   const handleCalculateFare = async () => {
     if (!source || !destination) {
-      setError('Please select both source and destination stations.');
+      setError(t('route.errorBoth'));
       return;
     }
     if (source === destination) {
-      setError('Source and destination cannot be the same.');
+      setError(t('route.errorSame'));
       return;
     }
 
@@ -55,7 +57,7 @@ export default function RouteSelectionScreen() {
       }));
       navigation.navigate('Fare');
     } catch (err) {
-      setError(err.response?.data?.message || 'Error calculating fare. Please try again.');
+      setError(err.response?.data?.message || t('route.errorCalc'));
     } finally {
       setLoading(false);
     }
@@ -71,7 +73,7 @@ export default function RouteSelectionScreen() {
             <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
               <Icon name="arrow-left" size={24} color={COLORS.text} />
             </TouchableOpacity>
-            <Text style={styles.headerTitle}>Book Ticket</Text>
+            <Text style={styles.headerTitle}>{t('route.title')}</Text>
             <View style={{ width: 44 }} />
           </View>
 
@@ -85,11 +87,12 @@ export default function RouteSelectionScreen() {
           <View style={styles.card}>
             {/* Station Pickers */}
             <StationPicker
-              label="From Station"
+              label={t('route.fromLabel')}
               value={source}
               onSelect={setSource}
               stations={ALL_STATIONS}
-              placeholder="Select Source"
+              sections={Object.values(METRO_LINES).map(line => ({ title: line.name, data: line.stations, color: line.color }))}
+              placeholder={t('route.selectSource')}
             />
 
             {/* Swap Button */}
@@ -100,11 +103,16 @@ export default function RouteSelectionScreen() {
             </TouchableOpacity>
 
             <StationPicker
-              label="To Station"
+              label={t('route.toLabel')}
               value={destination}
               onSelect={setDestination}
               stations={ALL_STATIONS.filter(s => s !== source)}
-              placeholder="Select Destination"
+              sections={Object.values(METRO_LINES).map(line => ({ 
+                title: line.name, 
+                data: line.stations.filter(s => s !== source), 
+                color: line.color 
+              }))}
+              placeholder={t('route.selectDest')}
             />
 
             <View style={styles.divider} />
@@ -112,8 +120,8 @@ export default function RouteSelectionScreen() {
             {/* Passengers */}
             <View style={styles.rowBetween}>
               <View>
-                <Text style={styles.rowLabel}>Passengers</Text>
-                <Text style={styles.rowSub}>Max 6 per booking</Text>
+                <Text style={styles.rowLabel}>{t('route.passengers')}</Text>
+                <Text style={styles.rowSub}>{t('route.maxPassengers')}</Text>
               </View>
               <View style={styles.counterWrap}>
                 <TouchableOpacity
@@ -142,7 +150,7 @@ export default function RouteSelectionScreen() {
                   <ActivityIndicator color="#fff" />
                 ) : (
                   <>
-                    <Text style={styles.calcButtonText}>Proceed to Fare</Text>
+                    <Text style={styles.calcButtonText}>{t('route.proceedFare')}</Text>
                     <Icon name="arrow-right" size={20} color="#fff" style={{ marginLeft: 10 }} />
                   </>
                 )}

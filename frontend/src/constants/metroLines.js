@@ -5,7 +5,7 @@ export const METRO_LINES = {
     stations: [
       'PCMC',
       'Sant Tukaram Nagar',
-      'Bhosari',
+      'Nashik Phata',
       'Kasarwadi',
       'Phugewadi',
       'Dapodi',
@@ -13,9 +13,9 @@ export const METRO_LINES = {
       'Khadki',
       'Range Hills',
       'Shivajinagar',
-      'Civil Court',
-      'Budhwar Peth',
-      'Mandai',
+      'District Court',
+      'Kasba Peth',
+      'Mahatma Phule Mandai',
       'Swargate'
     ]
   },
@@ -25,14 +25,14 @@ export const METRO_LINES = {
     stations: [
       'Vanaz',
       'Anand Nagar',
-      'Ideal Colony',
-      'Nal Stop',
+      'Paud Phata',
+      'SNDT',
       'Garware College',
       'Deccan Gymkhana',
       'Chhatrapati Sambhaji Udyan',
-      'PMC',
-      'Civil Court',
-      'Mangalwar Peth',
+      'Pune Municipal Corporation',
+      'District Court',
+      'RTO',
       'Pune Railway Station',
       'Ruby Hall Clinic',
       'Bund Garden',
@@ -67,7 +67,7 @@ export const METRO_LINES = {
       'R.B.I.',
       'Agriculture College',
       'Shivajinagar',
-      'Civil Court'
+      'District Court'
     ]
   }
 };

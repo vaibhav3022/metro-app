@@ -1,23 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
-import { StyleSheet, Text, View, TouchableOpacity, StatusBar, ScrollView, RefreshControl, Platform } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, StatusBar, ScrollView, RefreshControl, Platform, Vibration } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import api from '../api/axiosConfig';
 import moment from 'moment';
+import { useTranslation } from 'react-i18next';
 
 export default function NotificationsScreen({ navigation }) {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const { theme: COLORS, isDark } = useTheme();
   const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
+  const { t } = useTranslation();
 
   const fetchNotifications = async () => {
     setLoading(true);
     try {
       const res = await api.get('/notifications');
-      setNotifications(res.data.data || []);
+      const list = res.data.data || [];
+      setNotifications(list);
+      
+      const hasUnread = list.some(item => !item.isRead);
+      if (hasUnread) {
+        // Double pulse vibration for new notifications
+        Vibration.vibrate([0, 150, 100, 150]);
+      }
     } catch (err) {
       console.log('Error fetching notifications');
     } finally {
@@ -30,6 +39,7 @@ export default function NotificationsScreen({ navigation }) {
   const markAllRead = async () => {
     try {
       await api.put('/notifications/read-all');
+      Vibration.vibrate(80);
       fetchNotifications();
     } catch (err) {}
   };
@@ -37,6 +47,7 @@ export default function NotificationsScreen({ navigation }) {
   const markRead = async (id) => {
     try {
       await api.put(`/notifications/${id}/read`);
+      Vibration.vibrate(50);
       fetchNotifications();
     } catch (err) {}
   };
@@ -59,7 +70,7 @@ export default function NotificationsScreen({ navigation }) {
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.primary} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Notifications</Text>
+          <Text style={styles.headerTitle}>{t('notifications.title')}</Text>
           <TouchableOpacity onPress={markAllRead} style={styles.backButton}>
             <MaterialCommunityIcons name="check-all" size={24} color={COLORS.secondary} />
           </TouchableOpacity>
@@ -75,8 +86,8 @@ export default function NotificationsScreen({ navigation }) {
               <View style={styles.iconCircle}>
                 <MaterialCommunityIcons name="bell-off-outline" size={48} color={COLORS.secondary} />
               </View>
-              <Text style={styles.emptyTitle}>No New Notifications</Text>
-              <Text style={styles.emptySubtitle}>You're all caught up!</Text>
+              <Text style={styles.emptyTitle}>{t('notifications.noNew')}</Text>
+              <Text style={styles.emptySubtitle}>{t('notifications.caughtUp')}</Text>
             </View>
           ) : (
             notifications.map(item => (

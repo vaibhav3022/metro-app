@@ -12,12 +12,14 @@ import { ticketAPI } from '../api/ticketAPI';
 import { walletAPI } from '../api/walletAPI';
 import { shopAPI } from '../api/shopAPI';
 import { setCurrentTicket } from '../redux/slices/ticketSlice';
-import { deductMoneySuccess } from '../redux/slices/walletSlice';
+import { deductMoneySuccess, addMoneySuccess } from '../redux/slices/walletSlice';
+import { useTranslation } from 'react-i18next';
 
 export default function PaymentScreen({ route, navigation }) {
   const { paymentContext = 'ticket', amount = 0 } = route?.params || {};
   const dispatch = useDispatch();
   const { theme: COLORS, isDark } = useTheme();
+  const { t } = useTranslation();
   const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
   const bookingDetails = useSelector((state) => state.tickets.bookingDetails);
   const balance = useSelector((state) => state.wallet.balance);
@@ -41,16 +43,16 @@ export default function PaymentScreen({ route, navigation }) {
 
     try {
       if (paymentContext === 'wallet') {
-        setLoadingMsg('Adding money to wallet...');
+        setLoadingMsg(t('payment.addingToWallet'));
         const res = await walletAPI.addMoney(finalAmount, paymentId);
         dispatch(addMoneySuccess({ balance: res.balance, transaction: res.transaction }));
         setLoading(false);
         setSuccessData({
-          title: 'Recharge Successful!',
+          title: t('payment.rechargeSuccess'),
           amount: finalAmount,
-          message: `Added ₹${finalAmount} to your wallet.`,
-          method: 'Top Up',
-          actionText: 'Back to Dashboard',
+          message: t('payment.addedToWallet', { amount: finalAmount }),
+          method: t('payment.topUp'),
+          actionText: t('payment.backToDash'),
           onAction: () => navigation.goBack()
         });
         return;
@@ -58,7 +60,7 @@ export default function PaymentScreen({ route, navigation }) {
 
       if (paymentContext === 'merchant') {
         const { shopId, businessName } = route.params || {};
-        setLoadingMsg('Processing merchant payment...');
+        setLoadingMsg(t('payment.processingMerchant'));
         
         // Process on backend (deducts wallet if method is 'wallet', else records as Razorpay transaction)
         await shopAPI.payShop(shopId, finalAmount, method === 'wallet' ? 'wallet' : 'razorpay', paymentId);
@@ -70,17 +72,17 @@ export default function PaymentScreen({ route, navigation }) {
 
         setLoading(false);
         setSuccessData({
-          title: 'Payment Successful!',
+          title: t('payment.paymentSuccess'),
           amount: finalAmount,
-          message: `Paid to ${businessName || 'Merchant'}`,
-          method: 'Merchant Payment',
-          actionText: 'Back to Dashboard',
+          message: t('payment.paidTo', { merchant: businessName || 'Merchant' }),
+          method: t('payment.merchantPayment'),
+          actionText: t('payment.backToDash'),
           onAction: () => navigation.navigate('Home')
         });
         return;
       }
 
-      setLoadingMsg('Generating your digital QR ticket...');
+      setLoadingMsg(t('payment.generatingTicket'));
       const ticketResult = await ticketAPI.createTicket({ source, destination, distance, fare: farePerPerson, passengers, totalAmount: finalAmount });
       const { ticket } = ticketResult;
 
@@ -97,27 +99,27 @@ export default function PaymentScreen({ route, navigation }) {
       dispatch(setCurrentTicket(paymentResult.ticket));
 
       setSuccessData({
-        title: 'Ticket Booked!',
+        title: t('payment.ticketBooked'),
         amount: finalAmount,
         message: `Ticket ID: ${paymentResult.ticket.ticketId}`,
-        method: 'Ticket Booking',
-        actionText: 'View Ticket QR',
+        method: t('payment.ticketBooking'),
+        actionText: t('payment.viewTicketQr'),
         onAction: () => navigation.replace('QRTicket')
       });
     } catch (error) {
       setLoading(false);
-      Alert.alert('Payment Failure', error.response?.data?.message || 'Error processing transaction.');
+      Alert.alert(t('payment.paymentFailure'), error.response?.data?.message || 'Error processing transaction.');
     }
   };
 
   const processPayment = async () => {
     if (!selectedMethod) {
-      Alert.alert('Selection Required', 'Please select a payment provider.');
+      Alert.alert(t('payment.selectionRequired'), t('payment.pleaseSelect'));
       return;
     }
     
     if (selectedMethod === 'wallet' && !isWalletSufficient) {
-       Alert.alert('Insufficient Balance', 'Please top up your wallet or select another method.');
+       Alert.alert(t('payment.insufficientBalance'), t('payment.pleaseTopUp'));
        return;
     }
 
@@ -129,7 +131,7 @@ export default function PaymentScreen({ route, navigation }) {
 
     // SIMULATED RAZORPAY
     setLoading(true);
-    setLoadingMsg('Initiating secure transaction...');
+    setLoadingMsg(t('payment.secureTransaction'));
     try {
       // Simulate create order
       setTimeout(() => {
@@ -145,7 +147,7 @@ export default function PaymentScreen({ route, navigation }) {
       }, 1500);
     } catch (e) {
       setLoading(false);
-      Alert.alert('Gateway Error', 'Could not initiate payment.');
+      Alert.alert(t('payment.gatewayError'), t('payment.couldNotInitiate'));
     }
   };
 
@@ -168,7 +170,7 @@ export default function PaymentScreen({ route, navigation }) {
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Icon name="arrow-left" size={24} color={COLORS.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Secure Checkout</Text>
+          <Text style={styles.headerTitle}>{t('payment.title')}</Text>
           <View style={{ width: 40 }} />
         </View>
 
@@ -178,15 +180,15 @@ export default function PaymentScreen({ route, navigation }) {
             {paymentContext === 'merchant' && (
               <View style={styles.merchantLabelWrap}>
                 <Icon name="storefront" size={20} color="#00C9A7" />
-                <Text style={styles.merchantLabel}>Paying to {route.params?.businessName || 'Merchant'}</Text>
+                <Text style={styles.merchantLabel}>{t('payment.payingTo', { merchant: route.params?.businessName || 'Merchant' })}</Text>
               </View>
             )}
-            <Text style={styles.totalPayableLabel}>Total Payable Amount</Text>
+            <Text style={styles.totalPayableLabel}>{t('payment.totalPayable')}</Text>
             <Text style={styles.totalPayableAmount}>₹{finalAmount}</Text>
-            <Text style={styles.orderIdText}>TXN ID: {Date.now().toString().slice(0, 10)}</Text>
+            <Text style={styles.orderIdText}>{t('payment.txnId')} {Date.now().toString().slice(0, 10)}</Text>
           </View>
 
-          <Text style={styles.sectionTitle}>Payment Options</Text>
+          <Text style={styles.sectionTitle}>{t('payment.options')}</Text>
 
           {/* Metro Wallet Option (Only visible when booking ticket or paying merchant) */}
           {(paymentContext === 'ticket' || paymentContext === 'merchant') && (
@@ -196,9 +198,9 @@ export default function PaymentScreen({ route, navigation }) {
                   <View style={[styles.iconBg, { backgroundColor: 'rgba(0, 201, 167, 0.15)' }]}>
                     <Icon name="wallet-outline" size={24} color="#00C9A7" />
                   </View>
-                  <Text style={styles.accordionTitle}>Metro Wallet</Text>
+                  <Text style={styles.accordionTitle}>{t('payment.metroWallet')}</Text>
                 </View>
-                <Icon name={expandedSection === 'wallet' ? 'chevron-up' : 'chevron-down'} size={24} color="rgba(255,255,255,0.5)" />
+                <Icon name={expandedSection === 'wallet' ? 'chevron-up' : 'chevron-down'} size={24} color={isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)'} />
               </TouchableOpacity>
 
               {expandedSection === 'wallet' && (
@@ -207,11 +209,11 @@ export default function PaymentScreen({ route, navigation }) {
                     style={[styles.paymentOption, selectedMethod === 'wallet' && styles.paymentOptionSelected]} 
                     onPress={() => selectOption('wallet')}
                   >
-                    <Icon name={selectedMethod === 'wallet' ? "radiobox-marked" : "radiobox-blank"} size={22} color={selectedMethod === 'wallet' ? "#00C9A7" : "rgba(255,255,255,0.3)"} />
+                    <Icon name={selectedMethod === 'wallet' ? "radiobox-marked" : "radiobox-blank"} size={22} color={selectedMethod === 'wallet' ? "#00C9A7" : (isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)")} />
                     <View style={{ marginLeft: 12 }}>
-                      <Text style={styles.optionText}>Pay with Metro Wallet</Text>
+                      <Text style={styles.optionText}>{t('payment.payWithWallet')}</Text>
                       <Text style={{ fontSize: 13, color: isWalletSufficient ? '#00C9A7' : '#EF4444', fontWeight: '600', marginTop: 2 }}>
-                        Available Balance: ₹{balance || '0.00'}
+                        {t('payment.availableBalance')} ₹{balance || '0.00'}
                       </Text>
                     </View>
                   </TouchableOpacity>
@@ -227,9 +229,9 @@ export default function PaymentScreen({ route, navigation }) {
                 <View style={[styles.iconBg, { backgroundColor: 'rgba(156, 39, 176, 0.15)' }]}>
                   <Icon name="cellphone-nfc" size={24} color="#9B59B6" />
                 </View>
-                <Text style={styles.accordionTitle}>UPI Apps</Text>
+                <Text style={styles.accordionTitle}>{t('payment.upiApps')}</Text>
               </View>
-              <Icon name={expandedSection === 'upi' ? 'chevron-up' : 'chevron-down'} size={24} color="rgba(255,255,255,0.5)" />
+              <Icon name={expandedSection === 'upi' ? 'chevron-up' : 'chevron-down'} size={24} color={isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)'} />
             </TouchableOpacity>
             
             {expandedSection === 'upi' && (
@@ -240,8 +242,8 @@ export default function PaymentScreen({ route, navigation }) {
                        style={[styles.paymentOption, selectedMethod === `upi_${app}` && styles.paymentOptionSelected]}
                        onPress={() => selectOption(`upi_${app}`)}
                      >
-                       <Icon name={selectedMethod === `upi_${app}` ? "radiobox-marked" : "radiobox-blank"} size={22} color={selectedMethod === `upi_${app}` ? "#00C9A7" : "rgba(255,255,255,0.3)"} />
-                       <Text style={styles.optionText}>{app === 'manual' ? 'Enter UPI ID' : app.charAt(0).toUpperCase() + app.slice(1)}</Text>
+                       <Icon name={selectedMethod === `upi_${app}` ? "radiobox-marked" : "radiobox-blank"} size={22} color={selectedMethod === `upi_${app}` ? "#00C9A7" : (isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)")} />
+                       <Text style={styles.optionText}>{app === 'manual' ? t('payment.enterUpi') : app.charAt(0).toUpperCase() + app.slice(1)}</Text>
                      </TouchableOpacity>
                      {app === 'manual' && selectedMethod === 'upi_manual' && (
                        <View style={styles.cardForm}>
@@ -268,16 +270,16 @@ export default function PaymentScreen({ route, navigation }) {
                 <View style={[styles.iconBg, { backgroundColor: 'rgba(52, 152, 219, 0.15)' }]}>
                   <Icon name="credit-card-outline" size={24} color="#3498DB" />
                 </View>
-                <Text style={styles.accordionTitle}>Credit / Debit Cards</Text>
+                <Text style={styles.accordionTitle}>{t('payment.cards')}</Text>
               </View>
-              <Icon name={expandedSection === 'card' ? 'chevron-up' : 'chevron-down'} size={24} color="rgba(255,255,255,0.5)" />
+              <Icon name={expandedSection === 'card' ? 'chevron-up' : 'chevron-down'} size={24} color={isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)'} />
             </TouchableOpacity>
             
             {expandedSection === 'card' && (
               <View style={styles.accordionBody}>
                  <TouchableOpacity style={[styles.paymentOption, selectedMethod === 'card' && styles.paymentOptionSelected]} onPress={() => selectOption('card')}>
-                   <Icon name={selectedMethod === 'card' ? "radiobox-marked" : "radiobox-blank"} size={22} color={selectedMethod === 'card' ? "#00C9A7" : "rgba(255,255,255,0.3)"} />
-                   <Text style={styles.optionText}>Pay with New Card</Text>
+                   <Icon name={selectedMethod === 'card' ? "radiobox-marked" : "radiobox-blank"} size={22} color={selectedMethod === 'card' ? "#00C9A7" : (isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)")} />
+                   <Text style={styles.optionText}>{t('payment.payNewCard')}</Text>
                  </TouchableOpacity>
                  
                  {selectedMethod === 'card' && (
@@ -300,16 +302,16 @@ export default function PaymentScreen({ route, navigation }) {
                 <View style={[styles.iconBg, { backgroundColor: 'rgba(243, 156, 18, 0.15)' }]}>
                   <Icon name="bank" size={24} color="#F39C12" />
                 </View>
-                <Text style={styles.accordionTitle}>Net Banking</Text>
+                <Text style={styles.accordionTitle}>{t('payment.netBanking')}</Text>
               </View>
-              <Icon name={expandedSection === 'netbanking' ? 'chevron-up' : 'chevron-down'} size={24} color="rgba(255,255,255,0.5)" />
+              <Icon name={expandedSection === 'netbanking' ? 'chevron-up' : 'chevron-down'} size={24} color={isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)'} />
             </TouchableOpacity>
             
             {expandedSection === 'netbanking' && (
               <View style={styles.accordionBody}>
                  {['sbi', 'hdfc', 'icici'].map(bank => (
                    <TouchableOpacity key={bank} style={[styles.paymentOption, selectedMethod === `nb_${bank}` && styles.paymentOptionSelected]} onPress={() => selectOption(`nb_${bank}`)}>
-                     <Icon name={selectedMethod === `nb_${bank}` ? "radiobox-marked" : "radiobox-blank"} size={22} color={selectedMethod === `nb_${bank}` ? "#00C9A7" : "rgba(255,255,255,0.3)"} />
+                     <Icon name={selectedMethod === `nb_${bank}` ? "radiobox-marked" : "radiobox-blank"} size={22} color={selectedMethod === `nb_${bank}` ? "#00C9A7" : (isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)")} />
                      <Text style={styles.optionText}>{bank.toUpperCase()} Bank</Text>
                    </TouchableOpacity>
                  ))}
@@ -322,9 +324,9 @@ export default function PaymentScreen({ route, navigation }) {
           <TouchableOpacity onPress={processPayment} disabled={!selectedMethod} style={{ width: '100%', borderRadius: 16, overflow: 'hidden' }}>
             <LinearGradient colors={!selectedMethod ? ['rgba(255,255,255,0.1)', 'rgba(255,255,255,0.1)'] : [COLORS.secondary, COLORS.secondary]} style={styles.payButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
               <Text style={[styles.payButtonText, !selectedMethod && { color: COLORS.textLight }]}>
-                {selectedMethod ? `PAY ₹${finalAmount}` : 'SELECT METHOD'}
+                {selectedMethod ? `${t('payment.payBtn')} ₹${finalAmount}` : t('payment.selectMethod')}
               </Text>
-              <Icon name="lock" size={18} color={!selectedMethod ? 'rgba(255,255,255,0.4)' : '#fff'} style={{ marginLeft: 8 }} />
+              <Icon name="lock" size={18} color={!selectedMethod ? (isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.3)') : '#fff'} style={{ marginLeft: 8 }} />
             </LinearGradient>
           </TouchableOpacity>
         </View>

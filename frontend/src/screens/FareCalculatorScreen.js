@@ -7,12 +7,14 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
-import { ALL_STATIONS } from '../constants/metroLines';
+import { useTranslation } from 'react-i18next';
+import { ALL_STATIONS, METRO_LINES } from '../constants/metroLines';
 import StationPicker from '../components/StationPicker';
 
 export default function FareCalculatorScreen() {
   const navigation = useNavigation();
   const { theme: COLORS, isDark } = useTheme();
+  const { t } = useTranslation();
   const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
   const [source, setSource] = useState(ALL_STATIONS[0]);
   const [destination, setDestination] = useState(ALL_STATIONS[10]);
@@ -27,7 +29,7 @@ export default function FareCalculatorScreen() {
 
   const calculateFare = () => {
     if (source === destination) {
-      Alert.alert('Error', 'Source and destination cannot be the same.');
+      Alert.alert(t('common.error'), t('route.errorSame'));
       return;
     }
     const idx1 = ALL_STATIONS.indexOf(source);
@@ -51,17 +53,18 @@ export default function FareCalculatorScreen() {
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <Icon name="arrow-left" size={24} color={COLORS.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Fare Calculator</Text>
+          <Text style={styles.headerTitle}>{t('fare.title')}</Text>
           <View style={{ width: 40 }} />
         </View>
 
         <View style={styles.card}>
           <StationPicker
-            label="From Station"
+            label={t('route.fromLabel')}
             value={source}
             onSelect={(val) => { setSource(val); setFareInfo(null); }}
             stations={ALL_STATIONS}
-            placeholder="Select Source Station"
+            sections={Object.values(METRO_LINES).map(line => ({ title: line.name, data: line.stations, color: line.color }))}
+            placeholder={t('route.selectSource')}
           />
 
           <TouchableOpacity style={styles.swapButton} onPress={handleSwap}>
@@ -71,16 +74,21 @@ export default function FareCalculatorScreen() {
           </TouchableOpacity>
 
           <StationPicker
-            label="To Station"
+            label={t('route.toLabel')}
             value={destination}
             onSelect={(val) => { setDestination(val); setFareInfo(null); }}
-            stations={ALL_STATIONS}
-            placeholder="Select Destination Station"
+            stations={ALL_STATIONS.filter(s => s !== source)}
+            sections={Object.values(METRO_LINES).map(line => ({ 
+              title: line.name, 
+              data: line.stations.filter(s => s !== source), 
+              color: line.color 
+            }))}
+            placeholder={t('route.selectDest')}
           />
 
           <TouchableOpacity onPress={calculateFare} style={styles.calcBtnContainer}>
             <LinearGradient colors={[COLORS.secondary, COLORS.secondary]} style={styles.calcButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-              <Text style={styles.calcButtonText}>Calculate Fare</Text>
+              <Text style={styles.calcButtonText}>{t('fare.calcFare')}</Text>
               <Icon name="calculator-variant-outline" size={20} color="#fff" style={{ marginLeft: 10 }} />
             </LinearGradient>
           </TouchableOpacity>
@@ -88,14 +96,14 @@ export default function FareCalculatorScreen() {
 
         {fareInfo && (
           <View style={styles.resultCard}>
-            <Text style={styles.resultTitle}>Estimated Journey Details</Text>
+            <Text style={styles.resultTitle}>{t('fare.estimatedJourney')}</Text>
             <View style={styles.resultGrid}>
               <View style={styles.resultItem}>
                 <View style={[styles.resultIconWrap, { backgroundColor: 'rgba(0,201,167,0.15)' }]}>
                   <Icon name="currency-inr" size={32} color="#00C9A7" />
                 </View>
                 <Text style={styles.resultValue}>₹{fareInfo.fare}</Text>
-                <Text style={styles.resultLabel}>Ticket Fare</Text>
+                <Text style={styles.resultLabel}>{t('fare.ticketFare')}</Text>
               </View>
 
               <View style={[styles.resultItem, styles.resultItemBorder]}>
@@ -103,7 +111,7 @@ export default function FareCalculatorScreen() {
                   <Icon name="clock-outline" size={32} color="#9B59B6" />
                 </View>
                 <Text style={styles.resultValue}>{fareInfo.time}</Text>
-                <Text style={styles.resultLabel}>Mins Est.</Text>
+                <Text style={styles.resultLabel}>{t('fare.minsEst')}</Text>
               </View>
 
               <View style={styles.resultItem}>
@@ -111,7 +119,7 @@ export default function FareCalculatorScreen() {
                   <Icon name="map-marker-distance" size={32} color="#3498DB" />
                 </View>
                 <Text style={styles.resultValue}>{fareInfo.distance}</Text>
-                <Text style={styles.resultLabel}>Stops</Text>
+                <Text style={styles.resultLabel}>{t('fare.stops')}</Text>
               </View>
             </View>
           </View>

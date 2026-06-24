@@ -7,20 +7,22 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
+import { useTranslation } from 'react-i18next';
 
 export default function FeederServicesScreen() {
   const navigation = useNavigation();
   const { theme: COLORS, isDark } = useTheme();
   const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
+  const { t } = useTranslation();
 
   const services = [
     {
       icon: 'bus',
       iconBg: 'rgba(219,39,119,0.15)',
       iconColor: '#db2777',
-      title: 'PMPML Metro Shuttle',
-      description: 'Frequent bus services available from major metro stations including Civil Court, Shivaji Nagar, and Swargate. Connect directly to IT parks and hubs.',
-      buttonLabel: 'View Bus Routes',
+      title: t('feeder.services.pmpml.title'),
+      description: t('feeder.services.pmpml.desc'),
+      buttonLabel: t('feeder.services.pmpml.button'),
       gradient: ['#db2777', '#be185d'],
       playStoreUrl: 'https://play.google.com/store/apps/details?id=in.chartr.pmpml'
     },
@@ -28,9 +30,9 @@ export default function FeederServicesScreen() {
       icon: 'bicycle',
       iconBg: 'rgba(34,197,94,0.15)',
       iconColor: '#22c55e',
-      title: 'E-Bike Rentals',
-      description: 'Rent an E-bike from outside any metro station. Scan and unlock using partner apps to easily reach home or office.',
-      buttonLabel: 'Find E-Bikes',
+      title: t('feeder.services.ebike.title'),
+      description: t('feeder.services.ebike.desc'),
+      buttonLabel: t('feeder.services.ebike.button'),
       gradient: ['#22c55e', '#16a34a'],
       playStoreUrl: 'https://play.google.com/store/apps/details?id=app.yulu.bike'
     },
@@ -38,9 +40,9 @@ export default function FeederServicesScreen() {
       icon: 'map-marker',
       iconBg: 'rgba(234,88,12,0.15)',
       iconColor: '#ea580c',
-      title: 'Partner Cabs/Autos',
-      description: 'Prepaid and app-based autos and cabs are stationed directly at designated pick-up zones outside busy stations.',
-      buttonLabel: 'Book a Ride',
+      title: t('feeder.services.cabs.title'),
+      description: t('feeder.services.cabs.desc'),
+      buttonLabel: t('feeder.services.cabs.button'),
       gradient: ['#ea580c', '#c2410c'],
       playStoreUrl: 'https://play.google.com/store/apps/details?id=com.ubercab'
     },
@@ -48,9 +50,9 @@ export default function FeederServicesScreen() {
       icon: 'car-electric',
       iconBg: 'rgba(59,130,246,0.15)',
       iconColor: '#3b82f6',
-      title: 'EV Auto',
-      description: 'Shared & private EV Autos connecting you beyond metro limits. Popular routes: Ramwadi ↔ Phoenix Mall/Viman Nagar/Hadapsar, PCMC ↔ Nigdi.',
-      buttonLabel: 'Book EV Auto',
+      title: t('feeder.services.evauto.title'),
+      description: t('feeder.services.evauto.desc'),
+      buttonLabel: t('feeder.services.evauto.button'),
       gradient: ['#3b82f6', '#2563eb'],
       playStoreUrl: 'https://play.google.com/store/search?q=Pune+EV+Auto&c=apps'
     },
@@ -64,7 +66,7 @@ export default function FeederServicesScreen() {
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <Icon name="arrow-left" size={24} color={COLORS.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Feeder Services</Text>
+          <Text style={styles.headerTitle}>{t('feeder.title')}</Text>
           <View style={{ width: 44 }} />
         </View>
 
@@ -74,13 +76,13 @@ export default function FeederServicesScreen() {
             <View style={styles.bannerIcon}>
               <Icon name="transit-connection-variant" size={40} color="#00C9A7" />
             </View>
-            <Text style={styles.bannerTitle}>Last Mile Connectivity</Text>
+            <Text style={styles.bannerTitle}>{t('feeder.bannerTitle')}</Text>
             <Text style={styles.bannerSubtitle}>
-              Pune Metro provides seamless feeder services to help you reach your final destination easily.
+              {t('feeder.bannerSubtitle')}
             </Text>
           </LinearGradient>
 
-          <Text style={styles.sectionTitle}>Available Services</Text>
+          <Text style={styles.sectionTitle}>{t('feeder.availableServices')}</Text>
 
           {services.map((s, i) => (
             <View key={i} style={styles.serviceCard}>

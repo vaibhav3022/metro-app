@@ -7,6 +7,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
+import { useTranslation } from 'react-i18next';
 import { ticketAPI } from '../api/ticketAPI';
 
 // Use react-native-camera or expo-barcode-scanner in a real app.
@@ -17,6 +18,7 @@ export default function QRScannerScreen() {
   const [processing, setProcessing] = useState(false);
   const navigation = useNavigation();
   const { theme: COLORS, isDark } = useTheme();
+  const { t } = useTranslation();
   const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
 
   const handleManualScan = async (code) => {
@@ -26,7 +28,7 @@ export default function QRScannerScreen() {
 
     try {
       const response = await ticketAPI.verifyTicketQR(code);
-      Alert.alert('Scan Successful', response.message || 'Ticket Verified!', [
+      Alert.alert(t('qrscanner.scanSuccess'), response.message || t('qrscanner.ticketVerified'), [
         { text: 'OK', onPress: () => navigation.navigate('Home') }
       ]);
     } catch (err) {
@@ -50,7 +52,7 @@ export default function QRScannerScreen() {
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeBtn}>
             <Icon name="close" size={24} color={COLORS.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Scan Ticket QR</Text>
+          <Text style={styles.headerTitle}>{t('qrscanner.title')}</Text>
           <View style={{ width: 44 }} />
         </View>
 
@@ -60,11 +62,11 @@ export default function QRScannerScreen() {
               <View style={styles.iconCircleRed}>
                 <Icon name="alert-circle-outline" size={40} color="#EF4444" />
               </View>
-              <Text style={styles.statusTitle}>Scan Failed</Text>
+              <Text style={styles.statusTitle}>{t('qrscanner.scanFailed')}</Text>
               <Text style={styles.statusSubtitle}>{error}</Text>
               <TouchableOpacity style={styles.actionButton} onPress={resetScanner}>
                 <LinearGradient colors={['rgba(255,255,255,0.1)', 'rgba(255,255,255,0.05)']} style={styles.actionBtnGrad}>
-                  <Text style={styles.actionButtonText}>Try Again</Text>
+                  <Text style={styles.actionButtonText}>{t('qrscanner.tryAgain')}</Text>
                 </LinearGradient>
               </TouchableOpacity>
             </View>
@@ -73,8 +75,8 @@ export default function QRScannerScreen() {
               <View style={styles.iconCircleBlue}>
                 <ActivityIndicator size="large" color="#00C9A7" />
               </View>
-              <Text style={styles.statusTitle}>Verifying Ticket...</Text>
-              <Text style={styles.statusSubtitle} numberOfLines={2}>Code: {scannedResult}</Text>
+              <Text style={styles.statusTitle}>{t('qrscanner.verifying')}</Text>
+              <Text style={styles.statusSubtitle} numberOfLines={2}>{t('qrscanner.code')} {scannedResult}</Text>
             </View>
           ) : (
             <View style={styles.centered}>
@@ -85,13 +87,13 @@ export default function QRScannerScreen() {
                 <View style={styles.scannerCorner3} />
                 <View style={styles.scannerCorner4} />
               </View>
-              <Text style={styles.scanHint}>Align your digital or physical ticket QR code within the frame.</Text>
+              <Text style={styles.scanHint}>{t('qrscanner.scanHint')}</Text>
               
               <View style={{ marginTop: 40, width: '100%' }}>
                 <TouchableOpacity style={styles.demoButton} onPress={() => handleManualScan('DEMO-TICKET-' + Date.now())}>
                   <LinearGradient colors={[COLORS.primary, COLORS.primary]} style={styles.actionBtnGrad}>
                     <Icon name="ticket-confirmation" size={20} color="#fff" />
-                    <Text style={styles.demoButtonText}>Simulate Successful Scan</Text>
+                    <Text style={styles.demoButtonText}>{t('qrscanner.simulateSuccess')}</Text>
                   </LinearGradient>
                 </TouchableOpacity>
               </View>

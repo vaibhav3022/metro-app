@@ -8,10 +8,12 @@ import LinearGradient from 'react-native-linear-gradient';
 import shopAPI from '../api/shopAPI';
 import { ticketAPI } from '../api/ticketAPI';
 import RazorpayCheckout from 'react-native-razorpay';
+import { useTranslation } from 'react-i18next';
 
 export default function ScanAndPayScreen({ route, navigation }) {
   const { theme: COLORS, isDark } = useTheme();
   const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
+  const { t } = useTranslation();
   const [scanned, setScanned] = useState(!!route.params?.shopId);
   const [merchantData, setMerchantData] = useState(route.params?.shopId ? { shopId: route.params.shopId, businessName: route.params.shopName } : null);
   const [amount, setAmount] = useState('');
@@ -32,9 +34,9 @@ export default function ScanAndPayScreen({ route, navigation }) {
         } catch {
           // Not valid JSON
           Alert.alert(
-            'Invalid QR',
-            `This is not a valid merchant QR code.\n\nScanned: ${e.data?.substring(0, 80)}`,
-            [{ text: 'Try Again', onPress: () => setScanned(false) }]
+            t('scan.alert.invalidTitle'),
+            `${t('scan.alert.invalidDesc')}\n\nScanned: ${e.data?.substring(0, 80)}`,
+            [{ text: t('scan.alert.tryAgain'), onPress: () => setScanned(false) }]
           );
           return;
         }
@@ -61,14 +63,14 @@ export default function ScanAndPayScreen({ route, navigation }) {
           });
         } else {
           Alert.alert(
-            'Invalid QR',
-            `This is not a valid merchant QR code.\n\nReceived: ${JSON.stringify(data).substring(0, 100)}`,
-            [{ text: 'Try Again', onPress: () => setScanned(false) }]
+            t('scan.alert.invalidTitle'),
+            `${t('scan.alert.invalidDesc')}\n\nReceived: ${JSON.stringify(data).substring(0, 100)}`,
+            [{ text: t('scan.alert.tryAgain'), onPress: () => setScanned(false) }]
           );
         }
       } catch (err) {
-        Alert.alert('Scan Failed', 'Could not read the QR code. Please try again.', [
-          { text: 'Try Again', onPress: () => setScanned(false) }
+        Alert.alert(t('scan.alert.scanFailedTitle'), t('scan.alert.scanFailedDesc'), [
+          { text: t('scan.alert.tryAgain'), onPress: () => setScanned(false) }
         ]);
       }
     }
@@ -77,7 +79,7 @@ export default function ScanAndPayScreen({ route, navigation }) {
   const handlePayment = async () => {
     const amt = parseFloat(amount);
     if (!amt || amt <= 0) {
-      Alert.alert('Error', 'Please enter a valid amount.');
+      Alert.alert(t('scan.alert.errorTitle'), t('scan.alert.invalidAmount'));
       return;
     }
 
@@ -137,13 +139,13 @@ export default function ScanAndPayScreen({ route, navigation }) {
       const errDesc = error?.error?.description || error?.description || '';
       const errCode = error?.error?.code || error?.code || '';
       if (errCode === 'PAYMENT_CANCELLED' || errDesc.toLowerCase().includes('cancel')) {
-        Alert.alert('Payment Cancelled', 'You cancelled the payment.', [
-          { text: 'Try Again' }
+        Alert.alert(t('scan.alert.paymentCancelledTitle'), t('scan.alert.paymentCancelledDesc'), [
+          { text: t('scan.alert.tryAgain') }
         ]);
       } else {
         Alert.alert(
-          'Payment Failed',
-          error?.response?.data?.message || errDesc || 'Something went wrong. Please try again.',
+          t('scan.alert.paymentFailedTitle'),
+          error?.response?.data?.message || errDesc || t('scan.alert.somethingWentWrong'),
           [{ text: 'OK' }]
         );
       }
@@ -152,7 +154,7 @@ export default function ScanAndPayScreen({ route, navigation }) {
 
   const handleWalletPayment = async () => {
     if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
-      Alert.alert('Invalid Amount', 'Please enter a valid amount.');
+      Alert.alert(t('scan.alert.errorTitle'), t('scan.alert.invalidAmount'));
       return;
     }
 
@@ -176,8 +178,8 @@ export default function ScanAndPayScreen({ route, navigation }) {
     } catch (error) {
       setProcessingMethod(null);
       Alert.alert(
-        'Payment Failed',
-        error?.response?.data?.message || 'Could not process wallet payment. Please check your balance.',
+        t('scan.alert.paymentFailedTitle'),
+        error?.response?.data?.message || t('scan.alert.walletFailed'),
         [{ text: 'OK' }]
       );
     }
@@ -193,7 +195,7 @@ export default function ScanAndPayScreen({ route, navigation }) {
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Icon name="arrow-left" size={24} color={COLORS.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Scan & Pay</Text>
+          <Text style={styles.headerTitle}>{t('scan.title')}</Text>
           <View style={{ width: 40 }} />
         </View>
 
@@ -206,7 +208,7 @@ export default function ScanAndPayScreen({ route, navigation }) {
             >
               <View style={styles.overlay}>
                 <View style={styles.scanFrame} />
-                <Text style={styles.scanText}>Align QR code within the frame</Text>
+                <Text style={styles.scanText}>{t('scan.alignQR')}</Text>
               </View>
             </RNCamera>
           </View>
@@ -216,8 +218,8 @@ export default function ScanAndPayScreen({ route, navigation }) {
               <View style={styles.merchantIconWrap}>
                 <Icon name="storefront" size={50} color="#9B59B6" />
               </View>
-              <Text style={styles.merchantName}>{merchantData?.businessName || merchantData?.merchantName || 'Unknown Merchant'}</Text>
-              <Text style={styles.merchantId}>ID: {merchantData?.merchantId || merchantData?.shopId}</Text>
+              <Text style={styles.merchantName}>{merchantData?.businessName || merchantData?.merchantName || t('scan.unknownMerchant')}</Text>
+              <Text style={styles.merchantId}>{t('scan.merchantId')} {merchantData?.merchantId || merchantData?.shopId}</Text>
             </View>
 
             <View style={styles.amountInputContainer}>
@@ -239,7 +241,7 @@ export default function ScanAndPayScreen({ route, navigation }) {
               disabled={!!processingMethod}
             >
               <LinearGradient colors={processingMethod === 'razorpay' ? ['#555', '#444'] : [COLORS.secondary, COLORS.secondary]} style={styles.primaryButtonGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-                {processingMethod === 'razorpay' ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Pay with Razorpay</Text>}
+                {processingMethod === 'razorpay' ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>{t('scan.payWithRazorpay')}</Text>}
               </LinearGradient>
             </TouchableOpacity>
 
@@ -249,7 +251,7 @@ export default function ScanAndPayScreen({ route, navigation }) {
               disabled={!!processingMethod}
             >
               <LinearGradient colors={processingMethod === 'wallet' ? ['#555', '#444'] : ['#8E44AD', '#9B59B6']} style={styles.primaryButtonGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-                {processingMethod === 'wallet' ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Pay with Wallet</Text>}
+                {processingMethod === 'wallet' ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>{t('scan.payWithWallet')}</Text>}
               </LinearGradient>
             </TouchableOpacity>
 
@@ -262,7 +264,7 @@ export default function ScanAndPayScreen({ route, navigation }) {
               }}
               disabled={!!processingMethod}
             >
-              <Text style={styles.cancelButtonText}>Cancel</Text>
+              <Text style={styles.cancelButtonText}>{t('scan.cancel')}</Text>
             </TouchableOpacity>
           </KeyboardAvoidingView>
         )}
@@ -274,17 +276,17 @@ export default function ScanAndPayScreen({ route, navigation }) {
               <View style={styles.modalIconWrap}>
                 <Icon name="check-decagram" size={70} color="#00C9A7" />
               </View>
-              <Text style={styles.modalTitle}>Payment Successful!</Text>
+              <Text style={styles.modalTitle}>{t('scan.successTitle')}</Text>
               <Text style={styles.modalAmount}>₹{successData?.amount?.toFixed(2)}</Text>
-              <Text style={styles.modalMessage}>Paid to {successData?.merchant}</Text>
+              <Text style={styles.modalMessage}>{t('scan.paidTo', { merchant: successData?.merchant })}</Text>
               
               <View style={styles.modalDivider} />
               <View style={styles.modalRow}>
-                 <Text style={styles.modalLabel}>Method:</Text>
+                 <Text style={styles.modalLabel}>{t('scan.method')}</Text>
                  <Text style={styles.modalValue}>{successData?.method}</Text>
               </View>
               <View style={styles.modalRow}>
-                 <Text style={styles.modalLabel}>Date:</Text>
+                 <Text style={styles.modalLabel}>{t('scan.date')}</Text>
                  <Text style={styles.modalValue}>{new Date().toLocaleString()}</Text>
               </View>
 
@@ -293,7 +295,7 @@ export default function ScanAndPayScreen({ route, navigation }) {
                 navigation.navigate('Home');
               }}>
                 <LinearGradient colors={['#00C9A7', '#00A88F']} style={styles.modalBtnGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-                   <Text style={styles.modalBtnText}>Back to Dashboard</Text>
+                   <Text style={styles.modalBtnText}>{t('scan.backToDashboard')}</Text>
                 </LinearGradient>
               </TouchableOpacity>
             </View>

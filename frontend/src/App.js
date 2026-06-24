@@ -1,4 +1,5 @@
 import React from 'react';
+import './i18n';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Provider, useSelector } from 'react-redux';
@@ -30,6 +31,7 @@ import QRScannerScreen from './screens/QRScannerScreen';
 import PaymentGatewayScreen from './screens/PaymentGatewayScreen';
 import PaymentScreen from './screens/PaymentScreen';
 import StationInfoScreen from './screens/StationInfoScreen';
+import TouristPlacesScreen from './screens/TouristPlacesScreen';
 
 // User sub-screens
 import TokenEconomyScreen from './screens/User/TokenEconomyScreen';
@@ -103,6 +105,7 @@ function AppNavigator() {
             <Stack.Screen name="PaymentGateway" component={PaymentGatewayScreen} />
             <Stack.Screen name="Payment" component={PaymentScreen} />
             <Stack.Screen name="StationInfo" component={StationInfoScreen} />
+            <Stack.Screen name="TouristPlaces" component={TouristPlacesScreen} />
 
             {/* User Sub-screens */}
             <Stack.Screen name="Tokens" component={TokenEconomyScreen} />
@@ -128,12 +131,17 @@ function AppNavigator() {
 }
 
 import { ThemeProvider, useTheme } from './context/ThemeContext';
+import { LanguageProvider } from './context/LanguageContext';
+import { GlobalAlertModal } from './components/GlobalAlertModal';
 
 export default function App() {
   return (
     <Provider store={store}>
       <ThemeProvider>
-        <AppNavigator />
+        <LanguageProvider>
+          <AppNavigator />
+          <GlobalAlertModal />
+        </LanguageProvider>
       </ThemeProvider>
     </Provider>
   );

@@ -7,14 +7,17 @@ import HomeScreen from '../screens/HomeScreen';
 import TicketHistoryScreen from '../screens/TicketHistoryScreen';
 import WalletScreen from '../screens/WalletScreen';
 import ShopsScreen from '../screens/ShopsScreen';
+import ShopsScreen from '../screens/ShopsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 const Tab = createBottomTabNavigator();
 
 export function BottomTabNavigator() {
   const { theme: COLORS } = useTheme();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
 
   return (
     <Tab.Navigator
@@ -53,11 +56,11 @@ export function BottomTabNavigator() {
         headerShown: false,
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Tickets" component={TicketHistoryScreen} />
-      <Tab.Screen name="Shops" component={ShopsScreen} />
-      <Tab.Screen name="Wallet" component={WalletScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="Home" component={HomeScreen} options={{ title: t('tabs.home') }} />
+      <Tab.Screen name="Tickets" component={TicketHistoryScreen} options={{ title: t('tabs.tickets') }} />
+      <Tab.Screen name="Shops" component={ShopsScreen} options={{ title: t('tabs.shops') }} />
+      <Tab.Screen name="Wallet" component={WalletScreen} options={{ title: t('tabs.wallet') }} />
+      <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: t('tabs.profile') }} />
     </Tab.Navigator>
   );
 }

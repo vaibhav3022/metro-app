@@ -8,6 +8,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
+import { useTranslation } from 'react-i18next';
 import { ticketAPI } from '../api/ticketAPI';
 import { fetchHistorySuccess, setCurrentTicket } from '../redux/slices/ticketSlice';
 
@@ -16,6 +17,7 @@ export default function TicketHistoryScreen() {
   const navigation = useNavigation();
   const history = useSelector((state) => state.tickets.history);
   const { theme: COLORS, isDark } = useTheme();
+  const { t } = useTranslation();
   const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
 
   const [filter, setFilter] = useState('all');
@@ -38,11 +40,11 @@ export default function TicketHistoryScreen() {
   }, [loadHistory]);
 
   const filters = [
-    { id: 'all', label: 'All' },
-    { id: 'active', label: 'Active' },
-    { id: 'used', label: 'Used' },
-    { id: 'expired', label: 'Expired' },
-    { id: 'failed', label: 'Failed' },
+    { id: 'all', label: t('tickets.all', { defaultValue: 'All' }) },
+    { id: 'active', label: t('tickets.active') },
+    { id: 'used', label: t('tickets.used') },
+    { id: 'expired', label: t('tickets.expired') },
+    { id: 'failed', label: t('tickets.failed', { defaultValue: 'Failed' }) },
   ];
 
   const filteredTickets = filter === 'all'
@@ -76,7 +78,7 @@ export default function TicketHistoryScreen() {
         </View>
         <View style={[styles.statusBadge, { backgroundColor: getStatusColor(ticket.ticketStatus) + '15', borderColor: getStatusColor(ticket.ticketStatus) + '30' }]}>
           <Text style={[styles.statusText, { color: getStatusColor(ticket.ticketStatus) }]}>
-            {ticket.ticketStatus || 'Unknown'}
+            {t(`tickets.${ticket.ticketStatus?.toLowerCase()}`, { defaultValue: ticket.ticketStatus || 'Unknown' })}
           </Text>
         </View>
       </View>
@@ -95,7 +97,7 @@ export default function TicketHistoryScreen() {
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <Icon name="arrow-left" size={24} color={COLORS.text} />
           </TouchableOpacity>
-          <Text style={styles.screenTitle}>My Tickets</Text>
+          <Text style={styles.screenTitle}>{t('tickets.title')}</Text>
           <View style={{ width: 40 }} />
         </View>
 
@@ -119,7 +121,7 @@ export default function TicketHistoryScreen() {
         {loading ? (
           <View style={styles.centered}>
             <ActivityIndicator size="large" color="#00C9A7" />
-            <Text style={styles.loadingText}>Fetching your trip logs...</Text>
+            <Text style={styles.loadingText}>{t('common.loading')}</Text>
           </View>
         ) : filteredTickets.length > 0 ? (
           <FlatList
@@ -132,15 +134,15 @@ export default function TicketHistoryScreen() {
         ) : (
           <View style={styles.emptyState}>
             <View style={styles.emptyIconWrap}>
-              <Icon name="ticket-confirmation-outline" size={44} color="rgba(255,255,255,0.2)" />
+              <Icon name="ticket-confirmation-outline" size={44} color={isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'} />
             </View>
-            <Text style={styles.emptyTitle}>No Trips Found</Text>
+            <Text style={styles.emptyTitle}>{t('tickets.noActive')}</Text>
             <Text style={styles.emptySubtitle}>
-              No tickets matched the "{filter.toUpperCase()}" filter. Book a new ticket now.
+              {t('tickets.noMatch', { defaultValue: `No tickets matched the "${filter.toUpperCase()}" filter. Book a new ticket now.` })}
             </Text>
             <TouchableOpacity onPress={() => navigation.navigate('RouteSelection')} style={styles.bookBtn}>
               <LinearGradient colors={[COLORS.secondary, COLORS.secondary]} style={styles.bookButtonGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-                <Text style={styles.bookButtonText}>Book Metro Ticket</Text>
+                <Text style={styles.bookButtonText}>{t('home.bookNow')}</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>

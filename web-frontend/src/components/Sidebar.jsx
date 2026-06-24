@@ -49,10 +49,9 @@ export default function Sidebar() {
 
   return (
     <aside className="sidebar">
-      {/* Title logo */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '40px', paddingLeft: '8px' }}>
-        <div style={{ padding: '8px', borderRadius: '8px', background: 'linear-gradient(135deg, var(--accent-teal), var(--accent-purple))', display: 'flex' }}>
-          <Train size={20} color="#fff" />
+        <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#FFFFFF', padding: '2px', display: 'flex', justifyContent: 'center', alignItems: 'center', boxShadow: 'var(--box-shadow)' }}>
+          <img src="/pune_metro_logo.png" alt="Pune Metro Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
         </div>
         <span style={{ fontSize: '18px', fontWeight: '800', letterSpacing: '1px' }}>PUNE METRO</span>
       </div>

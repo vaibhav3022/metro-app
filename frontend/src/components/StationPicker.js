@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import {
   View, Text, StyleSheet, TouchableOpacity, TextInput,
-  Modal, FlatList, SafeAreaView
+  Modal, FlatList, SectionList, SafeAreaView
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -11,6 +11,7 @@ export default function StationPicker({
   value,
   onSelect,
   stations = [],
+  sections = null,
   placeholder = 'Select Station',
 }) {
   const { theme: COLORS, isDark } = useTheme();
@@ -75,32 +76,69 @@ export default function StationPicker({
               ) : null}
             </View>
 
-            <FlatList
-              data={filteredStations}
-              keyExtractor={(item) => item}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={[styles.stationItem, value === item && styles.stationItemActive]}
-                  onPress={() => handleSelect(item)}
-                >
-                  <Icon
-                    name={value === item ? 'radiobox-marked' : 'radiobox-blank'}
-                    size={18}
-                    color={value === item ? '#00C9A7' : COLORS.textLight}
-                    style={{ marginRight: 12 }}
-                  />
-                  <Text style={[styles.stationName, value === item && styles.stationNameActive]}>
-                    {item}
-                  </Text>
-                </TouchableOpacity>
-              )}
-              ListEmptyComponent={
-                <View style={styles.emptyItem}>
-                  <Text style={styles.emptyText}>No stations found.</Text>
-                </View>
-              }
-              showsVerticalScrollIndicator={false}
-            />
+            {sections && sections.length > 0 ? (
+              <SectionList
+                sections={sections.map(sec => ({
+                  ...sec,
+                  data: sec.data.filter(s => s.toLowerCase().includes(search.toLowerCase()))
+                })).filter(sec => sec.data.length > 0)}
+                keyExtractor={(item, index) => item + index}
+                renderSectionHeader={({ section: { title, color } }) => (
+                  <View style={[styles.sectionHeader, { borderLeftColor: color || COLORS.primary }]}>
+                    <Text style={styles.sectionHeaderText}>{title}</Text>
+                  </View>
+                )}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={[styles.stationItem, value === item && styles.stationItemActive]}
+                    onPress={() => handleSelect(item)}
+                  >
+                    <Icon
+                      name={value === item ? 'radiobox-marked' : 'radiobox-blank'}
+                      size={18}
+                      color={value === item ? '#00C9A7' : COLORS.textLight}
+                      style={{ marginRight: 12 }}
+                    />
+                    <Text style={[styles.stationName, value === item && styles.stationNameActive]}>
+                      {item}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+                ListEmptyComponent={
+                  <View style={styles.emptyItem}>
+                    <Text style={styles.emptyText}>No stations found.</Text>
+                  </View>
+                }
+                showsVerticalScrollIndicator={false}
+              />
+            ) : (
+              <FlatList
+                data={filteredStations}
+                keyExtractor={(item) => item}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={[styles.stationItem, value === item && styles.stationItemActive]}
+                    onPress={() => handleSelect(item)}
+                  >
+                    <Icon
+                      name={value === item ? 'radiobox-marked' : 'radiobox-blank'}
+                      size={18}
+                      color={value === item ? '#00C9A7' : COLORS.textLight}
+                      style={{ marginRight: 12 }}
+                    />
+                    <Text style={[styles.stationName, value === item && styles.stationNameActive]}>
+                      {item}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+                ListEmptyComponent={
+                  <View style={styles.emptyItem}>
+                    <Text style={styles.emptyText}>No stations found.</Text>
+                  </View>
+                }
+                showsVerticalScrollIndicator={false}
+              />
+            )}
           </SafeAreaView>
         </View>
       </Modal>
@@ -127,4 +165,6 @@ const getStyles = (COLORS) => StyleSheet.create({
   stationNameActive: { color: '#00C9A7', fontWeight: '800' },
   emptyItem: { padding: 32, alignItems: 'center' },
   emptyText: { color: COLORS.textLight, fontSize: 14 },
+  sectionHeader: { backgroundColor: COLORS.background, paddingVertical: 8, paddingHorizontal: 20, borderBottomWidth: 1, borderBottomColor: COLORS.border, borderLeftWidth: 4 },
+  sectionHeaderText: { fontSize: 13, fontWeight: '800', color: COLORS.text, letterSpacing: 0.5, textTransform: 'uppercase' },
 });

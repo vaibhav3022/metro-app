@@ -76,11 +76,11 @@ export default function Login() {
       <div className="glass-panel" style={{ width: '100%', maxWidth: '480px', padding: '40px', textAlign: 'center' }}>
         
         {/* Logo */}
-        <div style={{ display: 'inline-flex', padding: '16px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-teal), var(--accent-purple))', marginBottom: '20px' }}>
-          <Train size={36} color="#fff" />
+        <div style={{ display: 'inline-flex', padding: '8px', borderRadius: '50%', backgroundColor: '#FFFFFF', marginBottom: '20px', width: '100px', height: '100px', justifyContent: 'center', alignItems: 'center', boxShadow: 'var(--box-shadow)' }}>
+          <img src="/pune_metro_logo.png" alt="Pune Metro Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
         </div>
         <h2 style={{ fontSize: '28px', fontWeight: '800', marginBottom: '4px', letterSpacing: '1px' }}>PUNE METRO</h2>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '30px' }}>आली आपली मेट्रो 🚇</p>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '30px' }}>आली आपली मेट्रो! 🚇</p>
 
         {/* Role Selector Tabs */}
         <div style={{ display: 'flex', background: 'rgba(0,0,0,0.05)', borderRadius: '12px', padding: '4px', marginBottom: '24px', border: '1px solid var(--glass-border)' }}>

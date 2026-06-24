@@ -2,6 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 // Screens
 import HomeScreen from '../screens/HomeScreen';
@@ -14,6 +15,7 @@ const Tab = createBottomTabNavigator();
 
 export default function MainTabNavigator() {
   const { theme: COLORS } = useTheme();
+  const { t } = useTranslation();
 
   return (
     <Tab.Navigator
@@ -55,30 +57,30 @@ export default function MainTabNavigator() {
         tabBarHideOnKeyboard: true,
       })}
     >
-      <Tab.Screen 
-        name="HomeTab" 
-        component={HomeScreen} 
-        options={{ title: 'Home' }} 
+      <Tab.Screen
+        name="HomeTab"
+        component={HomeScreen}
+        options={{ title: t('tabs.home') }}
       />
-      <Tab.Screen 
-        name="TicketsTab" 
-        component={TicketHistoryScreen} 
-        options={{ title: 'Tickets' }} 
+      <Tab.Screen
+        name="TicketsTab"
+        component={TicketHistoryScreen}
+        options={{ title: t('tabs.tickets') }}
       />
-      <Tab.Screen 
-        name="WalletTab" 
-        component={WalletScreen} 
-        options={{ title: 'Wallet' }} 
+      <Tab.Screen
+        name="WalletTab"
+        component={WalletScreen}
+        options={{ title: t('tabs.wallet') }}
       />
-      <Tab.Screen 
-        name="ShopsTab" 
-        component={ShopsScreen} 
-        options={{ title: 'Shops' }} 
+      <Tab.Screen
+        name="ShopsTab"
+        component={ShopsScreen}
+        options={{ title: 'Shops' }}
       />
-      <Tab.Screen 
-        name="ProfileTab" 
-        component={ProfileScreen} 
-        options={{ title: 'Profile' }} 
+      <Tab.Screen
+        name="ProfileTab"
+        component={ProfileScreen}
+        options={{ title: t('tabs.profile') }}
       />
     </Tab.Navigator>
   );

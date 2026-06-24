@@ -11,6 +11,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import { ticketAPI } from '../api/ticketAPI';
 import { setCurrentTicket } from '../redux/slices/ticketSlice';
 import RazorpayCheckout from 'react-native-razorpay';
+import { useTranslation } from 'react-i18next';
 
 export default function FareScreen() {
   const navigation = useNavigation();
@@ -23,17 +24,18 @@ export default function FareScreen() {
 
   const [loading, setLoading] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState('');
+  const { t } = useTranslation();
 
   if (!bookingDetails) {
     return (
       <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.gradient}>
         <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
         <View style={styles.centered}>
-          <Icon name="ticket-outline" size={60} color="rgba(255,255,255,0.2)" />
-          <Text style={styles.emptyText}>No booking details found.</Text>
+          <Icon name="ticket-outline" size={60} color={isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)'} />
+          <Text style={styles.emptyText}>{t('fare.noDetails')}</Text>
           <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: 20 }}>
             <LinearGradient colors={[COLORS.secondary, COLORS.secondary]} style={styles.goBackBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-              <Text style={styles.goBackBtnText}>Go Back</Text>
+              <Text style={styles.goBackBtnText}>{t('fare.goBack')}</Text>
             </LinearGradient>
           </TouchableOpacity>
         </View>
@@ -45,7 +47,7 @@ export default function FareScreen() {
 
   const handlePaymentSuccess = async (paymentId, method, razorpayData = {}) => {
     setLoading(true);
-    setLoadingMsg('Generating your digital QR ticket...');
+    setLoadingMsg(t('fare.generatingTicket'));
     try {
       const ticketResult = await ticketAPI.createTicket({ source, destination, distance, fare: farePerPerson, passengers, totalAmount });
       const { ticket } = ticketResult;
@@ -60,17 +62,17 @@ export default function FareScreen() {
       setLoading(false);
       // If error occurs, check if it's just a network timeout but ticket was saved.
       if (error.response) {
-        Alert.alert('Notice', 'Payment received. Checking ticket status...');
+        Alert.alert(t('fare.alert.noticeTitle'), t('fare.alert.paymentReceived'));
         navigation.navigate('TicketHistory'); // Or redirect to history to see it
       } else {
-        Alert.alert('Error', 'Failed to generate ticket after payment.');
+        Alert.alert(t('fare.alert.errorTitle'), t('fare.alert.failedTicket'));
       }
     }
   };
 
   const handleRazorpayPayment = async () => {
     setLoading(true);
-    setLoadingMsg('Initiating secure transaction...');
+    setLoadingMsg(t('fare.initiatingTransaction'));
     try {
       const orderRes = await ticketAPI.createRazorpayOrder(totalAmount);
       setLoading(false);
@@ -125,17 +127,17 @@ export default function FareScreen() {
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <Icon name="arrow-left" size={24} color={COLORS.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Fare Breakdown</Text>
+          <Text style={styles.headerTitle}>{t('fare.fareBreakdown')}</Text>
           <View style={{ width: 40 }} />
         </View>
 
         {/* Journey Summary */}
         <View style={styles.card}>
-          <Text style={styles.sectionLabel}>Journey Details</Text>
+          <Text style={styles.sectionLabel}>{t('fare.journeyDetails')}</Text>
           <View style={styles.journeyRow}>
             <View style={styles.stationInfo}>
               <View style={styles.dot} />
-              <Text style={styles.stationLabel}>Source</Text>
+              <Text style={styles.stationLabel}>{t('fare.source')}</Text>
               <Text style={styles.stationName}>{source}</Text>
             </View>
             <View style={styles.distanceWrap}>
@@ -145,7 +147,7 @@ export default function FareScreen() {
             </View>
             <View style={[styles.stationInfo, { alignItems: 'flex-end' }]}>
               <View style={[styles.dot, { backgroundColor: '#22c55e' }]} />
-              <Text style={styles.stationLabel}>Destination</Text>
+              <Text style={styles.stationLabel}>{t('fare.destination')}</Text>
               <Text style={styles.stationName}>{destination}</Text>
             </View>
           </View>
@@ -153,23 +155,23 @@ export default function FareScreen() {
 
         {/* Fare Breakdown */}
         <View style={styles.card}>
-          <Text style={styles.sectionLabel}>Fare Calculation</Text>
+          <Text style={styles.sectionLabel}>{t('fare.fareCalculation')}</Text>
           <View style={styles.fareRow}>
-            <Text style={styles.fareItemLabel}>Fare (Per Passenger)</Text>
+            <Text style={styles.fareItemLabel}>{t('fare.farePerPassenger')}</Text>
             <Text style={styles.fareItemValue}>₹{farePerPerson}</Text>
           </View>
           {discountApplied && (
             <View style={styles.fareRow}>
-              <Text style={styles.fareItemLabel}>Discount Applied</Text>
+              <Text style={styles.fareItemLabel}>{t('fare.discountApplied')}</Text>
               <Text style={[styles.fareItemValue, { color: '#22c55e' }]}>{discountApplied}</Text>
             </View>
           )}
           <View style={styles.fareRow}>
-            <Text style={styles.fareItemLabel}>Total Passengers</Text>
+            <Text style={styles.fareItemLabel}>{t('fare.totalPassengers')}</Text>
             <Text style={styles.fareItemValue}>{passengers}</Text>
           </View>
           <View style={[styles.fareRow, { borderBottomWidth: 0, marginTop: 12, paddingTop: 16, borderTopWidth: 1, borderTopColor: COLORS.border }]}>
-            <Text style={styles.totalLabel}>Total Payable</Text>
+            <Text style={styles.totalLabel}>{t('fare.totalPayable')}</Text>
             <Text style={styles.totalValue}>₹{totalAmount}</Text>
           </View>
         </View>
@@ -179,7 +181,7 @@ export default function FareScreen() {
           <TouchableOpacity onPress={handleRazorpayPayment} disabled={loading} style={styles.payBtnContainer}>
             <LinearGradient colors={[COLORS.primary, COLORS.primary]} style={styles.payBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
               <Icon name="credit-card-outline" size={22} color="#fff" />
-              <Text style={styles.payBtnText}>Pay Now</Text>
+              <Text style={styles.payBtnText}>{t('fare.payNow')}</Text>
             </LinearGradient>
           </TouchableOpacity>
         </View>

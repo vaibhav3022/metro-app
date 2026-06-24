@@ -1,14 +1,14 @@
 export const LIGHT_THEME = {
   mode: 'light',
-  primary: '#6A1B9A',      // Pune Metro Purple Line
-  secondary: '#00897B',    // Pune Metro Aqua Line
+  primary: '#0D47A1',      // Official Royal Blue
+  secondary: '#FF5722',    // Official Orange Accent
   background: '#F5F5F5',
   white: '#FFFFFF',
   text: '#212121',
-  textLight: '#757575',
+  textLight: '#666666',
   success: '#2E7D32',
   error: '#D32F2F',
-  warning: '#FFC107',
+  warning: '#FF9800',
   border: '#E0E0E0',
   cardBg: '#FFFFFF',
   purpleLine: '#6A1B9A',
@@ -23,24 +23,24 @@ export const LIGHT_THEME = {
 
 export const DARK_THEME = {
   mode: 'dark',
-  primary: '#6A1B9A',
-  secondary: '#00897B',
-  background: '#0F172A',   // Slate 900
-  white: '#1E293B',        // Slate 800
-  text: '#F8FAFC',         // Slate 50
-  textLight: '#CBD5E1',    // Slate 300
-  success: '#2E7D32',
-  error: '#EF4444',        // Red 500
-  warning: '#FFC107',
-  border: '#334155',       // Slate 700
-  cardBg: '#1E293B',       // Slate 800
+  primary: '#1E88E5',      // Lighter blue for dark contrast
+  secondary: '#FF7043',    // Lighter orange
+  background: '#0B132B',   // Deep slate blue
+  white: '#1C2541',        // Slate card
+  text: '#F8FAFC',
+  textLight: '#94A3B8',
+  success: '#4CAF50',
+  error: '#EF4444',
+  warning: '#FFB74D',
+  border: '#3A506B',
+  cardBg: '#1C2541',
   purpleLine: '#6A1B9A',
   aquaLine: '#00897B',
   absoluteWhite: '#FFFFFF',
   absoluteBlack: '#000000',
-  inputBg: '#1E293B',
+  inputBg: '#1C2541',
   inputText: '#F8FAFC',
-  inputBorder: '#334155',
+  inputBorder: '#3A506B',
   iconMuted: 'rgba(255,255,255,0.4)',
 };
 

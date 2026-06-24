@@ -7,6 +7,7 @@ import { PinchGestureHandler, State, GestureHandlerRootView } from 'react-native
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
+import { useTranslation } from 'react-i18next';
 
 const { width, height } = Dimensions.get('window');
 
@@ -17,6 +18,7 @@ export default function MetroMapScreen() {
   const navigation = useNavigation();
   const { theme: COLORS, isDark } = useTheme();
   const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
+  const { t } = useTranslation();
 
   // Pinch-to-Zoom (Gesture)
   const baseScale = useRef(new Animated.Value(1)).current;
@@ -61,7 +63,7 @@ export default function MetroMapScreen() {
             <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
               <Icon name="arrow-left" size={24} color={COLORS.text} />
             </TouchableOpacity>
-            <Text style={styles.headerTitle}>Official Route Map</Text>
+            <Text style={styles.headerTitle}>{t('map.title')}</Text>
             <View style={{ width: 44 }} />
           </View>
 
