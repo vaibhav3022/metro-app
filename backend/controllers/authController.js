@@ -8,7 +8,8 @@ const { generateAccessToken, generateRefreshToken } = require('../utils/generate
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
-  auth: { user: process.env.GMAIL_USER || 'dhotrev384@gmail.com', pass: process.env.GMAIL_APP_PASSWORD || 'uqvjsavnkzrxreen' }
+  auth: { user: process.env.GMAIL_USER || 'dhotrev384@gmail.com', pass: process.env.GMAIL_APP_PASSWORD || 'uqvjsavnkzrxreen' },
+  family: 4 // Force IPv4 to prevent ENETUNREACH error on Render
 });
 
 const sendOTP = async (req, res) => {
