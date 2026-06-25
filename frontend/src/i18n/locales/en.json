@@ -68,8 +68,8 @@
     "bookNow": "Book Now",
     "pmpmlTitle": "PMPML Bus Tickets",
     "pmpmlSub": "Book city bus tickets seamlessly",
-    "evAutoTitle": "EV Auto",
-    "evAutoSub": "Book shared EV autos to your destination",
+    "evAutoTitle": "EV Charging",
+    "evAutoSub": "Charge your electric vehicles at metro stations",
     "notifShortcutTitle": "Notifications",
     "notifShortcutSub": "Check your latest alerts & offers"
   },
@@ -357,9 +357,9 @@
         "button": "Book a Ride"
       },
       "evauto": {
-        "title": "EV Auto",
-        "desc": "Shared & private EV Autos connecting you beyond metro limits. Popular routes: Ramwadi ↔ Phoenix Mall/Viman Nagar/Hadapsar, PCMC ↔ Nigdi.",
-        "button": "Book EV Auto"
+        "title": "EV Charging",
+        "desc": "Charge your electric vehicles at metro stations with our fast charging points.",
+        "button": "Find EV Charging"
       }
     }
   },

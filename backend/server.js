@@ -17,16 +17,32 @@ const tokenRoutes = require('./routes/tokenRoutes');
 const revenueRoutes = require('./routes/revenueRoutes');
 const stationRoutes = require('./routes/stationRoutes');
 const webhookRoutes = require('./routes/webhookRoutes');
+const metroRoutes = require('./routes/metroRoutes');
+const giftCardRoutes = require('./routes/giftCardRoutes');
+const healthRoutes = require('./routes/health');
+
+const { applySecurity } = require('./config/security');
+const { apiLimiter, authLimiter, paymentLimiter } = require('./middleware/rateLimiter');
+const { setupGracefulShutdown } = require('./utils/gracefulShutdown');
 
 // Connect to Database
 connectDB();
 
 const app = express();
 
+// Security Middlewares
+applySecurity(app);
+
 // Middlewares
 app.use(cors());
-app.use(express.json());
+// express.json is already applied in security.js (with limit), but we keep urlencoded
 app.use(express.urlencoded({ extended: true }));
+
+// Rate Limiting
+app.use('/api/', apiLimiter);
+app.use('/api/auth/otp', authLimiter);
+app.use('/api/wallet/topup', paymentLimiter);
+app.use('/api/tickets/book', paymentLimiter);
 
 // Welcome Route
 app.get('/', (req, res) => {
@@ -35,6 +51,9 @@ app.get('/', (req, res) => {
     status: 'Operational'
   });
 });
+
+// Health Route
+app.use('/health', healthRoutes);
 
 // Mounting Sub-routers
 app.use('/api/auth', authRoutes);
@@ -50,14 +69,18 @@ app.use('/api/tokens', tokenRoutes);
 app.use('/api/revenue', revenueRoutes);
 app.use('/api/stations', stationRoutes);
 app.use('/api/webhooks', webhookRoutes);
+app.use('/api/metro', metroRoutes);
+app.use('/api/giftcard', giftCardRoutes);
 // Fallback error catcher
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`\n===========================================`);
   console.log(`Pune Metro server running on port: ${PORT}`);
   console.log(`Database target URI configured.`);
   console.log(`===========================================\n`);
 });
+
+setupGracefulShutdown(server);

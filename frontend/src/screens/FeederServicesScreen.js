@@ -47,14 +47,14 @@ export default function FeederServicesScreen() {
       playStoreUrl: 'https://play.google.com/store/apps/details?id=com.ubercab'
     },
     {
-      icon: 'car-electric',
+      icon: 'ev-station',
       iconBg: 'rgba(59,130,246,0.15)',
       iconColor: '#3b82f6',
       title: t('feeder.services.evauto.title'),
       description: t('feeder.services.evauto.desc'),
       buttonLabel: t('feeder.services.evauto.button'),
       gradient: ['#3b82f6', '#2563eb'],
-      playStoreUrl: 'https://play.google.com/store/search?q=Pune+EV+Auto&c=apps'
+      playStoreUrl: 'https://play.google.com/store/search?q=EV+Charging+Pune&c=apps'
     },
   ];
 

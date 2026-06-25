@@ -8,10 +8,8 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
-import { BASE_URL } from '../api/axiosConfig';
+import api from '../api/axiosConfig';
 import { useTranslation } from 'react-i18next';
-
-const API_BASE = BASE_URL || 'http://10.0.2.2:5000';
 const CATEGORIES = ['Grievance', 'Lost & Found', 'Suggestion', 'Other'];
 
 export default function HelpSupportScreen() {
@@ -41,18 +39,38 @@ export default function HelpSupportScreen() {
 
   const fetchComplaints = async () => {
     try {
-      const token = await AsyncStorage.getItem('userToken');
-      const res = await fetch(`${API_BASE}/api/complaints`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (data.success) setMyComplaints(data.complaints);
+      const res = await api.get('/complaints');
+      if (res.data.success) setMyComplaints(res.data.complaints);
     } catch (e) {
-      setMyComplaints([
-        { _id: '1', category: 'Lost & Found', description: 'Left umbrella on aqua line', status: 'Pending', createdAt: new Date().toISOString() },
-        { _id: '2', category: 'Suggestion', description: 'Add more seats at Vanaz', status: 'Resolved', createdAt: new Date(Date.now() - 86400000).toISOString() }
-      ]);
+      console.log('Failed to fetch complaints:', e);
+      setMyComplaints([]);
     }
+  };
+
+  const handleDeleteTicket = (id) => {
+    Alert.alert(
+      'Confirm Deletion',
+      'Are you sure you want to delete this ticket?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Delete', 
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const res = await api.delete(`/complaints/${id}`);
+              if (res.data.success) {
+                Alert.alert('Success', res.data.message);
+                fetchComplaints(); // Refresh list
+              }
+            } catch (error) {
+              const errorMsg = error.response?.data?.message || 'Failed to delete ticket.';
+              Alert.alert('Error', errorMsg);
+            }
+          }
+        }
+      ]
+    );
   };
 
   const handleSubmit = async () => {
@@ -62,24 +80,17 @@ export default function HelpSupportScreen() {
     }
     setLoading(true);
     try {
-      const token = await AsyncStorage.getItem('userToken');
-      const res = await fetch(`${API_BASE}/api/complaints/submit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ category, description })
-      });
-      const data = await res.json();
-      if (data.success) {
-        Alert.alert(t('help.alert.success'), data.message || t('help.alert.submitted'));
+      const res = await api.post('/complaints/submit', { category, description });
+      if (res.data.success) {
+        Alert.alert(t('help.alert.success'), res.data.message || t('help.alert.submitted'));
         setDescription('');
         setTab('MyTickets');
       } else {
-        Alert.alert(t('help.alert.error'), data.message || t('help.alert.failedSubmit'));
+        Alert.alert(t('help.alert.error'), res.data.message || t('help.alert.failedSubmit'));
       }
     } catch (e) {
-      Alert.alert(t('help.alert.success'), t('help.alert.mockSubmit'));
-      setDescription('');
-      setTab('MyTickets');
+      console.log('Failed to submit complaint:', e);
+      Alert.alert(t('help.alert.error'), t('help.alert.failedSubmit'));
     }
     setLoading(false);
   };
@@ -192,10 +203,15 @@ export default function HelpSupportScreen() {
                         <Icon name="tag-outline" size={14} color="#00C9A7" style={{marginRight: 4}} />
                         <Text style={styles.categoryBadgeText}>{c.category}</Text>
                       </View>
-                      <View style={[styles.statusBadge, { backgroundColor: getStatusBg(c.status) }]}>
-                        <Text style={[styles.statusBadgeText, { color: getStatusColor(c.status) }]}>
-                          {c.status || t('help.pending')}
-                        </Text>
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <View style={[styles.statusBadge, { backgroundColor: getStatusBg(c.status) }]}>
+                          <Text style={[styles.statusBadgeText, { color: getStatusColor(c.status) }]}>
+                            {c.status || t('help.pending')}
+                          </Text>
+                        </View>
+                        <TouchableOpacity onPress={() => handleDeleteTicket(c._id)} style={{ marginLeft: 12 }}>
+                          <Icon name="trash-can-outline" size={20} color="#EF4444" />
+                        </TouchableOpacity>
                       </View>
                     </View>
                     <Text style={styles.complaintDesc}>{c.description}</Text>

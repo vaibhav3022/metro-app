@@ -7,8 +7,11 @@ import LinearGradient from 'react-native-linear-gradient';
 import api from '../api/axiosConfig';
 import moment from 'moment';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import { setNotifications as setReduxNotifications } from '../redux/slices/notificationSlice';
 
 export default function NotificationsScreen({ navigation }) {
+  const dispatch = useDispatch();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const { theme: COLORS, isDark } = useTheme();
@@ -21,6 +24,7 @@ export default function NotificationsScreen({ navigation }) {
       const res = await api.get('/notifications');
       const list = res.data.data || [];
       setNotifications(list);
+      dispatch(setReduxNotifications(list));
       
       const hasUnread = list.some(item => !item.isRead);
       if (hasUnread) {

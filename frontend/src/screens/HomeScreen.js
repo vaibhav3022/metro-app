@@ -2,14 +2,16 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet,
-  StatusBar, ActivityIndicator, Dimensions, Image, FlatList, Alert, Linking
+  StatusBar, ActivityIndicator, Dimensions, Image, FlatList, Alert, Linking, Modal, Animated
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTranslation } from 'react-i18next';
 import { ticketAPI } from '../api/ticketAPI';
+import api from '../api/axiosConfig';
 import { fetchHistorySuccess, setCurrentTicket } from '../redux/slices/ticketSlice';
+import { setNotifications } from '../redux/slices/notificationSlice';
 
 export default function HomeScreen({ navigation }) {
   const dispatch = useDispatch();
@@ -19,17 +21,116 @@ export default function HomeScreen({ navigation }) {
   const { user } = useSelector((state) => state.auth);
   const { balance, loading: walletLoading } = useSelector((state) => state.wallet);
   const { history } = useSelector((state) => state.tickets);
+  const { unreadCount } = useSelector((state) => state.notification);
   const [greeting, setGreeting] = useState('');
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [comingSoonModal, setComingSoonModal] = useState({ visible: false, vertical: null });
+  const modalAnim = useRef(new Animated.Value(0)).current;
 
   const screenWidth = Dimensions.get('window').width;
   const sliderWidth = screenWidth; // full width
 
+  const verticalsData = [
+    {
+      id: 'energia',
+      name: 'Energeia',
+      tagline: 'Complete EV Ecosystem Platform',
+      icon: 'lightning-bolt',
+      gradient: ['#F59E0B', '#B45309'],
+      color: '#B45309',
+      emoji: '⚡',
+      url: 'https://energeia369.com/'
+    },
+    {
+      id: 'oasis',
+      name: 'Oasis T-Cafe',
+      tagline: 'Premium Tea & Snacks at Every Station',
+      icon: 'coffee',
+      gradient: ['#D4A574', '#8B5E3C'],
+      color: '#8B5E3C',
+      emoji: '☕',
+      url: 'https://energeia369.com/oasis'
+    },
+    {
+      id: 'llbeauty',
+      name: 'LL Beauty',
+      tagline: 'Quick Grooming & Beauty Services',
+      icon: 'face-woman-shimmer',
+      gradient: ['#F472B6', '#BE185D'],
+      color: '#BE185D',
+      emoji: '💄',
+      url: 'https://lalyora.energeia369.com/'
+    },
+    {
+      id: 'evcharging',
+      name: 'EV Charging',
+      tagline: 'Charge your electric vehicles at stations',
+      icon: 'ev-station',
+      gradient: ['#60A5FA', '#1D4ED8'],
+      color: '#1D4ED8',
+      emoji: '🔋',
+      url: null
+    },
+    {
+      id: 'coworking',
+      name: 'CoWorking Space',
+      tagline: 'Work Pods & Meeting Rooms at Stations',
+      icon: 'laptop',
+      gradient: ['#34D399', '#059669'],
+      color: '#059669',
+      emoji: '🏢',
+      url: null
+    },
+    {
+      id: 'events',
+      name: 'Events',
+      tagline: 'Explore exciting events and gatherings',
+      icon: 'calendar-star',
+      gradient: ['#A78BFA', '#6D28D9'],
+      color: '#6D28D9',
+      emoji: '🎉',
+      url: 'https://energeia369.com/events'
+    },
+    {
+      id: 'nexus',
+      name: 'Nexus',
+      tagline: 'Franchise & Investor Connect',
+      icon: 'handshake',
+      gradient: ['#F87171', '#B91C1C'],
+      color: '#B91C1C',
+      emoji: '🤝',
+      url: 'https://energeia369.com/nexus'
+    },
+  ];
+
+  const handleVerticalPress = (vertical) => {
+    if (vertical.url) {
+      Linking.openURL(vertical.url).catch(() => Alert.alert('Error', 'Could not open link.'));
+    } else {
+      showComingSoon(vertical);
+    }
+  };
+
+  const showComingSoon = (vertical) => {
+    setComingSoonModal({ visible: true, vertical });
+    Animated.spring(modalAnim, { toValue: 1, useNativeDriver: true, tension: 65, friction: 8 }).start();
+  };
+
+  const hideComingSoon = () => {
+    Animated.timing(modalAnim, { toValue: 0, duration: 200, useNativeDriver: true }).start(() => {
+      setComingSoonModal({ visible: false, vertical: null });
+    });
+  };
+
   const sliderImages = [
-    { id: '1', source: require('../../assets/slider/metro_train.png'), title: t('home.slider1') },
-    { id: '2', source: require('../../assets/slider/station_shop.png'), title: t('home.slider2') },
-    { id: '3', source: require('../../assets/slider/qr_payment.png'), title: t('home.slider3') },
-    { id: '4', source: require('../../assets/slider/digital_ticket.png'), title: t('home.slider4') },
+    { id: 's1', source: require('../../assets/slider/metro_train.png'), title: t('home.slider1'), isVertical: false },
+    { id: 'v1', source: require('../../assets/slider/energia.jpg'), title: 'Energia', isVertical: true, vertical: verticalsData[0] },
+    { id: 'v2', source: require('../../assets/slider/oasis_cafe.jpg'), title: 'Oasis T-Cafe', isVertical: true, vertical: verticalsData[1] },
+    { id: 'v3', source: require('../../assets/slider/ll_beauty.jpg'), title: 'LL Beauty', isVertical: true, vertical: verticalsData[2] },
+    { id: 'v4', source: require('../../assets/slider/ev_auto.jpg'), title: 'EV Charging', isVertical: true, vertical: verticalsData[3] },
+    { id: 'v5', source: require('../../assets/slider/coworking.jpg'), title: 'CoWorking Space', isVertical: true, vertical: verticalsData[4] },
+    { id: 'v6', source: require('../../assets/slider/events.jpg'), title: 'Events', isVertical: true, vertical: verticalsData[5] },
+    { id: 'v7', source: require('../../assets/slider/nexus.jpg'), title: 'Nexus', isVertical: true, vertical: verticalsData[6] },
   ];
 
   const flatListRef = useRef(null);
@@ -70,7 +171,19 @@ export default function HomeScreen({ navigation }) {
         console.log('Failed to fetch recent tickets in home');
       }
     };
+
+    const fetchNotifications = async () => {
+      try {
+        const res = await api.get('/notifications');
+        const list = res.data.data || [];
+        dispatch(setNotifications(list));
+      } catch (err) {
+        console.log('Failed to fetch notifications in home');
+      }
+    };
+
     fetchTickets();
+    fetchNotifications();
 
     return () => clearInterval(autoScroll);
   }, [dispatch, t]);
@@ -112,6 +225,10 @@ export default function HomeScreen({ navigation }) {
             <TouchableOpacity onPress={toggleTheme} style={[styles.themeToggle, { marginRight: 10 }]}>
               <Icon name={isDark ? "weather-night" : "white-balance-sunny"} size={22} color={COLORS.text} />
             </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('Notifications')} style={styles.notifIconHeader}>
+              <Icon name="bell-outline" size={24} color={COLORS.text} />
+              {unreadCount > 0 && <View style={styles.notifBadge} />}
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => navigation.navigate('ProfileTab')} style={styles.avatarWrap}>
               <LinearGradient colors={[COLORS.secondary, COLORS.primary]} style={styles.avatar}>
                 <Text style={styles.avatarText}>{(user?.name || 'P')[0].toUpperCase()}</Text>
@@ -132,12 +249,26 @@ export default function HomeScreen({ navigation }) {
             onViewableItemsChanged={onViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}
             renderItem={({ item }) => (
-              <View style={[styles.slideWrap, { width: sliderWidth }]}>
+              <TouchableOpacity
+                activeOpacity={0.9}
+                style={[styles.slideWrap, { width: sliderWidth }]}
+                onPress={() => item.isVertical && item.vertical ? handleVerticalPress(item.vertical) : null}
+              >
                 <Image source={item.source} style={styles.slideImage} />
-                <LinearGradient colors={['transparent', 'rgba(0,0,0,0.8)']} style={styles.slideOverlay}>
-                  <Text style={styles.slideTitle}>{item.title}</Text>
+                <LinearGradient colors={['transparent', 'rgba(0,0,0,0.7)']} style={styles.slideOverlay}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', width: '100%' }}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.slideTitle}>{item.isVertical ? item.vertical.name : item.title}</Text>
+                      {item.isVertical && <Text style={styles.slideSubtitle}>{item.vertical.tagline}</Text>}
+                    </View>
+                    {item.isVertical && (
+                      <View style={styles.exploreBadge}>
+                        <Text style={styles.exploreBadgeText}>Explore →</Text>
+                      </View>
+                    )}
+                  </View>
                 </LinearGradient>
-              </View>
+              </TouchableOpacity>
             )}
           />
           <View style={styles.pagination}>
@@ -150,6 +281,25 @@ export default function HomeScreen({ navigation }) {
 
       {/* ── SCROLLABLE CONTENT below ── */}
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+
+        {/* ── Our Verticals ── */}
+        <Text style={styles.sectionTitle}>Our Verticals</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.verticalsScroll}>
+          {verticalsData.map((v) => (
+            <TouchableOpacity key={v.id} activeOpacity={0.85} onPress={() => handleVerticalPress(v)}>
+              <LinearGradient colors={v.gradient} style={styles.verticalCard} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+                <View style={styles.verticalCardIcon}>
+                  <Icon name={v.icon} size={28} color="#fff" />
+                </View>
+                <Text style={styles.verticalCardName}>{v.name}</Text>
+                <Text style={styles.verticalCardTag} numberOfLines={2}>{v.tagline}</Text>
+                <View style={styles.verticalBadge}>
+                  <Text style={styles.verticalBadgeText}>Explore →</Text>
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
 
         {/* Quick Actions */}
         <Text style={styles.sectionTitle}>{t('home.quickServices')}</Text>
@@ -251,29 +401,62 @@ export default function HomeScreen({ navigation }) {
           <Icon name="chevron-right" size={22} color="#888" />
         </TouchableOpacity>
 
-        {/* EV Auto Rickshaws Card */}
-        <TouchableOpacity style={styles.evAutoCard} onPress={() => Linking.openURL('https://play.google.com/store/search?q=Pune+EV+Auto&c=apps').catch(() => Alert.alert('Error', 'Could not open Play Store'))}>
-          <LinearGradient colors={['#3b82f6', '#2563eb']} style={styles.evAutoIconWrap} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
-            <Icon name="car-electric" size={24} color="#fff" />
-          </LinearGradient>
-          <View style={{ flex: 1, marginLeft: 16 }}>
-            <Text style={styles.evAutoTitle}>{t('home.evAutoTitle')}</Text>
-            <Text style={styles.evAutoSub}>{t('home.evAutoSub')}</Text>
-          </View>
-          <Icon name="chevron-right" size={22} color="#888" />
-        </TouchableOpacity>
-
-        {/* Notifications shortcut */}
-        <TouchableOpacity style={styles.notifCard} onPress={() => navigation.navigate('Notifications')}>
-          <Icon name="bell-outline" size={22} color="#00C9A7" />
-          <View style={{ flex: 1, marginLeft: 12 }}>
-            <Text style={styles.notifTitle}>{t('home.notifShortcutTitle')}</Text>
-            <Text style={styles.notifSub}>{t('home.notifShortcutSub')}</Text>
-          </View>
-          <Icon name="chevron-right" size={20} color="#555" />
-        </TouchableOpacity>
-
       </ScrollView>
+
+      {/* ── Coming Soon Modal ── */}
+      <Modal
+        visible={comingSoonModal.visible}
+        transparent
+        animationType="none"
+        onRequestClose={hideComingSoon}
+      >
+        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={hideComingSoon}>
+          <Animated.View style={[
+            styles.modalContent,
+            {
+              transform: [{ scale: modalAnim.interpolate({ inputRange: [0, 1], outputRange: [0.8, 1] }) }],
+              opacity: modalAnim,
+            }
+          ]}>
+            {comingSoonModal.vertical && (
+              <>
+                <LinearGradient
+                  colors={comingSoonModal.vertical.gradient}
+                  style={styles.modalIconCircle}
+                  start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                >
+                  <Icon name={comingSoonModal.vertical.icon} size={40} color="#fff" />
+                </LinearGradient>
+
+                <Text style={styles.modalEmoji}>{comingSoonModal.vertical.emoji}</Text>
+                <Text style={styles.modalTitle}>{comingSoonModal.vertical.name}</Text>
+                <Text style={styles.modalTagline}>{comingSoonModal.vertical.tagline}</Text>
+
+                <View style={styles.modalDivider} />
+
+                <View style={styles.modalBadge}>
+                  <Icon name="clock-outline" size={18} color="#f59e0b" />
+                  <Text style={styles.modalBadgeText}>Coming Soon</Text>
+                </View>
+
+                <Text style={styles.modalDesc}>
+                  We're working hard to bring {comingSoonModal.vertical.name} to every Pune Metro station. Stay tuned for an amazing experience!
+                </Text>
+
+                <TouchableOpacity style={styles.modalCloseBtn} onPress={hideComingSoon}>
+                  <LinearGradient
+                    colors={comingSoonModal.vertical.gradient}
+                    style={styles.modalCloseBtnGrad}
+                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                  >
+                    <Text style={styles.modalCloseBtnText}>Got it! 👍</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </>
+            )}
+          </Animated.View>
+        </TouchableOpacity>
+      </Modal>
 
     </LinearGradient>
   );
@@ -295,17 +478,36 @@ const getStyles = (COLORS) => StyleSheet.create({
   userName: { fontSize: 22, fontWeight: '800', color: COLORS.text, marginTop: 2 },
   themeToggle: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.border },
   avatarWrap: { borderRadius: 28, overflow: 'hidden' },
-  avatar: { width: 50, height: 50, borderRadius: 25, justifyContent: 'center', alignItems: 'center' },
-  avatarText: { fontSize: 20, fontWeight: '800', color: '#fff' },
-
+  avatar: { width: 38, height: 38, borderRadius: 19, justifyContent: 'center', alignItems: 'center' },
+  avatarText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  notifIconHeader: { marginRight: 12, position: 'relative', justifyContent: 'center' },
+  notifBadge: { position: 'absolute', top: 0, right: 2, width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#EF4444', borderWidth: 1.5, borderColor: COLORS.cardBg },
   sliderContainer: { width: '100%', height: 190, marginBottom: 20, overflow: 'hidden', backgroundColor: COLORS.cardBg },
   slideWrap: { height: 190 },
   slideImage: { width: '100%', height: '100%', resizeMode: 'cover' },
-  slideOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 80, justifyContent: 'flex-end', padding: 16 },
-  slideTitle: { color: '#fff', fontSize: 16, fontWeight: '800', letterSpacing: 0.5 },
+  slideOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 100, justifyContent: 'flex-end', padding: 16 },
+  slideTitle: { color: '#fff', fontSize: 18, fontWeight: '900', letterSpacing: 0.5 },
+  slideSubtitle: { color: 'rgba(255,255,255,0.9)', fontSize: 13, marginTop: 4, fontWeight: '500' },
+  exploreBadge: { backgroundColor: 'rgba(255,255,255,0.25)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16, marginLeft: 10 },
+  exploreBadgeText: { color: '#fff', fontSize: 12, fontWeight: '800' },
   pagination: { position: 'absolute', bottom: 16, right: 16, flexDirection: 'row', gap: 6 },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.4)' },
   activeDot: { width: 18, backgroundColor: '#00C9A7' },
+
+  verticalSlideContent: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
+  verticalSlideEmoji: { fontSize: 42, marginBottom: 8 },
+  verticalSlideName: { fontSize: 24, fontWeight: '900', color: '#fff', letterSpacing: 1, textShadowColor: 'rgba(0,0,0,0.3)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 4 },
+  verticalSlideTagline: { fontSize: 13, color: 'rgba(255,255,255,0.9)', marginTop: 4, textAlign: 'center' },
+  tapToExplore: { marginTop: 14, backgroundColor: 'rgba(255,255,255,0.25)', paddingHorizontal: 18, paddingVertical: 8, borderRadius: 20 },
+  tapToExploreText: { color: '#fff', fontWeight: '700', fontSize: 13 },
+
+  verticalsScroll: { paddingHorizontal: 18, gap: 14, marginBottom: 26 },
+  verticalCard: { width: 150, height: 180, borderRadius: 22, padding: 16, justifyContent: 'space-between', elevation: 6, shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 10, shadowOffset: { width: 0, height: 4 } },
+  verticalCardIcon: { width: 48, height: 48, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.25)', justifyContent: 'center', alignItems: 'center' },
+  verticalCardName: { fontSize: 15, fontWeight: '900', color: '#fff', marginTop: 8 },
+  verticalCardTag: { fontSize: 10, color: 'rgba(255,255,255,0.85)', lineHeight: 14 },
+  verticalBadge: { backgroundColor: 'rgba(255,255,255,0.25)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, alignSelf: 'flex-start' },
+  verticalBadgeText: { color: '#fff', fontSize: 11, fontWeight: '800' },
 
   sectionTitle: { fontSize: 17, fontWeight: '800', color: COLORS.text, marginHorizontal: 22, marginBottom: 14 },
   sectionRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 22 },
@@ -345,4 +547,19 @@ const getStyles = (COLORS) => StyleSheet.create({
   ticketFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, borderTopColor: COLORS.border, paddingTop: 14 },
   ticketDetails: { fontSize: 14, color: COLORS.textLight, fontWeight: '500' },
   ticketFare: { fontSize: 18, fontWeight: '900', color: COLORS.text },
+
+  // Coming Soon Modal
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', padding: 30 },
+  modalContent: { backgroundColor: COLORS.cardBg, borderRadius: 28, padding: 30, alignItems: 'center', width: '100%', maxWidth: 340, borderWidth: 1, borderColor: COLORS.border, elevation: 10, shadowColor: '#000', shadowOpacity: 0.25, shadowRadius: 20, shadowOffset: { width: 0, height: 10 } },
+  modalIconCircle: { width: 80, height: 80, borderRadius: 40, justifyContent: 'center', alignItems: 'center', marginBottom: 8 },
+  modalEmoji: { fontSize: 32, marginBottom: 6 },
+  modalTitle: { fontSize: 24, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5, textAlign: 'center' },
+  modalTagline: { fontSize: 13, color: COLORS.textLight, marginTop: 4, textAlign: 'center' },
+  modalDivider: { width: 50, height: 3, backgroundColor: COLORS.border, borderRadius: 2, marginVertical: 18 },
+  modalBadge: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: 'rgba(245,158,11,0.12)', paddingHorizontal: 18, paddingVertical: 10, borderRadius: 20, marginBottom: 14 },
+  modalBadgeText: { fontSize: 16, fontWeight: '900', color: '#f59e0b' },
+  modalDesc: { fontSize: 13, color: COLORS.textLight, textAlign: 'center', lineHeight: 20, marginBottom: 22 },
+  modalCloseBtn: { borderRadius: 16, overflow: 'hidden', width: '100%' },
+  modalCloseBtnGrad: { paddingVertical: 14, alignItems: 'center', borderRadius: 16 },
+  modalCloseBtnText: { color: '#fff', fontSize: 16, fontWeight: '800' },
 });

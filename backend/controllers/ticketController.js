@@ -2,14 +2,22 @@ const Ticket = require('../models/Ticket');
 const Wallet = require('../models/Wallet');
 const { calculateFare: computeFare, calculateDistance } = require('../utils/fareCalculator');
 const { encryptQR, decryptQR } = require('../utils/generateQR');
+const { createBreaker } = require('../utils/circuitBreaker');
 const crypto = require('crypto');
 const Razorpay = require('razorpay');
 
 // Initialize Razorpay
 const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
+  key_id: process.env.RAZORPAY_KEY_ID || 'dummy_key',
+  key_secret: process.env.RAZORPAY_KEY_SECRET || 'dummy_secret'
 });
+
+// Wrap razorpay call
+async function callRazorpayOrderCreate(options) {
+  return await razorpay.orders.create(options);
+}
+const razorpayBreaker = createBreaker(callRazorpayOrderCreate);
+razorpayBreaker.fallback(() => ({ id: 'fallback_order_id', amount: 0, currency: 'INR' }));
 
 // @desc    Calculate ticket fare
 // @route   POST /api/tickets/calculate-fare
@@ -100,7 +108,7 @@ const createRazorpayOrder = async (req, res) => {
         currency: options.currency
       };
     } else {
-      order = await razorpay.orders.create(options);
+      order = await razorpayBreaker.fire(options);
     }
 
     res.status(200).json({

@@ -1,9 +1,19 @@
 import api from './axiosConfig';
+import SyncService from '../services/SyncService';
 
 export const ticketAPI = {
   calculateFare: async (source, destination, passengers, isReturn) => {
-    const response = await api.post('/tickets/calculate-fare', { source, destination, passengers, isReturn });
-    return response.data;
+    try {
+      const response = await api.post('/tickets/calculate-fare', { source, destination, passengers, isReturn });
+      return response.data;
+    } catch (error) {
+      if (!error.response) {
+        // Network error, fallback to offline calculation
+        console.warn('Network error, calculating fare offline...');
+        return await SyncService.calculateFareOffline(source, destination, passengers, isReturn);
+      }
+      throw error;
+    }
   },
 
   createTicket: async (ticketData) => {

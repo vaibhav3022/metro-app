@@ -8,114 +8,13 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
-
-const TOURIST_PLACES = [
-  {
-    name: 'Shaniwar Wada (शनिवार वाडा)',
-    station: 'Budhwar Peth / PMC',
-    line: 'Purple Line / Aqua Line',
-    lineColor: '#6A1B9A',
-    distance: '500 meters',
-    desc: 'Historic fortification built in 1732. It served as the seat of the Peshwas of the Maratha Empire until 1818.',
-    img: require('../assets/images/shaniwar_wada.png'),
-    mapsUrl: 'https://maps.google.com/?q=Shaniwar+Wada+Pune'
-  },
-  {
-    name: 'Dagdusheth Ganpati (दगडूशेठ गणपती)',
-    station: 'Budhwar Peth',
-    line: 'Purple Line',
-    lineColor: '#6A1B9A',
-    distance: '400 meters',
-    desc: 'One of the most famous Ganesh temples in Maharashtra, known for its beautiful deity and grand Ganeshotsav celebrations.',
-    img: require('../assets/images/dagdusheth_ganpati.png'),
-    mapsUrl: 'https://maps.google.com/?q=Dagdusheth+Halwai+Ganpati+Temple+Pune'
-  },
-  {
-    name: 'Aga Khan Palace (आगाखान पॅलेस)',
-    station: 'Kalyani Nagar',
-    line: 'Aqua Line',
-    lineColor: '#00897B',
-    distance: '1.5 km',
-    desc: 'Built in 1892, this Italian-style palace has historical significance. Mahatma Gandhi and Kasturba Gandhi were interned here during the Quit India movement.',
-    img: require('../assets/images/aga_khan_palace.png'),
-    mapsUrl: 'https://maps.google.com/?q=Aga+Khan+Palace+Pune'
-  },
-  {
-    name: 'Sambhaji Park (संभाजी उद्यान)',
-    station: 'Chhatrapati Sambhaji Udyan',
-    line: 'Aqua Line',
-    lineColor: '#00897B',
-    distance: '100 meters',
-    desc: 'A gorgeous central park on JM Road featuring a small aquarium, children playground, and beautiful flower beds.',
-    img: require('../assets/images/metro_station.png'),
-    mapsUrl: 'https://maps.google.com/?q=Chhatrapati+Sambhaji+Udyan+Pune'
-  },
-  {
-    name: 'Saras Baug (सारस बाग)',
-    station: 'Swargate',
-    line: 'Purple Line',
-    lineColor: '#6A1B9A',
-    distance: '1.2 km',
-    desc: 'A scenic park and temple of Talyatla Ganapati (Ganesh on a pond), popular for evening walks and street food stalls.',
-    img: require('../assets/images/metro_inside.png'),
-    mapsUrl: 'https://maps.google.com/?q=Saras+Baug+Pune'
-  },
-  {
-    name: 'Raja Dinkar Kelkar Museum (राजा केळकर संग्रहालय)',
-    station: 'Mandai',
-    line: 'Purple Line',
-    lineColor: '#6A1B9A',
-    distance: '900 meters',
-    desc: 'Houses a massive, fascinating collection of Indian arts, crafts, musical instruments, and sculptures accumulated by Dr. Kelkar.',
-    img: require('../assets/images/metro_hero.png'),
-    mapsUrl: 'https://maps.google.com/?q=Raja+Dinkar+Kelkar+Museum+Pune'
-  }
-];
+import { TOURIST_PLACES } from '../data/touristPlacesData';
 
 export default function TouristPlacesScreen() {
   const navigation = useNavigation();
   const { theme: COLORS, isDark } = useTheme();
   const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
   const { t } = useTranslation();
-
-  const localizedTouristPlaces = [
-    {
-      ...TOURIST_PLACES[0],
-      name: t('tourist.places.shaniwar_wada.name'),
-      station: t('tourist.places.shaniwar_wada.station'),
-      desc: t('tourist.places.shaniwar_wada.desc')
-    },
-    {
-      ...TOURIST_PLACES[1],
-      name: t('tourist.places.dagdusheth.name'),
-      station: t('tourist.places.dagdusheth.station'),
-      desc: t('tourist.places.dagdusheth.desc')
-    },
-    {
-      ...TOURIST_PLACES[2],
-      name: t('tourist.places.agakhan.name'),
-      station: t('tourist.places.agakhan.station'),
-      desc: t('tourist.places.agakhan.desc')
-    },
-    {
-      ...TOURIST_PLACES[3],
-      name: t('tourist.places.sambhaji.name'),
-      station: t('tourist.places.sambhaji.station'),
-      desc: t('tourist.places.sambhaji.desc')
-    },
-    {
-      ...TOURIST_PLACES[4],
-      name: t('tourist.places.saras.name'),
-      station: t('tourist.places.saras.station'),
-      desc: t('tourist.places.saras.desc')
-    },
-    {
-      ...TOURIST_PLACES[5],
-      name: t('tourist.places.kelkar.name'),
-      station: t('tourist.places.kelkar.station'),
-      desc: t('tourist.places.kelkar.desc')
-    }
-  ];
 
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
@@ -145,13 +44,18 @@ export default function TouristPlacesScreen() {
           <Text style={styles.sectionTitle}>{t('tourist.landmarks')}</Text>
 
           {/* Places Cards */}
-          {localizedTouristPlaces.map((place, i) => (
-            <View key={i} style={styles.card}>
-              <Image source={place.img} style={styles.cardImage} resizeMode="cover" />
+          {TOURIST_PLACES.map((place, i) => (
+            <TouchableOpacity 
+              key={place.id} 
+              style={styles.card}
+              activeOpacity={0.8}
+              onPress={() => navigation.navigate('PlaceDetails', { place })}
+            >
+              <Image source={place.images[0]} style={styles.cardImage} resizeMode="cover" />
               
               <View style={styles.cardBody}>
                 <Text style={styles.placeName}>{place.name}</Text>
-                <Text style={styles.placeDesc}>{place.desc}</Text>
+                <Text style={styles.placeDesc} numberOfLines={2}>{place.shortDesc}</Text>
                 
                 {/* Station Info Row */}
                 <View style={styles.infoRow}>
@@ -171,16 +75,8 @@ export default function TouristPlacesScreen() {
                   </View>
                 </View>
 
-                {/* Maps Button */}
-                <TouchableOpacity 
-                  style={styles.mapBtn} 
-                  onPress={() => Linking.openURL(place.mapsUrl).catch(() => alert(t('tourist.mapError')))}
-                >
-                  <Icon name="google-maps" size={18} color="#FFFFFF" />
-                  <Text style={styles.mapBtnText}>{t('tourist.getDirections')}</Text>
-                </TouchableOpacity>
               </View>
-            </View>
+            </TouchableOpacity>
           ))}
 
         </ScrollView>

@@ -36,7 +36,37 @@ const getMyComplaints = async (req, res) => {
   }
 };
 
+// @desc    Delete a complaint
+// @route   DELETE /api/complaints/:id
+// @access  Private
+const deleteComplaint = async (req, res) => {
+  try {
+    const mongoose = require('mongoose');
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'Invalid ticket ID' });
+    }
+
+    const complaint = await Complaint.findById(req.params.id);
+
+    if (!complaint) {
+      return res.status(404).json({ message: 'Complaint not found' });
+    }
+
+    // Make sure the logged in user matches the complaint user
+    if (complaint.userId.toString() !== req.user.id) {
+      return res.status(401).json({ message: 'Not authorized' });
+    }
+
+    await complaint.deleteOne();
+
+    res.status(200).json({ success: true, message: 'Ticket deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
 module.exports = {
   submitComplaint,
-  getMyComplaints
+  getMyComplaints,
+  deleteComplaint
 };

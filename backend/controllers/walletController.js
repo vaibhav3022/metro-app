@@ -1,11 +1,19 @@
 const Wallet = require('../models/Wallet');
+const User = require('../models/User');
 const TokenTransaction = require('../models/TokenTransaction');
+const { createBreaker } = require('../utils/circuitBreaker');
 const Razorpay = require('razorpay');
 
 const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
+  key_id: process.env.RAZORPAY_KEY_ID || 'dummy_key',
+  key_secret: process.env.RAZORPAY_KEY_SECRET || 'dummy_secret'
 });
+
+async function callRazorpayOrderCreate(options) {
+  return await razorpay.orders.create(options);
+}
+const razorpayBreaker = createBreaker(callRazorpayOrderCreate);
+razorpayBreaker.fallback(() => ({ id: 'fallback_order_id', amount: 0, currency: 'INR' }));
 
 // @desc    Get current wallet balance
 // @route   GET /api/wallet/balance
@@ -62,7 +70,7 @@ const createRazorpayOrder = async (req, res) => {
         currency: options.currency
       };
     } else {
-      order = await razorpay.orders.create(options);
+      order = await razorpayBreaker.fire(options);
     }
 
     res.status(200).json({

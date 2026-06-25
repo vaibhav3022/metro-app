@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './i18n';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -32,6 +32,8 @@ import PaymentGatewayScreen from './screens/PaymentGatewayScreen';
 import PaymentScreen from './screens/PaymentScreen';
 import StationInfoScreen from './screens/StationInfoScreen';
 import TouristPlacesScreen from './screens/TouristPlacesScreen';
+import PlaceDetailsScreen from './screens/PlaceDetailsScreen';
+import SyncService from './services/SyncService';
 
 // User sub-screens
 import TokenEconomyScreen from './screens/User/TokenEconomyScreen';
@@ -57,6 +59,12 @@ const Stack = createNativeStackNavigator();
 function AppNavigator() {
   const { user, token, loading } = useSelector((state) => state.auth);
   const { isDark, theme: COLORS } = useTheme();
+
+  useEffect(() => {
+    if (token) {
+      SyncService.sync();
+    }
+  }, [token]);
 
   const navigationTheme = isDark ? {
     ...DarkTheme,
@@ -106,6 +114,7 @@ function AppNavigator() {
             <Stack.Screen name="Payment" component={PaymentScreen} />
             <Stack.Screen name="StationInfo" component={StationInfoScreen} />
             <Stack.Screen name="TouristPlaces" component={TouristPlacesScreen} />
+            <Stack.Screen name="PlaceDetails" component={PlaceDetailsScreen} />
 
             {/* User Sub-screens */}
             <Stack.Screen name="Tokens" component={TokenEconomyScreen} />
