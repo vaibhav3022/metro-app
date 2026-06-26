@@ -57,7 +57,7 @@ export default function HomeScreen({ navigation }) {
   const verticalsData = [
     {
       id: 'energia',
-      name: 'ENERGEIA',
+      name: 'Energeia',
       tagline: 'Complete EV Ecosystem Platform',
       icon: 'lightning-bolt',
       gradient: ['#F59E0B', '#B45309'],
@@ -67,7 +67,7 @@ export default function HomeScreen({ navigation }) {
     },
     {
       id: 'oasis',
-      name: 'Oasis T-Cafe',
+      name: 'Oasis t-cafe',
       tagline: 'Premium Tea & Snacks at Every Station',
       icon: 'coffee',
       gradient: ['#D4A574', '#8B5E3C'],
@@ -87,8 +87,8 @@ export default function HomeScreen({ navigation }) {
     },
     {
       id: 'coworking',
-      name: 'CoWorking Space',
-      tagline: 'Work Pods & Meeting Rooms at Stations',
+      name: 'Coworking space',
+      tagline: 'Work Pods & Meeting Rooms ',
       icon: 'laptop',
       gradient: ['#34D399', '#059669'],
       color: '#059669',
@@ -97,7 +97,7 @@ export default function HomeScreen({ navigation }) {
     },
     {
       id: 'eva',
-      name: 'EVA',
+      name: 'Eva',
       tagline: 'Premium Beauty Salon & Products',
       icon: 'spa',
       gradient: ['#FCA5A5', '#E11D48'],
@@ -108,12 +108,22 @@ export default function HomeScreen({ navigation }) {
     {
       id: 'events',
       name: 'Events',
-      tagline: 'Explore exciting events and gatherings',
+      tagline: 'Explore exciting events ',
       icon: 'calendar-star',
       gradient: ['#A78BFA', '#6D28D9'],
       color: '#6D28D9',
       emoji: '🎟️',
       url: 'https://energeia369.com/events'
+    },
+    {
+      id: 'cybeorch',
+      name: 'Cybeorch labs',
+      tagline: 'Innovate, Build & Secure ',
+      icon: 'shield-check',
+      gradient: ['#0EA5E9', '#2563EB'],
+      color: '#2563EB',
+      emoji: '🛡️',
+      url: 'https://cybeorch.com/'
     },
   ];
 
@@ -144,6 +154,8 @@ export default function HomeScreen({ navigation }) {
     { id: 'v5', source: require('../../assets/slider/coworking.png'), title: 'CoWorking Space', isVertical: true, vertical: verticalsData[3] },
     { id: 'v6', source: require('../../assets/slider/eva_salon.png'), title: 'EVA', isVertical: true, vertical: verticalsData[4] },
     { id: 'v7', source: require('../../assets/slider/events.jpg'), title: 'Events', isVertical: true, vertical: verticalsData[5] },
+    // Use the provided Cybeorch image in src/assets/slider
+    { id: 'v8', source: require('../assets/slider/cybeorch.jpg'), title: 'Cybeorch Labs', isVertical: true, vertical: verticalsData[6] },
   ];
 
   const flatListRef = useRef(null);
@@ -256,18 +268,11 @@ export default function HomeScreen({ navigation }) {
             </View>
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 0 }}>
-            <TouchableOpacity onPress={() => navigation.navigate('NXLCredits')} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', minWidth: 90, backgroundColor: isDark ? 'rgba(245,158,11,0.15)' : 'rgba(245,158,11,0.1)', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 28, borderWidth: 2, borderColor: '#F59E0B' }}>
-              <Animated.Image 
-                source={require('../assets/images/nxl_icon.png')} 
-                style={{ 
-                  width: 22, 
-                  height: 22, 
-                  marginRight: 6,
-                  transform: [{ scale: nxlAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 1.15] }) }]
-                }} 
-                resizeMode="contain" 
-              />
-              <Text style={{ color: '#D97706', fontWeight: '900', fontSize: 16 }}>{'\u20B9'}{user?.nxlCredits || 0}</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('NXLCredits')} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', minWidth: 90, backgroundColor: '#000000', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 28, borderWidth: 2, borderColor: '#F59E0B' }}>
+              <Animated.View style={{ width: 30, height: 30, borderRadius: 16, backgroundColor: '#EF4444', borderWidth: 2, borderColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center', marginRight: 10 }}>
+                <Text style={{ color: '#FFFFFF', fontWeight: '900', fontSize: 12 }}>NXL</Text>
+              </Animated.View>
+              <Text style={{ color: '#FBBF24', fontWeight: '900', fontSize: 16 }}>{'\u20B9'}999</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -549,7 +554,7 @@ const getStyles = (COLORS) => StyleSheet.create({
   verticalCard: { width: 150, height: 180, borderRadius: 22, padding: 16, justifyContent: 'space-between', elevation: 6, shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 10, shadowOffset: { width: 0, height: 4 } },
   verticalCardIcon: { width: 48, height: 48, borderRadius: 14, justifyContent: 'center', alignItems: 'center' },
   verticalCardName: { fontSize: 15, fontWeight: '900', color: '#fff', marginTop: 8 },
-  verticalCardTag: { fontSize: 10, color: 'rgba(255,255,255,0.85)', lineHeight: 14 },
+  verticalCardTag: { fontSize: 12, fontWeight: '600', color: 'rgba(255,255,255,0.95)', lineHeight: 16 },
   verticalBadge: { backgroundColor: 'rgba(255,255,255,0.25)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, alignSelf: 'flex-start' },
   verticalBadgeText: { color: '#fff', fontSize: 11, fontWeight: '800' },
 
