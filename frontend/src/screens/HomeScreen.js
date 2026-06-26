@@ -58,7 +58,7 @@ export default function HomeScreen({ navigation }) {
     {
       id: 'energia',
       name: 'Energeia',
-      tagline: 'Complete EV Ecosystem Platform',
+      tagline: 'EV Car & Auto Charging',
       icon: 'lightning-bolt',
       gradient: ['#F59E0B', '#B45309'],
       color: '#B45309',
@@ -67,7 +67,7 @@ export default function HomeScreen({ navigation }) {
     },
     {
       id: 'oasis',
-      name: 'Oasis t-cafe',
+      name: 'Oasis T-cafe',
       tagline: 'Premium Tea & Snacks at Every Station',
       icon: 'coffee',
       gradient: ['#D4A574', '#8B5E3C'],
@@ -87,7 +87,7 @@ export default function HomeScreen({ navigation }) {
     },
     {
       id: 'coworking',
-      name: 'Coworking space',
+      name: 'Maytriya CoWork',
       tagline: 'Work Pods & Meeting Rooms ',
       icon: 'laptop',
       gradient: ['#34D399', '#059669'],
@@ -148,14 +148,17 @@ export default function HomeScreen({ navigation }) {
 
   const sliderImages = [
     { id: 's1', source: require('../../assets/slider/metro_train.png'), title: t('home.slider1'), isVertical: false },
-    { id: 'v1', source: require('../../assets/slider/energia.jpg'), title: 'Energia', isVertical: true, vertical: verticalsData[0] },
-    { id: 'v2', source: require('../../assets/slider/oasis_cafe.jpg'), title: 'Oasis T-Cafe', isVertical: true, vertical: verticalsData[1] },
+    { id: 'v1', source: require('../assets/slider/energia.png'), title: 'Energia', displayTitle: 'Energia', isVertical: true, vertical: verticalsData[0] },
+    { id: 'v2', source: require('../assets/slider/Oasis.jpeg'), title: 'Oasis T-Cafe', isVertical: true, vertical: verticalsData[1] },
     { id: 'v3', source: require('../../assets/slider/ll_beauty.png'), title: 'LL Beauty', isVertical: true, vertical: verticalsData[2] },
-    { id: 'v5', source: require('../../assets/slider/coworking.png'), title: 'CoWorking Space', isVertical: true, vertical: verticalsData[3] },
+    { id: 'v5', source: require('../../assets/slider/coworking.png'), title: 'Maytriya CoWork', isVertical: true, vertical: verticalsData[3] },
     { id: 'v6', source: require('../../assets/slider/eva_salon.png'), title: 'EVA', isVertical: true, vertical: verticalsData[4] },
-    { id: 'v7', source: require('../../assets/slider/events.jpg'), title: 'Events', isVertical: true, vertical: verticalsData[5] },
+    { id: 'v7', source: require('../assets/slider/events.jpeg'), title: 'Events', isVertical: true, vertical: verticalsData[5] },
     // Use the provided Cybeorch image in src/assets/slider
     { id: 'v8', source: require('../assets/slider/cybeorch.jpg'), title: 'Cybeorch Labs', isVertical: true, vertical: verticalsData[6] },
+    { id: 's2', source: require('../assets/slider/Maytriya_Logo.jpeg'), title: '', isVertical: false },
+    { id: 's3', source: require('../assets/slider/GSA.jpeg'), title: '', isVertical: false, url: 'https://energeia369.com/events/', imageResizeMode: 'contain' },
+    { id: 's4', source: require('../assets/slider/metroxia.jpeg'), title: '', isVertical: false },
   ];
 
   const flatListRef = useRef(null);
@@ -262,8 +265,8 @@ export default function HomeScreen({ navigation }) {
             <View style={{ flex: 1 }}>
               <Text style={styles.headerTitle}><Text style={{ color: '#EF4444' }}>METRO</Text><Text style={{ color: '#000000' }}>XIA</Text></Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
-                <Icon name="map-marker" size={14} color="#EF4444" />
-                <Text style={[styles.greeting, { marginTop: 0, marginLeft: 2 }]} numberOfLines={1} ellipsizeMode="tail">Pune, Maharashtra</Text>
+                <Icon name="map-marker" size={14} color="#EF4444" style={{ marginRight: 2, marginLeft: -2 }} />
+                <Text style={[styles.greeting, { marginTop: 0, marginLeft: 0 }]} numberOfLines={1} ellipsizeMode="tail">Pune, Maharashtra</Text>
               </View>
             </View>
           </View>
@@ -292,13 +295,19 @@ export default function HomeScreen({ navigation }) {
               <TouchableOpacity
                 activeOpacity={0.9}
                 style={[styles.slideWrap, { width: sliderWidth }]}
-                onPress={() => item.isVertical && item.vertical ? handleVerticalPress(item.vertical) : null}
+                onPress={() => {
+                  if (item.isVertical && item.vertical) {
+                    handleVerticalPress(item.vertical);
+                  } else if (item.url) {
+                    Linking.openURL(item.url).catch(() => Alert.alert('Error', 'Could not open link.'));
+                  }
+                }}
               >
-                <Image source={item.source} style={styles.slideImage} />
+                <Image source={item.source} style={[styles.slideImage, item.imageResizeMode === 'contain' && styles.slideImageContain]} resizeMode={item.imageResizeMode || 'cover'} />
                 <LinearGradient colors={['transparent', 'rgba(0,0,0,0.7)']} style={styles.slideOverlay}>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', width: '100%' }}>
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.slideTitle}>{item.isVertical ? item.vertical.name : item.title}</Text>
+                      <Text style={styles.slideTitle}>{item.displayTitle || (item.isVertical ? item.vertical.name : item.title)}</Text>
                       {item.isVertical && <Text style={styles.slideSubtitle}>{item.vertical.tagline}</Text>}
                     </View>
                     {item.isVertical && (
@@ -533,7 +542,8 @@ const getStyles = (COLORS) => StyleSheet.create({
   notifBadge: { position: 'absolute', top: 0, right: 2, width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#EF4444', borderWidth: 1.5, borderColor: COLORS.cardBg },
   sliderContainer: { marginHorizontal: 16, height: 190, marginBottom: 24, overflow: 'hidden', backgroundColor: COLORS.cardBg, borderRadius: 20, borderWidth: 2, borderColor: '#D97706', elevation: 8, shadowColor: '#D97706', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8 },
   slideWrap: { height: 190 },
-  slideImage: { width: '100%', height: '100%', resizeMode: 'cover' },
+  slideImage: { width: '100%', height: '100%' },
+  slideImageContain: { backgroundColor: '#000' },
   slideOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 100, justifyContent: 'flex-end', padding: 16 },
   slideTitle: { color: '#fff', fontSize: 18, fontWeight: '900', letterSpacing: 0.5 },
   slideSubtitle: { color: 'rgba(255,255,255,0.9)', fontSize: 13, marginTop: 4, fontWeight: '500' },
