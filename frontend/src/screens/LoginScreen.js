@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
-  ActivityIndicator, Alert, KeyboardAvoidingView, Platform,
-  ScrollView, StatusBar, Modal, Image
+  ScrollView, StatusBar, Modal, Image, Animated, Easing
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useDispatch, useSelector } from 'react-redux';
@@ -27,7 +26,20 @@ export default function LoginScreen() {
   const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
   
   const [activeTab, setActiveTab] = useState('passenger');
-  const [isRegister, setIsRegister] = useState(false); // Toggle between Login and Register
+  const [isRegister, setIsRegister] = useState(false);
+
+  const logoAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.timing(logoAnim, {
+        toValue: 1,
+        duration: 15000,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    ).start();
+  }, [logoAnim]);
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState(''); // Used for Merchant/Admin login and Merchant register
@@ -126,9 +138,12 @@ export default function LoginScreen() {
               style={{ alignItems: 'center' }}
             >
               <View style={styles.logoBg}>
-                <Image 
+                <Animated.Image 
                   source={require('../assets/images/app_logo.png')} 
-                  style={styles.logoImage} 
+                  style={[
+                    styles.logoImage,
+                    { transform: [{ rotate: logoAnim.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] }) }] }
+                  ]} 
                   resizeMode="contain" 
                 />
               </View>
@@ -362,7 +377,7 @@ const getStyles = (COLORS) => StyleSheet.create({
     shadowOffset: { width: 0, height: 2 }
   },
   logoArea: { alignItems: 'center', marginBottom: 32 },
-  logoBg: { width: 110, height: 110, borderRadius: 55, backgroundColor: '#FFFFFF', justifyContent: 'center', alignItems: 'center', marginBottom: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 10, elevation: 4, padding: 8 },
+  logoBg: { width: 110, height: 110, borderRadius: 55, backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center', marginBottom: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 10, elevation: 4, padding: 8 },
   logoImage: { width: '100%', height: '100%' },
   title: { fontSize: 28, fontWeight: '900', color: COLORS.text, letterSpacing: 3 },
   subtitle: { fontSize: 14, color: COLORS.textLight, marginTop: 4, letterSpacing: 0.5 },

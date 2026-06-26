@@ -21,6 +21,7 @@ import FareCalculatorScreen from '../screens/FareCalculatorScreen';
 import StationInfoScreen from '../screens/StationInfoScreen';
 import FeederServicesScreen from '../screens/FeederServicesScreen';
 import SmartCardScreen from '../screens/SmartCardScreen';
+import GiftCardScreen from '../screens/GiftCardScreen';
 import QRScannerScreen from '../screens/QRScannerScreen';
 import TokenEconomyScreen from '../screens/User/TokenEconomyScreen';
 import MerchantManagementScreen from '../screens/Admin/MerchantManagementScreen';
@@ -61,6 +62,7 @@ export function AppNavigator() {
         <Stack.Screen name="StationInfo" component={StationInfoScreen} />
         <Stack.Screen name="FeederServices" component={FeederServicesScreen} />
         <Stack.Screen name="SmartCard" component={SmartCardScreen} />
+        <Stack.Screen name="GiftCard" component={GiftCardScreen} />
         <Stack.Screen name="QRScanner" component={QRScannerScreen} />
         <Stack.Screen name="TokenEconomy" component={TokenEconomyScreen} />
 

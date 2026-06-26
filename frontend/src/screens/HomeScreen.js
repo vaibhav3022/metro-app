@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet,
-  StatusBar, ActivityIndicator, Dimensions, Image, FlatList, Alert, Linking, Modal, Animated, ImageBackground
+  StatusBar, ActivityIndicator, Dimensions, Image, FlatList, Alert, Linking, Modal, Animated, ImageBackground, Easing
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useDispatch, useSelector } from 'react-redux';
@@ -27,6 +27,29 @@ export default function HomeScreen({ navigation }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [comingSoonModal, setComingSoonModal] = useState({ visible: false, vertical: null });
   const modalAnim = useRef(new Animated.Value(0)).current;
+  const logoAnim = useRef(new Animated.Value(0)).current;
+
+  // Header logo slow continuous rotation
+  useEffect(() => {
+    Animated.loop(
+      Animated.timing(logoAnim, {
+        toValue: 1,
+        duration: 15000, // Very slow continuous spin
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    ).start();
+  }, [logoAnim]);
+
+  const nxlAnim = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(nxlAnim, { toValue: 1, duration: 1500, useNativeDriver: true }),
+        Animated.timing(nxlAnim, { toValue: 0, duration: 1500, useNativeDriver: true })
+      ])
+    ).start();
+  }, [nxlAnim]);
 
   const screenWidth = Dimensions.get('window').width;
   const sliderWidth = screenWidth - 36; // inset (16 margin each side + 2 border each side)
@@ -197,7 +220,7 @@ export default function HomeScreen({ navigation }) {
     { title: 'Wallet', icon: 'wallet-outline', route: 'Wallet', color: '#00C9A7' },
     { title: 'Help & Support', icon: 'help-circle-outline', route: 'HelpSupport', color: '#EC4899' },
     { title: 'Metro Alerts', icon: 'bell-alert-outline', route: 'Notifications', color: '#FF9800' },
-    { title: 'Gift Cards', icon: 'gift-outline', route: 'SmartCard', params: { initialTab: 'gift' }, color: '#FF6B6B' },
+    { title: 'Gift Cards', icon: 'gift-outline', route: 'GiftCard', color: '#FF6B6B' },
   ];
 
   return (
@@ -209,13 +232,25 @@ export default function HomeScreen({ navigation }) {
         {/* Header */}
         <View style={styles.header}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1, marginRight: 15 }}>
-            <Image 
+            <Animated.Image 
               source={require('../assets/images/app_logo.png')} 
-              style={styles.headerLogo} 
+              style={[
+                styles.headerLogo, 
+                { 
+                  transform: [{ 
+                    rotate: logoAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ['0deg', '360deg']
+                    }) 
+                  }] 
+                }
+              ]} 
               resizeMode="contain" 
             />
             <View style={{ flex: 1 }}>
-              <Text style={styles.headerTitle}>{t('home.puneMetro')}</Text>
+              <Text style={styles.headerTitle}>
+                ENERGEIA <Text style={{ color: '#EF4444' }}>METRO</Text>
+              </Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
                 <Icon name="map-marker" size={14} color="#EF4444" />
                 <Text style={[styles.greeting, { marginTop: 0, marginLeft: 2 }]} numberOfLines={1} ellipsizeMode="tail">Pune, Maharashtra</Text>
@@ -224,8 +259,17 @@ export default function HomeScreen({ navigation }) {
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 0 }}>
             <TouchableOpacity onPress={() => navigation.navigate('NXLCredits')} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: isDark ? 'rgba(245,158,11,0.15)' : 'rgba(245,158,11,0.1)', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 28, borderWidth: 2, borderColor: '#F59E0B' }}>
-              <Text style={{ color: COLORS.text, fontWeight: '900', fontSize: 11, letterSpacing: 0.5 }}>NXL CREDITS </Text>
-              <Text style={{ color: '#D97706', fontWeight: '900', fontSize: 15 }}>₹{user?.nxlCredits || 0}</Text>
+              <Animated.Image 
+                source={require('../assets/images/nxl_icon.png')} 
+                style={{ 
+                  width: 22, 
+                  height: 22, 
+                  marginRight: 6,
+                  transform: [{ scale: nxlAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 1.15] }) }]
+                }} 
+                resizeMode="contain" 
+              />
+              <Text style={{ color: '#D97706', fontWeight: '900', fontSize: 16 }}>₹{user?.nxlCredits || 0}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -474,7 +518,7 @@ const getStyles = (COLORS) => StyleSheet.create({
   },
   scroll: { paddingTop: 10, paddingBottom: 30 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, marginBottom: 22 },
-  headerLogo: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#FFFFFF', padding: 2, borderWidth: 1, borderColor: '#E0E0E0' },
+  headerLogo: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'transparent', padding: 2 },
   headerTitle: { fontSize: 18, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
   greeting: { fontSize: 13, color: COLORS.textLight, marginTop: 1 },
   userName: { fontSize: 22, fontWeight: '800', color: COLORS.text, marginTop: 2 },

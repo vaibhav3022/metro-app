@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTheme } from '../context/ThemeContext';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StatusBar, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StatusBar, Image, Animated, Easing } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchWallet, addMoney } from '../redux/slices/walletSlice';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -23,6 +23,19 @@ export default function WalletScreen({ navigation }) {
   useEffect(() => {
     dispatch(fetchWallet());
   }, [dispatch]);
+
+  const logoAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.timing(logoAnim, {
+        toValue: 1,
+        duration: 15000,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    ).start();
+  }, [logoAnim]);
 
   const handleAddMoney = async () => {
     const amountVal = parseFloat(amount);
@@ -106,9 +119,12 @@ export default function WalletScreen({ navigation }) {
                 <Text style={styles.balanceCardBrand}>{t('wallet.brand')}</Text>
                 <Text style={styles.balanceCardSubBrand}>{t('wallet.subBrand')}</Text>
               </View>
-              <Image 
+              <Animated.Image 
                 source={require('../assets/images/app_logo.png')} 
-                style={styles.cardLogo} 
+                style={[
+                  styles.cardLogo,
+                  { transform: [{ rotate: logoAnim.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] }) }] }
+                ]} 
                 resizeMode="contain" 
               />
             </View>
