@@ -61,6 +61,7 @@ export default function HomeScreen({ navigation }) {
       tagline: 'EV Car & Auto Charging',
       icon: 'lightning-bolt',
       gradient: ['#F59E0B', '#B45309'],
+      bgColor: '#FEF3C7',
       color: '#B45309',
       emoji: '⚡',
       url: 'https://energeia369.com/'
@@ -71,6 +72,7 @@ export default function HomeScreen({ navigation }) {
       tagline: 'Premium Tea & Snacks at Every Station',
       icon: 'coffee',
       gradient: ['#D4A574', '#8B5E3C'],
+      bgColor: '#ECFCCB',
       color: '#8B5E3C',
       emoji: '☕',
       url: 'https://energeia369.com/oasis'
@@ -81,6 +83,7 @@ export default function HomeScreen({ navigation }) {
       tagline: 'Quick Grooming & Beauty Services',
       icon: 'face-woman-shimmer',
       gradient: ['#F472B6', '#BE185D'],
+      bgColor: '#FCE7F3',
       color: '#BE185D',
       emoji: '💄',
       url: 'https://lalyora.energeia369.com/'
@@ -91,6 +94,7 @@ export default function HomeScreen({ navigation }) {
       tagline: 'Work Pods & Meeting Rooms ',
       icon: 'laptop',
       gradient: ['#34D399', '#059669'],
+      bgColor: '#DCFCE7',
       color: '#059669',
       emoji: '🏢',
       url: null
@@ -101,6 +105,7 @@ export default function HomeScreen({ navigation }) {
       tagline: 'Premium Beauty Salon & Products',
       icon: 'spa',
       gradient: ['#FCA5A5', '#E11D48'],
+      bgColor: '#FEE2E2',
       color: '#E11D48',
       emoji: '✨',
       url: null
@@ -111,6 +116,7 @@ export default function HomeScreen({ navigation }) {
       tagline: 'Explore exciting events ',
       icon: 'calendar-star',
       gradient: ['#A78BFA', '#6D28D9'],
+      bgColor: '#EDE9FE',
       color: '#6D28D9',
       emoji: '🎟️',
       url: 'https://energeia369.com/events'
@@ -121,6 +127,7 @@ export default function HomeScreen({ navigation }) {
       tagline: 'Innovate, Build & Secure ',
       icon: 'shield-check',
       gradient: ['#0EA5E9', '#2563EB'],
+      bgColor: '#DBEAFE',
       color: '#2563EB',
       emoji: '🛡️',
       url: 'https://cybeorch.com/'
@@ -337,7 +344,7 @@ export default function HomeScreen({ navigation }) {
           {verticalsData.map((v) => (
             <TouchableOpacity key={v.id} activeOpacity={0.85} onPress={() => handleVerticalPress(v)}>
               <View style={[styles.verticalCard, { 
-                backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,1)', 
+                backgroundColor: v.bgColor || (isDark ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,1)'), 
                 borderWidth: 1.5, 
                 borderColor: v.gradient ? v.gradient[0] : (isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'),
                 elevation: 4,

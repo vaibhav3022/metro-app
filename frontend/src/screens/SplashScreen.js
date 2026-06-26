@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, Text, View, ActivityIndicator, StatusBar, Image } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { StyleSheet, Text, View, ActivityIndicator, StatusBar, Animated, Easing } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { useTheme } from '../context/ThemeContext';
 import { storage } from '../utils/storage';
@@ -10,8 +10,18 @@ export default function SplashScreen({ navigation }) {
   const dispatch = useDispatch();
   const { theme: COLORS, isDark } = useTheme();
   const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
+  const logoAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    Animated.loop(
+      Animated.timing(logoAnim, {
+        toValue: 1,
+        duration: 15000,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    ).start();
+
     const checkAuthStatus = async () => {
       try {
         const token = await storage.getToken();
@@ -69,9 +79,9 @@ export default function SplashScreen({ navigation }) {
       
       <View style={styles.logoContainer}>
         <View style={styles.logoBg}>
-          <Image 
+          <Animated.Image 
             source={require('../assets/images/app_logo.png')} 
-            style={styles.logoImage} 
+            style={[styles.logoImage, { transform: [{ rotate: logoAnim.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] }) }] }]} 
             resizeMode="contain" 
           />
         </View>
