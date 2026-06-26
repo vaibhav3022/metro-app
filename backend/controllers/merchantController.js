@@ -218,6 +218,39 @@ const markNotificationRead = async (req, res) => {
   } catch (err) { res.status(500).json({ success: false }); }
 };
 
+const registerMerchant = async (req, res) => {
+  try {
+    const { businessName, ownerName, shopAddress } = req.body;
+
+    // Check if files exist
+    if (!req.files || !req.files.aadhar || !req.files.pan || !req.files.photo) {
+      return res.status(400).json({ success: false, message: 'All KYC documents are required (aadhar, pan, photo)' });
+    }
+
+    // Check if user already applied
+    let merchant = await Merchant.findOne({ userId: req.user._id });
+    if (merchant) {
+      return res.status(400).json({ success: false, message: 'You have already applied for a merchant account.' });
+    }
+
+    merchant = await Merchant.create({
+      userId: req.user._id,
+      businessName,
+      ownerName,
+      shopAddress,
+      aadharUrl: req.files.aadhar[0].filename,
+      panUrl: req.files.pan[0].filename,
+      photoUrl: req.files.photo[0].filename,
+      status: 'pending'
+    });
+
+    res.status(201).json({ success: true, message: 'Merchant application submitted successfully', data: merchant });
+  } catch (error) {
+    console.error('Merchant Registration Error:', error);
+    res.status(500).json({ success: false, message: 'Server error during registration' });
+  }
+};
+
 module.exports = {
-  getStatus, getDashboard, getTransactions, scanToken, getShop, updateShop, addProduct, editProduct, deleteProduct, addOffer, getNotifications, markNotificationRead
+  getStatus, getDashboard, getTransactions, scanToken, getShop, updateShop, addProduct, editProduct, deleteProduct, addOffer, getNotifications, markNotificationRead, registerMerchant
 };

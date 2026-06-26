@@ -4,7 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import SplashScreen from '../screens/SplashScreen';
 import AuthNavigator from './AuthNavigator';
-import BottomTabNavigator from './BottomTabNavigator';
+import MainTabNavigator from './MainTabNavigator';
 import RouteSelectionScreen from '../screens/RouteSelectionScreen';
 import FareScreen from '../screens/FareScreen';
 import PaymentScreen from '../screens/PaymentScreen';
@@ -46,7 +46,7 @@ export function AppNavigator() {
         <Stack.Screen name="Auth" component={AuthNavigator} />
         
         {/* User Portal */}
-        <Stack.Screen name="Main" component={BottomTabNavigator} />
+        <Stack.Screen name="Main" component={MainTabNavigator} />
         <Stack.Screen name="RouteSelection" component={RouteSelectionScreen} />
         <Stack.Screen name="Fare" component={FareScreen} />
         <Stack.Screen name="Payment" component={PaymentScreen} />

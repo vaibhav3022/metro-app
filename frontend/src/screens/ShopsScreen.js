@@ -68,7 +68,7 @@ export default function ShopsScreen({ navigation }) {
             <Icon name="star" size={14} color="#FFD700" />
             <Text style={styles.ratingText}>{item.rating || '4.5'}</Text>
           </View>
-          <View style={{ flexDirection: 'row', gap: 10 }}>
+          <View style={{ flexDirection: 'row' }}>
             <TouchableOpacity 
               onPress={() => navigation.navigate('ScanAndPay', { shopId: item._id, shopName: item.shopName })}
               style={{ borderRadius: 16, overflow: 'hidden' }}
@@ -76,16 +76,6 @@ export default function ShopsScreen({ navigation }) {
               <LinearGradient colors={[COLORS.primary, COLORS.primary]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.payBtn}>
                 <Icon name="form-textbox" size={16} color="#fff" style={{ marginRight: 6 }} />
                 <Text style={styles.payBtnText}>{t('shops.pay')}</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              onPress={() => navigation.navigate('ScanAndPay')}
-              style={{ borderRadius: 16, overflow: 'hidden' }}
-            >
-              <LinearGradient colors={[COLORS.secondary, COLORS.secondary]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.payBtn}>
-                <Icon name="qrcode-scan" size={16} color="#fff" style={{ marginRight: 6 }} />
-                <Text style={styles.payBtnText}>{t('shops.scan')}</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>
@@ -208,19 +198,6 @@ export default function ShopsScreen({ navigation }) {
                     <Text style={styles.modalActionText}>{t('shops.payBill')}</Text>
                   </LinearGradient>
                 </TouchableOpacity>
-
-                <TouchableOpacity 
-                  style={styles.modalActionBtn}
-                  onPress={() => {
-                    setSelectedShop(null);
-                    navigation.navigate('ScanAndPay');
-                  }}
-                >
-                  <LinearGradient colors={[COLORS.secondary, COLORS.secondary]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.modalActionGrad}>
-                    <Icon name="qrcode-scan" size={20} color="#fff" style={{ marginRight: 8 }} />
-                    <Text style={styles.modalActionText}>{t('shops.scanQr')}</Text>
-                  </LinearGradient>
-                </TouchableOpacity>
               </View>
             </View>
           )}
@@ -322,8 +299,8 @@ const getStyles = (COLORS) => StyleSheet.create({
   modalDescWrap: { marginTop: 10, marginBottom: 40, backgroundColor: COLORS.background, padding: 16, borderRadius: 16 },
   modalDescTitle: { color: COLORS.text, fontSize: 16, fontWeight: '800', marginBottom: 8 },
   modalDesc: { color: COLORS.textLight, fontSize: 14, lineHeight: 22 },
-  modalFooter: { flexDirection: 'row', padding: 20, paddingBottom: 30, backgroundColor: COLORS.cardBg, borderTopWidth: 1, borderTopColor: COLORS.border, gap: 12 },
-  modalActionBtn: { flex: 1, borderRadius: 16, overflow: 'hidden' },
+  modalFooter: { flexDirection: 'row', justifyContent: 'center', padding: 20, paddingBottom: 30, backgroundColor: COLORS.cardBg, borderTopWidth: 1, borderTopColor: COLORS.border },
+  modalActionBtn: { borderRadius: 16, overflow: 'hidden', minWidth: 200 },
   modalActionGrad: { paddingVertical: 16, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
   modalActionText: { color: '#fff', fontSize: 16, fontWeight: '800' },
 });

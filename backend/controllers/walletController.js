@@ -1,6 +1,9 @@
 const Wallet = require('../models/Wallet');
+const WalletTransaction = require('../models/WalletTransaction');
 const User = require('../models/User');
 const TokenTransaction = require('../models/TokenTransaction');
+const Merchant = require('../models/Merchant');
+const MerchantTransaction = require('../models/MerchantTransaction');
 const { createBreaker } = require('../utils/circuitBreaker');
 const Razorpay = require('razorpay');
 
@@ -31,7 +34,19 @@ const getWalletBalance = async (req, res) => {
       await wallet.save();
     }
 
-    const sortedTransactions = wallet.transactions ? [...wallet.transactions].sort((a, b) => b.date - a.date) : [];
+    // Fetch new transactions
+    const newTx = await WalletTransaction.find({ walletId: wallet._id }).lean();
+    const mappedNewTx = newTx.map(t => ({
+      _id: t._id,
+      type: t.type,
+      amount: t.amount,
+      description: t.description,
+      date: t.createdAt,
+      referenceType: t.referenceType
+    }));
+
+    let allTransactions = [...(wallet.transactions || []), ...mappedNewTx];
+    const sortedTransactions = allTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
 
     res.status(200).json({
       success: true,
@@ -110,24 +125,27 @@ const addMoney = async (req, res) => {
       });
     }
 
-    const rechargeAmount = parseFloat(amount);
-    wallet.balance += rechargeAmount;
+    const baseAmount = parseFloat(amount);
+    const bonusAmount = Math.floor(baseAmount * 0.05); // 5% extra from admin
+    const totalCredit = baseAmount + bonusAmount;
 
-    const newTransaction = {
-      type: 'credit',
-      amount: rechargeAmount,
-      description: `Wallet Recharge (ID: ${paymentId || 'PAY-' + Date.now()})`,
-      date: new Date()
-    };
-
-    wallet.transactions.push(newTransaction);
+    wallet.balance += totalCredit;
     await wallet.save();
+
+    const tx = await WalletTransaction.create({
+      walletId: wallet._id,
+      userId: req.user.id,
+      amount: totalCredit,
+      type: 'credit',
+      description: `Wallet Recharge + 5% Oasis Bonus (ID: ${paymentId || 'PAY-' + Date.now()})`,
+      referenceType: 'WALLET_TOPUP'
+    });
 
     res.status(200).json({
       success: true,
       message: 'Wallet credited successfully.',
       balance: wallet.balance,
-      transaction: wallet.transactions[wallet.transactions.length - 1]
+      transaction: { ...tx.toObject(), date: tx.createdAt }
     });
   } catch (error) {
     console.error('Wallet Add Money Error:', error);
@@ -153,21 +171,22 @@ const deductMoney = async (req, res) => {
 
     const debitAmount = parseFloat(amount);
     wallet.balance -= debitAmount;
-
-    wallet.transactions.push({
-      type: 'debit',
-      amount: debitAmount,
-      description: `Metro Ticket booking: ${ticketId || 'PMA-PASS'}`,
-      date: new Date()
-    });
-
     await wallet.save();
+
+    const tx = await WalletTransaction.create({
+      walletId: wallet._id,
+      userId: req.user.id,
+      amount: debitAmount,
+      type: 'debit',
+      description: `Metro Ticket booking: ${ticketId || 'PMA-PASS'}`,
+      referenceType: 'TICKET_BOOKING'
+    });
 
     res.status(200).json({
       success: true,
       message: 'Wallet debited successfully.',
       balance: wallet.balance,
-      transaction: wallet.transactions[wallet.transactions.length - 1]
+      transaction: { ...tx.toObject(), date: tx.createdAt }
     });
   } catch (error) {
     console.error('Wallet Deduct Money Error:', error);
@@ -186,8 +205,19 @@ const getTransactionHistory = async (req, res) => {
       return res.status(200).json({ success: true, transactions: [] });
     }
 
-    // Sort transactions by date newest first
-    const sortedTransactions = [...wallet.transactions].sort((a, b) => b.date - a.date);
+    // Fetch new transactions
+    const newTx = await WalletTransaction.find({ walletId: wallet._id }).lean();
+    const mappedNewTx = newTx.map(t => ({
+      _id: t._id,
+      type: t.type,
+      amount: t.amount,
+      description: t.description,
+      date: t.createdAt,
+      referenceType: t.referenceType
+    }));
+
+    let allTransactions = [...(wallet.transactions || []), ...mappedNewTx];
+    const sortedTransactions = allTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
 
     res.status(200).json({
       success: true,
@@ -217,14 +247,16 @@ const buyTokens = async (req, res) => {
 
     const tokensToBuy = parseFloat(amount);
     wallet.balance += tokensToBuy;
-
-    wallet.transactions.push({
-      type: 'credit',
-      amount: tokensToBuy,
-      description: `Purchased ${tokensToBuy} Tokens (ID: ${paymentId || 'PAY-' + Date.now()})`,
-      date: new Date()
-    });
     await wallet.save();
+
+    const tx = await WalletTransaction.create({
+      walletId: wallet._id,
+      userId: req.user.id,
+      amount: tokensToBuy,
+      type: 'credit',
+      description: `Purchased ${tokensToBuy} Tokens (ID: ${paymentId || 'PAY-' + Date.now()})`,
+      referenceType: 'TOKEN_PURCHASE'
+    });
 
     // Create TokenTransaction record for admin metrics
     const tokenTx = new TokenTransaction({
@@ -247,11 +279,100 @@ const buyTokens = async (req, res) => {
   }
 };
 
+const processQRPayment = async (req, res) => {
+  const { qrToken, amount } = req.body;
+
+  if (!qrToken) return res.status(400).json({ message: 'QR Token is required.' });
+  if (!amount || isNaN(amount) || parseFloat(amount) <= 0) return res.status(400).json({ message: 'Valid amount is required.' });
+
+  try {
+    const merchant = await Merchant.findOne({ qrCodeToken: qrToken });
+    if (!merchant) return res.status(404).json({ message: 'Invalid QR Code or Merchant not found.' });
+    if (merchant.status !== 'approved') return res.status(400).json({ message: 'Merchant account is not active.' });
+
+    const wallet = await Wallet.findOne({ userId: req.user.id });
+    if (!wallet || wallet.balance < parseFloat(amount)) {
+      return res.status(400).json({ message: 'Insufficient wallet balance.' });
+    }
+
+    const payAmount = parseFloat(amount);
+    
+    // Deduct from user
+    wallet.balance -= payAmount;
+    await wallet.save();
+    
+    await WalletTransaction.create({
+      walletId: wallet._id,
+      userId: req.user.id,
+      amount: payAmount,
+      type: 'debit',
+      description: `Paid to ${merchant.businessName}`,
+      referenceType: 'QR_PAYMENT'
+    });
+
+    // Credit to merchant
+    merchant.balance = (merchant.balance || 0) + payAmount;
+    await merchant.save();
+
+    await MerchantTransaction.create({
+      merchantId: merchant._id,
+      userId: req.user.id,
+      amount: payAmount,
+      type: 'qr_payment',
+      status: 'SUCCESS'
+    });
+
+    res.status(200).json({ success: true, message: `Payment of ₹${payAmount} successful to ${merchant.businessName}` });
+  } catch (error) {
+    console.error('QR Payment Error:', error);
+    res.status(500).json({ message: 'Server error processing QR payment.' });
+  }
+};
+
+// @desc    Retrieve cashback history for user
+// @route   GET /api/wallet/cashback-history
+// @access  Private
+const getCashbackHistory = async (req, res) => {
+  try {
+    const wallet = await Wallet.findOne({ userId: req.user.id });
+    
+    if (!wallet) {
+      return res.status(200).json({ success: true, transactions: [] });
+    }
+
+    const newTx = await WalletTransaction.find({ walletId: wallet._id }).lean();
+    const mappedNewTx = newTx.map(t => ({
+      _id: t._id,
+      type: t.type,
+      amount: t.amount,
+      description: t.description,
+      date: t.createdAt,
+      referenceType: t.referenceType
+    }));
+
+    let allTransactions = [...(wallet.transactions || []), ...mappedNewTx];
+    
+    // Filter only those containing "Cashback" in description
+    const cashbackTransactions = allTransactions.filter(tx => 
+      tx.description && tx.description.toLowerCase().includes('cashback')
+    );
+
+    const sortedTransactions = cashbackTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    res.status(200).json({ success: true, transactions: sortedTransactions });
+  } catch (error) {
+    console.error('Fetch Cashback History Error:', error);
+    res.status(500).json({ message: 'Server error retrieving cashback history.' });
+  }
+};
+
 module.exports = {
   getWalletBalance,
   createRazorpayOrder,
   addMoney,
   deductMoney,
   getTransactionHistory,
-  buyTokens
+  buyTokens,
+  processQRPayment,
+  getCashbackHistory
 };

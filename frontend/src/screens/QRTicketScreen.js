@@ -8,6 +8,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import { useTranslation } from 'react-i18next';
+import QRCode from 'react-native-qrcode-svg';
 
 const { width } = Dimensions.get('window');
 
@@ -67,14 +68,18 @@ export default function QRTicketScreen() {
   };
 
   const renderQRItem = ({ index }) => {
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${ticket.ticketId || ticket.id}_${index + 1}&color=000000&bgcolor=FFFFFF`;
+    // Use encrypted qrData from backend if available, otherwise fallback to ticketId
+    const qrPayload = ticket.qrData 
+      ? ticket.qrData
+      : `${ticket.ticketId || ticket.id}_${index + 1}`;
 
     return (
-      <View style={{ width: QR_SIZE, height: QR_SIZE, position: 'relative', overflow: 'hidden', borderRadius: 12 }}>
-        <Image
-          source={{ uri: qrUrl }}
-          style={styles.qrImage}
-          resizeMode="contain"
+      <View style={{ width: QR_SIZE, height: QR_SIZE, position: 'relative', overflow: 'hidden', borderRadius: 12, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFFFFF' }}>
+        <QRCode
+          value={qrPayload}
+          size={QR_SIZE - 20}
+          color="black"
+          backgroundColor="white"
         />
         {isInvalid && (
           <View style={styles.invalidOverlay}>

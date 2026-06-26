@@ -4,7 +4,10 @@ const {
   createRazorpayOrder,
   addMoney,
   getTransactionHistory,
-  buyTokens
+  buyTokens,
+  processQRPayment,
+  deductMoney,
+  getCashbackHistory
 } = require('../controllers/walletController');
 const { protect } = require('../middleware/authMiddleware');
 const idempotency = require('../middleware/idempotency');
@@ -19,7 +22,10 @@ router.post('/create-razorpay-order', protect, createRazorpayOrder);
 // @desc    Add money to wallet via Stripe
 // @access  Private
 router.post('/add-money', protect, validate(walletTopupSchema), idempotency, addMoney);
+router.post('/deduct-money', protect, deductMoney);
 router.post('/buy-tokens', protect, buyTokens);
 router.get('/transactions', protect, getTransactionHistory);
+router.get('/cashback-history', protect, getCashbackHistory);
+router.post('/payment/qr', protect, processQRPayment);
 
 module.exports = router;

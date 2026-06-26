@@ -32,6 +32,11 @@ const authSlice = createSlice({
     updateProfileSuccess: (state, action) => {
       state.user = action.payload;
     },
+    updateUserCredits: (state, action) => {
+      if (state.user) {
+        state.user.nxlCredits = action.payload;
+      }
+    },
     updateToken: (state, action) => {
       state.token = action.payload.token;
       if (action.payload.refreshToken) {
@@ -57,6 +62,7 @@ export const {
   authSuccess,
   authFailure,
   updateProfileSuccess,
+  updateUserCredits,
   updateToken,
   logout,
   clearError

@@ -11,7 +11,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import { ticketAPI } from '../api/ticketAPI';
 import { walletAPI } from '../api/walletAPI';
 import { shopAPI } from '../api/shopAPI';
-import { setCurrentTicket } from '../redux/slices/ticketSlice';
+import { setCurrentTicket, fetchHistorySuccess } from '../redux/slices/ticketSlice';
 import { deductMoneySuccess, addMoneySuccess } from '../redux/slices/walletSlice';
 import { useTranslation } from 'react-i18next';
 
@@ -97,6 +97,14 @@ export default function PaymentScreen({ route, navigation }) {
 
       setLoading(false);
       dispatch(setCurrentTicket(paymentResult.ticket));
+
+      // Refresh ticket history so HomeScreen Recent Tickets updates immediately
+      try {
+        const historyData = await ticketAPI.getTicketHistory();
+        if (historyData.tickets) {
+          dispatch(fetchHistorySuccess(historyData.tickets));
+        }
+      } catch (_) {}
 
       setSuccessData({
         title: t('payment.ticketBooked'),

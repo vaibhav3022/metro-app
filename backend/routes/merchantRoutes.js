@@ -12,14 +12,21 @@ const {
   addOffer,
   getNotifications,
   markNotificationRead,
-  getStatus
+  getStatus,
+  registerMerchant
 } = require('../controllers/merchantController');
 const { protect } = require('../middleware/authMiddleware');
 const { requireMerchant } = require('../middleware/roleMiddleware');
+const upload = require('../utils/upload');
 
 router.use(protect);
 
-router.get('/status', requireMerchant, getStatus); // Allowed even if pending
+router.get('/status', getStatus); // Allowed for any logged in user who applied
+router.post('/register', upload.fields([
+  { name: 'aadhar', maxCount: 1 },
+  { name: 'pan', maxCount: 1 },
+  { name: 'photo', maxCount: 1 }
+]), registerMerchant);
 
 // Require Approved Merchant Status for below routes
 router.use(requireMerchant); 

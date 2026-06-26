@@ -1,13 +1,14 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet,
-  StatusBar, ActivityIndicator, Dimensions, Image, FlatList, Alert, Linking, Modal, Animated
+  StatusBar, ActivityIndicator, Dimensions, Image, FlatList, Alert, Linking, Modal, Animated, ImageBackground
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTranslation } from 'react-i18next';
+import { useFocusEffect } from '@react-navigation/native';
 import { ticketAPI } from '../api/ticketAPI';
 import api from '../api/axiosConfig';
 import { fetchHistorySuccess, setCurrentTicket } from '../redux/slices/ticketSlice';
@@ -28,12 +29,12 @@ export default function HomeScreen({ navigation }) {
   const modalAnim = useRef(new Animated.Value(0)).current;
 
   const screenWidth = Dimensions.get('window').width;
-  const sliderWidth = screenWidth; // full width
+  const sliderWidth = screenWidth - 36; // inset (16 margin each side + 2 border each side)
 
   const verticalsData = [
     {
       id: 'energia',
-      name: 'Energeia',
+      name: 'ENERGEIA',
       tagline: 'Complete EV Ecosystem Platform',
       icon: 'lightning-bolt',
       gradient: ['#F59E0B', '#B45309'],
@@ -62,16 +63,6 @@ export default function HomeScreen({ navigation }) {
       url: 'https://lalyora.energeia369.com/'
     },
     {
-      id: 'evcharging',
-      name: 'EV Charging',
-      tagline: 'Charge your electric vehicles at stations',
-      icon: 'ev-station',
-      gradient: ['#60A5FA', '#1D4ED8'],
-      color: '#1D4ED8',
-      emoji: '🔋',
-      url: null
-    },
-    {
       id: 'coworking',
       name: 'CoWorking Space',
       tagline: 'Work Pods & Meeting Rooms at Stations',
@@ -79,6 +70,16 @@ export default function HomeScreen({ navigation }) {
       gradient: ['#34D399', '#059669'],
       color: '#059669',
       emoji: '🏢',
+      url: null
+    },
+    {
+      id: 'eva',
+      name: 'EVA',
+      tagline: 'Premium Beauty Salon & Products',
+      icon: 'spa',
+      gradient: ['#FCA5A5', '#E11D48'],
+      color: '#E11D48',
+      emoji: '✨',
       url: null
     },
     {
@@ -90,16 +91,6 @@ export default function HomeScreen({ navigation }) {
       color: '#6D28D9',
       emoji: '🎉',
       url: 'https://energeia369.com/events'
-    },
-    {
-      id: 'nexus',
-      name: 'Nexus',
-      tagline: 'Franchise & Investor Connect',
-      icon: 'handshake',
-      gradient: ['#F87171', '#B91C1C'],
-      color: '#B91C1C',
-      emoji: '🤝',
-      url: 'https://energeia369.com/nexus'
     },
   ];
 
@@ -126,11 +117,10 @@ export default function HomeScreen({ navigation }) {
     { id: 's1', source: require('../../assets/slider/metro_train.png'), title: t('home.slider1'), isVertical: false },
     { id: 'v1', source: require('../../assets/slider/energia.jpg'), title: 'Energia', isVertical: true, vertical: verticalsData[0] },
     { id: 'v2', source: require('../../assets/slider/oasis_cafe.jpg'), title: 'Oasis T-Cafe', isVertical: true, vertical: verticalsData[1] },
-    { id: 'v3', source: require('../../assets/slider/ll_beauty.jpg'), title: 'LL Beauty', isVertical: true, vertical: verticalsData[2] },
-    { id: 'v4', source: require('../../assets/slider/ev_auto.jpg'), title: 'EV Charging', isVertical: true, vertical: verticalsData[3] },
-    { id: 'v5', source: require('../../assets/slider/coworking.jpg'), title: 'CoWorking Space', isVertical: true, vertical: verticalsData[4] },
+    { id: 'v3', source: require('../../assets/slider/ll_beauty.png'), title: 'LL Beauty', isVertical: true, vertical: verticalsData[2] },
+    { id: 'v5', source: require('../../assets/slider/coworking.png'), title: 'CoWorking Space', isVertical: true, vertical: verticalsData[3] },
+    { id: 'eva1', source: require('../../assets/slider/eva_salon.png'), title: 'EVA', isVertical: true, vertical: verticalsData[4] },
     { id: 'v6', source: require('../../assets/slider/events.jpg'), title: 'Events', isVertical: true, vertical: verticalsData[5] },
-    { id: 'v7', source: require('../../assets/slider/nexus.jpg'), title: 'Nexus', isVertical: true, vertical: verticalsData[6] },
   ];
 
   const flatListRef = useRef(null);
@@ -160,33 +150,37 @@ export default function HomeScreen({ navigation }) {
       setCurrentSlide(nextIndex);
     }, 3000);
 
-    // Fetch tickets for recent tickets section
-    const fetchTickets = async () => {
-      try {
-        const data = await ticketAPI.getTicketHistory();
-        if (data.tickets) {
-          dispatch(fetchHistorySuccess(data.tickets));
-        }
-      } catch (err) {
-        console.log('Failed to fetch recent tickets in home');
-      }
-    };
-
-    const fetchNotifications = async () => {
-      try {
-        const res = await api.get('/notifications');
-        const list = res.data.data || [];
-        dispatch(setNotifications(list));
-      } catch (err) {
-        console.log('Failed to fetch notifications in home');
-      }
-    };
-
-    fetchTickets();
-    fetchNotifications();
-
     return () => clearInterval(autoScroll);
-  }, [dispatch, t]);
+  }, [t]);
+
+  useFocusEffect(
+    useCallback(() => {
+      // Fetch tickets for recent tickets section
+      const fetchTickets = async () => {
+        try {
+          const data = await ticketAPI.getTicketHistory();
+          if (data.tickets) {
+            dispatch(fetchHistorySuccess(data.tickets));
+          }
+        } catch (err) {
+          console.log('Failed to fetch recent tickets in home');
+        }
+      };
+
+      const fetchNotifications = async () => {
+        try {
+          const res = await api.get('/notifications');
+          const list = res.data.data || [];
+          dispatch(setNotifications(list));
+        } catch (err) {
+          console.log('Failed to fetch notifications in home');
+        }
+      };
+
+      fetchTickets();
+      fetchNotifications();
+    }, [dispatch])
+  );
 
   const activeTicket = history?.find(t => t.ticketStatus === 'active' || t.ticketStatus === 'entered');
   const firstName = user?.name ? user.name.split(' ')[0] : t('home.passenger');
@@ -200,6 +194,10 @@ export default function HomeScreen({ navigation }) {
     { title: t('home.touristPlaces'), icon: 'compass-outline', route: 'TouristPlaces', color: '#9C27B0' },
     { title: t('home.smartCard'), icon: 'card-account-details-outline', route: 'SmartCard', color: '#00796B' },
     { title: t('home.metroMap'), icon: 'map-outline', route: 'MetroMap', color: '#E64A19' },
+    { title: 'Wallet', icon: 'wallet-outline', route: 'Wallet', color: '#00C9A7' },
+    { title: 'Help & Support', icon: 'help-circle-outline', route: 'HelpSupport', color: '#EC4899' },
+    { title: 'Metro Alerts', icon: 'bell-alert-outline', route: 'Notifications', color: '#FF9800' },
+    { title: 'Gift Cards', icon: 'gift-outline', route: 'SmartCard', params: { initialTab: 'gift' }, color: '#FF6B6B' },
   ];
 
   return (
@@ -212,27 +210,22 @@ export default function HomeScreen({ navigation }) {
         <View style={styles.header}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1, marginRight: 15 }}>
             <Image 
-              source={require('../assets/images/pune_metro_logo.png')} 
+              source={require('../assets/images/app_logo.png')} 
               style={styles.headerLogo} 
               resizeMode="contain" 
             />
             <View style={{ flex: 1 }}>
               <Text style={styles.headerTitle}>{t('home.puneMetro')}</Text>
-              <Text style={styles.greeting} numberOfLines={1} ellipsizeMode="tail">{greeting}, {firstName}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
+                <Icon name="map-marker" size={14} color="#EF4444" />
+                <Text style={[styles.greeting, { marginTop: 0, marginLeft: 2 }]} numberOfLines={1} ellipsizeMode="tail">Pune, Maharashtra</Text>
+              </View>
             </View>
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 0 }}>
-            <TouchableOpacity onPress={toggleTheme} style={[styles.themeToggle, { marginRight: 10 }]}>
-              <Icon name={isDark ? "weather-night" : "white-balance-sunny"} size={22} color={COLORS.text} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('Notifications')} style={styles.notifIconHeader}>
-              <Icon name="bell-outline" size={24} color={COLORS.text} />
-              {unreadCount > 0 && <View style={styles.notifBadge} />}
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('ProfileTab')} style={styles.avatarWrap}>
-              <LinearGradient colors={[COLORS.secondary, COLORS.primary]} style={styles.avatar}>
-                <Text style={styles.avatarText}>{(user?.name || 'P')[0].toUpperCase()}</Text>
-              </LinearGradient>
+            <TouchableOpacity onPress={() => navigation.navigate('NXLCredits')} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: isDark ? 'rgba(245,158,11,0.15)' : 'rgba(245,158,11,0.1)', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 28, borderWidth: 2, borderColor: '#F59E0B' }}>
+              <Text style={{ color: COLORS.text, fontWeight: '900', fontSize: 11, letterSpacing: 0.5 }}>NXL CREDITS </Text>
+              <Text style={{ color: '#D97706', fontWeight: '900', fontSize: 15 }}>₹{user?.nxlCredits || 0}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -287,16 +280,25 @@ export default function HomeScreen({ navigation }) {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.verticalsScroll}>
           {verticalsData.map((v) => (
             <TouchableOpacity key={v.id} activeOpacity={0.85} onPress={() => handleVerticalPress(v)}>
-              <LinearGradient colors={v.gradient} style={styles.verticalCard} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
-                <View style={styles.verticalCardIcon}>
-                  <Icon name={v.icon} size={28} color="#fff" />
+              <View style={[styles.verticalCard, { 
+                backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,1)', 
+                borderWidth: 1.5, 
+                borderColor: v.gradient ? v.gradient[0] : (isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'),
+                elevation: 4,
+                shadowOpacity: 0.15,
+                shadowColor: v.gradient ? v.gradient[0] : '#000',
+                shadowRadius: 6,
+                shadowOffset: { width: 0, height: 2 }
+              }]}>
+                <View style={[styles.verticalCardIcon, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }]}>
+                  <Icon name={v.icon} size={30} color={v.gradient ? v.gradient[0] : COLORS.primary} />
                 </View>
-                <Text style={styles.verticalCardName}>{v.name}</Text>
-                <Text style={styles.verticalCardTag} numberOfLines={2}>{v.tagline}</Text>
-                <View style={styles.verticalBadge}>
-                  <Text style={styles.verticalBadgeText}>Explore →</Text>
+                <Text style={[styles.verticalCardName, { color: COLORS.text }]}>{v.name}</Text>
+                <Text style={[styles.verticalCardTag, { color: COLORS.textLight }]} numberOfLines={2}>{v.tagline}</Text>
+                <View style={[styles.verticalBadge, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)' }]}>
+                  <Text style={[styles.verticalBadgeText, { color: COLORS.text }]}>Explore →</Text>
                 </View>
-              </LinearGradient>
+              </View>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -308,7 +310,7 @@ export default function HomeScreen({ navigation }) {
             <TouchableOpacity
               key={index}
               style={styles.gridItem}
-              onPress={() => navigation.navigate(action.route)}
+              onPress={() => navigation.navigate(action.route, action.params)}
               activeOpacity={0.75}
             >
               <View style={[styles.iconBox, { backgroundColor: action.color + '22' }]}>
@@ -440,7 +442,7 @@ export default function HomeScreen({ navigation }) {
                 </View>
 
                 <Text style={styles.modalDesc}>
-                  We're working hard to bring {comingSoonModal.vertical.name} to every Pune Metro station. Stay tuned for an amazing experience!
+                  We're working hard to bring {comingSoonModal.vertical.name} to every ENERGEIA METRO station. Stay tuned for an amazing experience!
                 </Text>
 
                 <TouchableOpacity style={styles.modalCloseBtn} onPress={hideComingSoon}>
@@ -482,7 +484,7 @@ const getStyles = (COLORS) => StyleSheet.create({
   avatarText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
   notifIconHeader: { marginRight: 12, position: 'relative', justifyContent: 'center' },
   notifBadge: { position: 'absolute', top: 0, right: 2, width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#EF4444', borderWidth: 1.5, borderColor: COLORS.cardBg },
-  sliderContainer: { width: '100%', height: 190, marginBottom: 20, overflow: 'hidden', backgroundColor: COLORS.cardBg },
+  sliderContainer: { marginHorizontal: 16, height: 190, marginBottom: 24, overflow: 'hidden', backgroundColor: COLORS.cardBg, borderRadius: 20, borderWidth: 2, borderColor: '#D97706', elevation: 8, shadowColor: '#D97706', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8 },
   slideWrap: { height: 190 },
   slideImage: { width: '100%', height: '100%', resizeMode: 'cover' },
   slideOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 100, justifyContent: 'flex-end', padding: 16 },
@@ -503,7 +505,7 @@ const getStyles = (COLORS) => StyleSheet.create({
 
   verticalsScroll: { paddingHorizontal: 18, gap: 14, marginBottom: 26 },
   verticalCard: { width: 150, height: 180, borderRadius: 22, padding: 16, justifyContent: 'space-between', elevation: 6, shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 10, shadowOffset: { width: 0, height: 4 } },
-  verticalCardIcon: { width: 48, height: 48, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.25)', justifyContent: 'center', alignItems: 'center' },
+  verticalCardIcon: { width: 48, height: 48, borderRadius: 14, justifyContent: 'center', alignItems: 'center' },
   verticalCardName: { fontSize: 15, fontWeight: '900', color: '#fff', marginTop: 8 },
   verticalCardTag: { fontSize: 10, color: 'rgba(255,255,255,0.85)', lineHeight: 14 },
   verticalBadge: { backgroundColor: 'rgba(255,255,255,0.25)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, alignSelf: 'flex-start' },

@@ -16,9 +16,11 @@ const merchantRoutes = require('./routes/merchantRoutes');
 const tokenRoutes = require('./routes/tokenRoutes');
 const revenueRoutes = require('./routes/revenueRoutes');
 const stationRoutes = require('./routes/stationRoutes');
+const contentRoutes = require('./routes/contentRoutes');
 const webhookRoutes = require('./routes/webhookRoutes');
 const metroRoutes = require('./routes/metroRoutes');
 const giftCardRoutes = require('./routes/giftCardRoutes');
+const membershipRoutes = require('./routes/membershipRoutes');
 const healthRoutes = require('./routes/health');
 
 const { applySecurity } = require('./config/security');
@@ -64,6 +66,7 @@ app.use('/api/smartcard', smartCardRoutes);
 app.use('/api/complaints', complaintRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/content', contentRoutes);
 app.use('/api/merchant', merchantRoutes);
 app.use('/api/tokens', tokenRoutes);
 app.use('/api/revenue', revenueRoutes);
@@ -71,6 +74,7 @@ app.use('/api/stations', stationRoutes);
 app.use('/api/webhooks', webhookRoutes);
 app.use('/api/metro', metroRoutes);
 app.use('/api/giftcard', giftCardRoutes);
+app.use('/api/membership', membershipRoutes);
 // Fallback error catcher
 app.use(errorHandler);
 

@@ -30,6 +30,18 @@ const StationSchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: true
+  },
+  facilities: {
+    hasParking: { type: Boolean, default: false },
+    hasElevator: { type: Boolean, default: false },
+    hasEscalator: { type: Boolean, default: false },
+    hasWashroom: { type: Boolean, default: false },
+    hasWater: { type: Boolean, default: false },
+    hasInterchange: { type: Boolean, default: false }
+  },
+  platforms: {
+    type: Number,
+    default: 2
   }
 }, { timestamps: true });
 

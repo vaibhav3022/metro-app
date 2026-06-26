@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useTheme } from '../context/ThemeContext';
-import { StyleSheet, View, Text, TouchableOpacity, StatusBar, ScrollView, Platform, Modal, Image, Dimensions, Animated } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, StatusBar, ScrollView, Platform, Modal, Image, Dimensions, Animated, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import StationPicker from '../components/StationPicker';
@@ -60,6 +60,23 @@ const getStationDetails = (stationName) => {
     landmarks: data.landmarks
   };
 };
+
+const getPlatformDirections = (stationName) => {
+  const data = STATION_DATA[stationName];
+  if (!data) return [];
+  if (data.line === "Purple Line" || data.line.includes("Purple")) {
+    return ["Platform 1: Towards PCMC", "Platform 2: Towards Swargate"];
+  } else if (data.line === "Aqua Line") {
+    return ["Platform 1: Towards Vanaz", "Platform 2: Towards Ramwadi"];
+  }
+  return [];
+};
+
+const stationImages = [
+  require('../../assets/stations/station1.png'),
+  require('../../assets/stations/station2.png'),
+  require('../../assets/stations/station3.png')
+];
 
 const getFacilities = (stationName, t) => {
   const data = STATION_DATA[stationName];
@@ -166,6 +183,20 @@ export default function StationInfoScreen({ navigation }) {
         </View>
 
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          {/* STATION IMAGES SLIDER */}
+          <View style={styles.sliderContainer}>
+            <FlatList
+              data={stationImages}
+              keyExtractor={(_, index) => index.toString()}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              renderItem={({ item }) => (
+                <Image source={item} style={styles.sliderImage} resizeMode="cover" />
+              )}
+            />
+          </View>
+
           {/* STATION SELECTOR */}
           <View style={[styles.card, { padding: 20 }]}>
             <StationPicker
@@ -188,16 +219,19 @@ export default function StationInfoScreen({ navigation }) {
             <View style={styles.overviewGrid}>
               <View style={styles.overviewItem}>
                 <View style={styles.overviewIconWrap}><MaterialCommunityIcons name="home-city-outline" size={20} color={COLORS.primary} /></View>
-                <View>
+                <View style={{ flexShrink: 1 }}>
                   <Text style={styles.overviewItemLabel}>Type</Text>
                   <Text style={styles.overviewItemValue}>{stationDetails.type}</Text>
                 </View>
               </View>
               <View style={styles.overviewItem}>
                 <View style={styles.overviewIconWrap}><MaterialCommunityIcons name="train-car" size={20} color={COLORS.primary} /></View>
-                <View>
+                <View style={{ flexShrink: 1 }}>
                   <Text style={styles.overviewItemLabel}>Platform</Text>
                   <Text style={styles.overviewItemValue}>{stationDetails.layout}</Text>
+                  {getPlatformDirections(station).map((dir, idx) => (
+                    <Text key={idx} style={[styles.overviewItemValue, { fontSize: 12, marginTop: 2, color: COLORS.textLight }]}>{dir}</Text>
+                  ))}
                 </View>
               </View>
               <View style={[styles.overviewItem, { width: '100%', marginTop: 10 }]}>
@@ -320,28 +354,37 @@ const getStyles = (COLORS) => StyleSheet.create({
   headerTitle: { fontSize: 20, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
   backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
   
-  content: { padding: 20, paddingBottom: 40 },
+  content: { paddingBottom: 100 },
+  sliderContainer: {
+    width: '100%',
+    height: 220,
+    marginBottom: -15, // to let the station picker card overlap slightly
+  },
+  sliderImage: {
+    width: SCREEN_WIDTH,
+    height: 220,
+  },
   
-  card: { backgroundColor: COLORS.cardBg, padding: 24, borderRadius: 24, borderWidth: 1, borderColor: COLORS.border, marginBottom: 24 },
+  card: { marginHorizontal: 20, backgroundColor: COLORS.cardBg, padding: 24, borderRadius: 24, borderWidth: 1, borderColor: COLORS.border, marginBottom: 24 },
   cardHeaderRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
   iconCircle: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(13,71,161,0.1)', justifyContent: 'center', alignItems: 'center', marginRight: 12, borderWidth: 1, borderColor: 'rgba(13,71,161,0.2)' },
   label: { fontSize: 16, fontWeight: '800', color: COLORS.text },
   dropdownWrap: { backgroundColor: COLORS.background, borderWidth: 1, borderColor: COLORS.border, borderRadius: 16 },
   
-  sectionTitle: { fontSize: 18, fontWeight: '800', color: COLORS.text, marginBottom: 16, letterSpacing: 0.5 },
+  sectionTitle: { marginHorizontal: 20, fontSize: 18, fontWeight: '800', color: COLORS.text, marginBottom: 16, letterSpacing: 0.5 },
   
   // Overview Card
-  overviewCard: { backgroundColor: COLORS.cardBg, borderRadius: 24, borderWidth: 1, borderColor: COLORS.border, marginBottom: 30, overflow: 'hidden' },
+  overviewCard: { marginHorizontal: 20, backgroundColor: COLORS.cardBg, borderRadius: 24, borderWidth: 1, borderColor: COLORS.border, marginBottom: 30, overflow: 'hidden' },
   overviewLineBand: { paddingVertical: 10, paddingHorizontal: 20, alignItems: 'center' },
   overviewLineText: { color: '#FFF', fontSize: 14, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 },
   overviewGrid: { flexDirection: 'row', flexWrap: 'wrap', padding: 20, justifyContent: 'space-between' },
   overviewItem: { width: '48%', flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   overviewIconWrap: { width: 36, height: 36, borderRadius: 12, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center', marginRight: 10, borderWidth: 1, borderColor: COLORS.border },
-  overviewItemLabel: { fontSize: 11, color: COLORS.textLight, fontWeight: '600', marginBottom: 2 },
-  overviewItemValue: { fontSize: 13, color: COLORS.text, fontWeight: '700' },
+  overviewItemLabel: { fontSize: 12, color: COLORS.textLight, fontWeight: '600', marginBottom: 4, textTransform: 'uppercase' },
+  overviewItemValue: { fontSize: 15, fontWeight: '700', color: COLORS.text },
 
   // Facilities
-  facilitiesGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
+  facilitiesGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginHorizontal: 20 },
   facCard: { width: '48%', backgroundColor: COLORS.cardBg, padding: 20, borderRadius: 24, alignItems: 'center', marginBottom: 16, borderWidth: 1, borderColor: COLORS.border, elevation: 2, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 5 },
   facIconBg: { width: 64, height: 64, borderRadius: 32, backgroundColor: 'rgba(13,71,161,0.08)', justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
   facText: { fontSize: 14, fontWeight: '800', color: COLORS.text, textAlign: 'center', lineHeight: 20 },

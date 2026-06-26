@@ -4,7 +4,7 @@ import { updateToken, logout } from '../redux/slices/authSlice';
 
 // Use LAN IP address for testing on physical devices
 // PC WiFi IP: 192.168.32.101 (update this if IP changes)
-export const API_BASE_URL = 'http://192.168.32.101:5001/api';
+export const API_BASE_URL = 'http://192.168.32.100:5001/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,

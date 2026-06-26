@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import {
   StyleSheet, Text, View, TouchableOpacity, SafeAreaView,
-  TextInput, ActivityIndicator, Alert, StatusBar, Platform
+  TextInput, ActivityIndicator, Alert, StatusBar, Platform, Vibration
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useDispatch } from 'react-redux';
@@ -11,6 +11,7 @@ import { ticketAPI } from '../api/ticketAPI';
 import { walletAPI } from '../api/walletAPI';
 import { setCurrentTicket, ticketActionFailure } from '../redux/slices/ticketSlice';
 import { addMoneySuccess } from '../redux/slices/walletSlice';
+import { updateUserCredits } from '../redux/slices/authSlice';
 
 export default function PaymentGatewayScreen({ route, navigation }) {
   const { amount, type, ticketId, method } = route.params || {};
@@ -36,6 +37,16 @@ export default function PaymentGatewayScreen({ route, navigation }) {
             paymentMethod: method || 'card',
             paymentStatus: 'success'
           });
+          
+          if (res.newNxlCredits !== undefined) {
+            dispatch(updateUserCredits(res.newNxlCredits));
+          }
+          
+          if (res.cashbackEarned > 0) {
+            Vibration.vibrate([0, 500, 200, 500]);
+            Alert.alert('🎉 Cashback Received!', `You just earned ₹${res.cashbackEarned} NXL CREDITS!`);
+          }
+          
           dispatch(setCurrentTicket(res.ticket));
           navigation.replace('QRTicket');
         } else {
@@ -84,7 +95,7 @@ export default function PaymentGatewayScreen({ route, navigation }) {
             <View style={styles.iconCircle}>
               <Icon name="shield-check" size={36} color="#00C9A7" />
             </View>
-            <Text style={styles.merchantName}>Pune Metro Rail</Text>
+            <Text style={styles.merchantName}>ENERGEIA METRO Rail</Text>
             <Text style={styles.amountText}>₹{amount}</Text>
           </View>
 

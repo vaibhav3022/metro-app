@@ -24,7 +24,7 @@ const UserSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['user', 'merchant', 'admin'],
+    enum: ['user', 'member', 'merchant', 'admin'],
     default: 'user'
   },
   walletBalance: {
@@ -32,6 +32,14 @@ const UserSchema = new mongoose.Schema({
     default: 0
   },
   tokenBalance: {
+    type: Number,
+    default: 0
+  },
+  nxlCredits: {
+    type: Number,
+    default: 0
+  },
+  lifetimeCashback: {
     type: Number,
     default: 0
   },

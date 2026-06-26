@@ -64,7 +64,7 @@ export default function TokenEconomyScreen({ navigation }) {
                 currency: 'INR',
                 key: 'rzp_test_St6f7LZjydxbQ0',
                 amount: orderAmount || totalPayable * 100, // backend returns GST-included paise
-                name: 'Pune Metro',
+                name: 'ENERGEIA METRO',
                 order_id: orderId,
                 theme: { color: COLORS.primary }
               };

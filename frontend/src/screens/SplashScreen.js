@@ -70,7 +70,7 @@ export default function SplashScreen({ navigation }) {
       <View style={styles.logoContainer}>
         <View style={styles.logoBg}>
           <Image 
-            source={require('../assets/images/pune_metro_logo.png')} 
+            source={require('../assets/images/app_logo.png')} 
             style={styles.logoImage} 
             resizeMode="contain" 
           />

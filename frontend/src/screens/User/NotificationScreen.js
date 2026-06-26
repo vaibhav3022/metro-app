@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import COLORS from '../../constants/colors';
 import api from '../../api/axiosConfig';
@@ -12,19 +13,30 @@ export default function NotificationScreen() {
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
 
-  const fetchNotifications = async () => {
-    setLoading(true);
+  const fetchNotifications = async (showLoading = false) => {
+    if (showLoading) setLoading(true);
     try {
       const res = await api.get('/notifications'); // Assumes generic or /user/notifications
       setNotifications(res.data.data || []);
     } catch (err) {
       showToast('Failed to load notifications', 'error');
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
-  useEffect(() => { fetchNotifications(); }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchNotifications(true); // Fetch immediately with loading indicator
+      
+      // Poll every 10 seconds for real-time feel
+      const interval = setInterval(() => {
+        fetchNotifications(false);
+      }, 10000);
+
+      return () => clearInterval(interval);
+    }, [])
+  );
 
   const showToast = (message, type) => setToast({ visible: true, message, type });
 

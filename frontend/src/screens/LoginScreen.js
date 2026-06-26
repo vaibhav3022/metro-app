@@ -127,7 +127,7 @@ export default function LoginScreen() {
             >
               <View style={styles.logoBg}>
                 <Image 
-                  source={require('../assets/images/pune_metro_logo.png')} 
+                  source={require('../assets/images/app_logo.png')} 
                   style={styles.logoImage} 
                   resizeMode="contain" 
                 />

@@ -24,6 +24,26 @@ const MerchantSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  aadharUrl: {
+    type: String, // Path to local uploads folder
+    default: null
+  },
+  panUrl: {
+    type: String,
+    default: null
+  },
+  photoUrl: {
+    type: String,
+    default: null
+  },
+  qrCodeToken: {
+    type: String,
+    default: null
+  },
+  qrCodeImageUrl: {
+    type: String,
+    default: null
+  },
   status: {
     type: String,
     enum: ['pending', 'approved', 'suspended', 'rejected'],

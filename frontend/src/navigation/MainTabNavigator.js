@@ -1,17 +1,39 @@
 import React from 'react';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import LinearGradient from 'react-native-linear-gradient';
 import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
 
 // Screens
 import HomeScreen from '../screens/HomeScreen';
 import TicketHistoryScreen from '../screens/TicketHistoryScreen';
-import WalletScreen from '../screens/WalletScreen';
+import ScanAndPayScreen from '../screens/ScanAndPayScreen';
 import ShopsScreen from '../screens/ShopsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
+
+// Floating Scanner Button - half above, half below nav bar
+function ScannerTabButton({ children, onPress }) {
+  return (
+    <TouchableOpacity
+      style={styles.scannerBtnWrap}
+      onPress={onPress}
+      activeOpacity={0.85}
+    >
+      <LinearGradient
+        colors={['#3B82F6', '#1D4ED8']}
+        style={styles.scannerBtn}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <Icon name="qrcode-scan" size={32} color="#fff" />
+      </LinearGradient>
+    </TouchableOpacity>
+  );
+}
 
 export default function MainTabNavigator() {
   const { theme: COLORS } = useTheme();
@@ -21,22 +43,22 @@ export default function MainTabNavigator() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarIcon: ({ focused, color, size }) => {
+        tabBarIcon: ({ focused, color }) => {
           let iconName;
 
           if (route.name === 'HomeTab') {
             iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'TicketsTab') {
             iconName = focused ? 'ticket-confirmation' : 'ticket-confirmation-outline';
-          } else if (route.name === 'WalletTab') {
-            iconName = focused ? 'wallet' : 'wallet-outline';
+          } else if (route.name === 'ScannerTab') {
+            iconName = 'qrcode-scan';
           } else if (route.name === 'ShopsTab') {
             iconName = focused ? 'storefront' : 'storefront-outline';
           } else if (route.name === 'ProfileTab') {
             iconName = focused ? 'account' : 'account-outline';
           }
 
-          return <Icon name={iconName} size={28} color={color} />;
+          return <Icon name={iconName} size={26} color={color} />;
         },
         tabBarActiveTintColor: COLORS.secondary,
         tabBarInactiveTintColor: COLORS.textLight,
@@ -50,9 +72,9 @@ export default function MainTabNavigator() {
           elevation: 10,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '600',
-          marginBottom: 4,
+          fontSize: 11,
+          fontWeight: '700',
+          marginBottom: 2,
         },
         tabBarHideOnKeyboard: true,
       })}
@@ -68,9 +90,13 @@ export default function MainTabNavigator() {
         options={{ title: t('tabs.tickets') }}
       />
       <Tab.Screen
-        name="WalletTab"
-        component={WalletScreen}
-        options={{ title: t('tabs.wallet') }}
+        name="ScannerTab"
+        component={ScanAndPayScreen}
+        options={{
+          title: '',
+          tabBarLabel: () => null,
+          tabBarButton: (props) => <ScannerTabButton {...props} />,
+        }}
       />
       <Tab.Screen
         name="ShopsTab"
@@ -85,3 +111,25 @@ export default function MainTabNavigator() {
     </Tab.Navigator>
   );
 }
+
+const styles = StyleSheet.create({
+  scannerBtnWrap: {
+    top: -26,           // half above the nav bar
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scannerBtn: {
+    width: 68,
+    height: 68,
+    borderRadius: 34,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 10,
+    shadowColor: '#1D4ED8',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.45,
+    shadowRadius: 10,
+    borderWidth: 4,
+    borderColor: '#fff',
+  },
+});

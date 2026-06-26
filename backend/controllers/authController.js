@@ -2,6 +2,7 @@ const User = require('../models/User');
 const Merchant = require('../models/Merchant');
 const Shop = require('../models/Shop');
 const Notification = require('../models/Notification');
+const Wallet = require('../models/Wallet');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const dns = require('dns');
@@ -59,7 +60,7 @@ const sendOTP = async (req, res) => {
 };
 
 const verifyOTP = async (req, res) => {
-  const { email, otp, name, phone, role, password, shopName, upiId, address, category } = req.body;
+  const { email, otp, name, phone, role, password, shopName, upiId, address, category, isRegister } = req.body;
   const normalizedEmail = email.toLowerCase().trim();
   const normalizedOtp = otp ? String(otp).trim() : '';
 
@@ -74,13 +75,20 @@ const verifyOTP = async (req, res) => {
     user.otp = null; user.otpExpiry = null;
     if (name) user.name = name;
     if (phone) user.phone = phone;
-    if (role) user.role = role;
+    // Only set role if this is a registration, so we don't accidentally downgrade premium members on login
+    if (role && isRegister) user.role = role;
     if (password) {
       const bcrypt = require('bcryptjs');
       const salt = await bcrypt.genSalt(10);
       user.password = await bcrypt.hash(password, salt);
     }
     await user.save();
+
+    // Auto-create Wallet if it doesn't exist
+    let wallet = await Wallet.findOne({ userId: user._id });
+    if (!wallet) {
+      await Wallet.create({ userId: user._id, balance: 0, transactions: [] });
+    }
 
     // Create Merchant/Shop records if it's a new merchant
     if (role === 'merchant' && shopName) {
@@ -140,6 +148,13 @@ const loginPassword = async (req, res) => {
 
     const token = generateAccessToken(user._id);
     const refreshToken = generateRefreshToken(user._id);
+    
+    // Auto-create Wallet if it doesn't exist for legacy users
+    let wallet = await Wallet.findOne({ userId: user._id });
+    if (!wallet) {
+      await Wallet.create({ userId: user._id, balance: 0, transactions: [] });
+    }
+    
     user.password = undefined;
 
     res.status(200).json({ success: true, user, token, refreshToken });

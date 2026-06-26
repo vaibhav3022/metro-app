@@ -6,6 +6,8 @@ const TokenTransaction = require('../models/TokenTransaction');
 const Revenue = require('../models/Revenue');
 const Notification = require('../models/Notification');
 const AuditLog = require('../models/AuditLog');
+const QRCode = require('qrcode');
+const crypto = require('crypto');
 
 const logAction = async (action, performedBy, targetId, targetModel, details) => {
   await AuditLog.create({ action, performedBy, targetId, targetModel, details });
@@ -90,7 +92,14 @@ const changeMerchantStatus = async (req, res, status, actionName) => {
     if (!merchant) return res.status(404).json({ success: false, message: 'Merchant not found' });
     
     merchant.status = status;
-    if (status === 'approved') merchant.approvedAt = new Date();
+    if (status === 'approved') {
+      merchant.approvedAt = new Date();
+      if (!merchant.qrCodeToken) {
+        merchant.qrCodeToken = crypto.randomBytes(16).toString('hex');
+        const qrData = JSON.stringify({ type: 'merchant_payment', mId: merchant._id.toString(), token: merchant.qrCodeToken });
+        merchant.qrCodeImageUrl = await QRCode.toDataURL(qrData);
+      }
+    }
     if (status === 'suspended') merchant.suspendedAt = new Date();
     if (req.body.reason) merchant.rejectionReason = req.body.reason;
     await merchant.save();

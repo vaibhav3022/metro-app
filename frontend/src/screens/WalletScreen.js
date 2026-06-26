@@ -107,7 +107,7 @@ export default function WalletScreen({ navigation }) {
                 <Text style={styles.balanceCardSubBrand}>{t('wallet.subBrand')}</Text>
               </View>
               <Image 
-                source={require('../assets/images/pune_metro_logo.png')} 
+                source={require('../assets/images/app_logo.png')} 
                 style={styles.cardLogo} 
                 resizeMode="contain" 
               />

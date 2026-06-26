@@ -1,31 +1,19 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, TextInput,
+  View, Text, StyleSheet, TouchableOpacity,
   ScrollView, ActivityIndicator, Alert, SafeAreaView, StatusBar, Platform,
-  Animated, Vibration, Modal, Share, Dimensions, FlatList
+  Animated, Vibration
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useSelector } from 'react-redux';
 import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import api from '../api/axiosConfig';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-
-// Gift card gradient themes
-const GIFT_THEMES = [
-  { id: 'sunset', colors: ['#FF6B6B', '#EE5A24'], icon: 'gift-outline', emoji: '🎁' },
-  { id: 'ocean', colors: ['#0652DD', '#1289A7'], icon: 'gift-outline', emoji: '🌊' },
-  { id: 'forest', colors: ['#009432', '#A3CB38'], icon: 'leaf', emoji: '🌿' },
-  { id: 'royal', colors: ['#6F1E51', '#B33771'], icon: 'crown', emoji: '👑' },
-  { id: 'gold', colors: ['#F79F1F', '#EE5A24'], icon: 'star-four-points', emoji: '⭐' },
-  { id: 'metro', colors: ['#1A2A6C', '#275E9B'], icon: 'train', emoji: '🚇' },
-];
-
-export default function SmartCardScreen() {
+export default function SmartCardScreen({ route }) {
   const { theme: COLORS, isDark } = useTheme();
   const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
   const navigation = useNavigation();
@@ -33,13 +21,12 @@ export default function SmartCardScreen() {
 
   // Get user details from Redux auth state
   const user = useSelector((state) => state.auth?.user);
-  const { balance: walletBalance } = useSelector((state) => state.wallet);
   const cardholderName = user?.name
     ? user.name.toUpperCase()
     : 'VAIBHAV PATIL';
 
-  // --- Tab State ---
-  const [activeTab, setActiveTab] = useState('card'); // 'card' | 'gift'
+  // --- Tabs State ---
+  const [activeTab, setActiveTab] = useState(route?.params?.initialTab === 'gift' ? 'gift' : 'smartcard');
 
   // --- Smart Card State ---
   const [card, setCard] = useState({
@@ -52,37 +39,10 @@ export default function SmartCardScreen() {
   const [isFlipped, setIsFlipped] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
 
-  // --- Gift Card State ---
-  const [sendModalVisible, setSendModalVisible] = useState(false);
-  const [redeemModalVisible, setRedeemModalVisible] = useState(false);
-  const [giftAmount, setGiftAmount] = useState('');
-  const [giftEmail, setGiftEmail] = useState('');
-  const [giftMessage, setGiftMessage] = useState('');
-  const [selectedTheme, setSelectedTheme] = useState(GIFT_THEMES[0]);
-  const [redeemCode, setRedeemCode] = useState('');
-  const [sentGifts, setSentGifts] = useState([]);
-  const [receivedGifts, setReceivedGifts] = useState([]);
-  const [giftLoading, setGiftLoading] = useState(false);
-  const [giftSubTab, setGiftSubTab] = useState('send'); // 'send' | 'sent' | 'received'
-
   // Animation values
   const flipAnimation = useRef(new Animated.Value(0)).current;
   const laserAnim = useRef(new Animated.Value(0)).current;
   const scanAnimRef = useRef(null);
-  const modalScaleAnim = useRef(new Animated.Value(0)).current;
-  const giftCardPulse = useRef(new Animated.Value(1)).current;
-
-  // Gift card pulse animation
-  useEffect(() => {
-    const pulse = Animated.loop(
-      Animated.sequence([
-        Animated.timing(giftCardPulse, { toValue: 1.03, duration: 1500, useNativeDriver: true }),
-        Animated.timing(giftCardPulse, { toValue: 1, duration: 1500, useNativeDriver: true }),
-      ])
-    );
-    pulse.start();
-    return () => pulse.stop();
-  }, []);
 
   useEffect(() => {
     loadCardData();
@@ -92,14 +52,6 @@ export default function SmartCardScreen() {
       }
     };
   }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      if (activeTab === 'gift') {
-        fetchGiftCards();
-      }
-    }, [activeTab])
-  );
 
   // --- Smart Card Functions ---
   const loadCardData = async () => {
@@ -282,151 +234,7 @@ export default function SmartCardScreen() {
     outputRange: [0, 55],
   });
 
-  // --- Gift Card Functions ---
-  const fetchGiftCards = async () => {
-    try {
-      const [sentRes, receivedRes] = await Promise.all([
-        api.get('/giftcard/sent'),
-        api.get('/giftcard/received'),
-      ]);
-      setSentGifts(sentRes.data?.giftCards || []);
-      setReceivedGifts(receivedRes.data?.giftCards || []);
-    } catch (err) {
-      console.log('Failed to fetch gift cards:', err.message);
-    }
-  };
 
-  const openSendModal = () => {
-    setGiftAmount('');
-    setGiftEmail('');
-    setGiftMessage('');
-    setSelectedTheme(GIFT_THEMES[0]);
-    setSendModalVisible(true);
-    Animated.spring(modalScaleAnim, { toValue: 1, useNativeDriver: true, tension: 65, friction: 8 }).start();
-  };
-
-  const closeSendModal = () => {
-    Animated.timing(modalScaleAnim, { toValue: 0, duration: 200, useNativeDriver: true }).start(() => {
-      setSendModalVisible(false);
-    });
-  };
-
-  const openRedeemModal = () => {
-    setRedeemCode('');
-    setRedeemModalVisible(true);
-    Animated.spring(modalScaleAnim, { toValue: 1, useNativeDriver: true, tension: 65, friction: 8 }).start();
-  };
-
-  const closeRedeemModal = () => {
-    Animated.timing(modalScaleAnim, { toValue: 0, duration: 200, useNativeDriver: true }).start(() => {
-      setRedeemModalVisible(false);
-    });
-  };
-
-  const handleSendGiftCard = async () => {
-    const amount = parseInt(giftAmount);
-    if (!amount || amount < 50) {
-      Alert.alert('Invalid Amount', 'Minimum gift amount is ₹50');
-      return;
-    }
-    if (amount > 5000) {
-      Alert.alert('Limit Exceeded', 'Maximum gift amount is ₹5,000');
-      return;
-    }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!giftEmail || !emailRegex.test(giftEmail)) {
-      Alert.alert('Invalid Email', 'Please enter a valid email address');
-      return;
-    }
-
-    setGiftLoading(true);
-    try {
-      const res = await api.post('/giftcard/create', {
-        amount,
-        receiverEmail: giftEmail,
-        message: giftMessage || `🎁 Here's a gift from ${user?.name || 'your friend'}!`,
-      });
-
-      Vibration.vibrate([100, 100, 200]);
-      const giftCode = res.data?.giftCard?.code || 'XXXX-XXXX-XXXX';
-
-      closeSendModal();
-
-      setTimeout(() => {
-        Alert.alert(
-          '🎉 Gift Card Sent!',
-          `Your gift card of ₹${amount} has been created!\n\nCode: ${giftCode}\n\nShare this code with your friend.`,
-          [
-            { text: 'Share Code', onPress: () => shareGiftCode(giftCode, amount) },
-            { text: 'OK', style: 'cancel' }
-          ]
-        );
-        fetchGiftCards();
-      }, 300);
-    } catch (err) {
-      const msg = err.response?.data?.message || 'Failed to create gift card';
-      Alert.alert('Error', msg);
-    } finally {
-      setGiftLoading(false);
-    }
-  };
-
-  const shareGiftCode = async (code, amount) => {
-    try {
-      await Share.share({
-        message: `🎁 तुम्हाला Pune Metro Gift Card मिळाले आहे!\n\n💰 Amount: ₹${amount}\n🔑 Code: ${code}\n\nPune Metro App मध्ये हा code redeem करा! 🚇`,
-      });
-    } catch (e) {
-      console.log('Share error:', e);
-    }
-  };
-
-  const handleRedeemGiftCard = async () => {
-    const cleanCode = redeemCode.trim().toUpperCase();
-    if (!cleanCode || cleanCode.length < 10) {
-      Alert.alert('Invalid Code', 'Please enter a valid gift card code');
-      return;
-    }
-
-    setGiftLoading(true);
-    try {
-      const res = await api.post('/giftcard/redeem', { code: cleanCode });
-      Vibration.vibrate([100, 100, 200, 200, 300]);
-      closeRedeemModal();
-
-      const redeemedAmount = res.data?.giftCard?.amount || 0;
-      setTimeout(() => {
-        Alert.alert(
-          '🎊 Gift Card Redeemed!',
-          `₹${redeemedAmount} has been added to your wallet!\n\nYou can use it for metro tickets or at station shops.`
-        );
-        fetchGiftCards();
-      }, 300);
-    } catch (err) {
-      const msg = err.response?.data?.message || 'Failed to redeem gift card';
-      Alert.alert('Error', msg);
-    } finally {
-      setGiftLoading(false);
-    }
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'active': return '#00C9A7';
-      case 'redeemed': return '#8B5CF6';
-      case 'expired': return '#EF4444';
-      default: return '#888';
-    }
-  };
-
-  const formatDate = (dateStr) => {
-    if (!dateStr) return '';
-    const d = new Date(dateStr);
-    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-  };
-
-  // Quick amount buttons
-  const quickAmounts = [100, 200, 500, 1000, 2000];
 
   // --- RENDER ---
   return (
@@ -438,32 +246,30 @@ export default function SmartCardScreen() {
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <Icon name="arrow-left" size={24} color={COLORS.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>{t('smartcard.title')}</Text>
+          <Text style={styles.headerTitle}>{activeTab === 'gift' ? t('smartcard.giftCardTitle', 'Gift Cards') : t('smartcard.title', 'Smart Card')}</Text>
           <View style={{ width: 44 }} />
         </View>
 
-        {/* Tab Switcher */}
+        {/* --- TABS --- */}
         <View style={styles.tabContainer}>
-          <TouchableOpacity
-            style={[styles.tabBtn, activeTab === 'card' && styles.tabBtnActive]}
-            onPress={() => setActiveTab('card')}
+          <TouchableOpacity 
+            style={[styles.tabButton, activeTab === 'smartcard' && styles.tabButtonActive]}
+            onPress={() => setActiveTab('smartcard')}
           >
-            <Icon name="credit-card-outline" size={18} color={activeTab === 'card' ? '#fff' : COLORS.textLight} />
-            <Text style={[styles.tabText, activeTab === 'card' && styles.tabTextActive]}>My Card</Text>
+            <Text style={[styles.tabText, activeTab === 'smartcard' && styles.tabTextActive]}>Smart Card</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tabBtn, activeTab === 'gift' && styles.tabBtnActive]}
-            onPress={() => { setActiveTab('gift'); fetchGiftCards(); }}
+          <TouchableOpacity 
+            style={[styles.tabButton, activeTab === 'gift' && styles.tabButtonActive]}
+            onPress={() => setActiveTab('gift')}
           >
-            <Icon name="gift-outline" size={18} color={activeTab === 'gift' ? '#fff' : COLORS.textLight} />
-            <Text style={[styles.tabText, activeTab === 'gift' && styles.tabTextActive]}>Gift Cards</Text>
+            <Text style={[styles.tabText, activeTab === 'gift' && styles.tabTextActive]}>Gift Card</Text>
           </TouchableOpacity>
         </View>
 
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-          {activeTab === 'card' ? (
-            // =================== MY CARD TAB ===================
+          {activeTab === 'smartcard' ? (
             <>
+              {/* === SMART CARD UI === */}
               {initLoading ? (
                 <View style={styles.centered}>
                   <ActivityIndicator size="large" color="#00C9A7" />
@@ -610,390 +416,93 @@ export default function SmartCardScreen() {
               )}
             </>
           ) : (
-            // =================== GIFT CARDS TAB ===================
             <>
-              {/* Hero Gift Card Preview */}
-              <Animated.View style={{ transform: [{ scale: giftCardPulse }] }}>
-                <LinearGradient
-                  colors={['#FF6B6B', '#EE5A24']}
-                  style={styles.giftHeroCard}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                >
-                  <View style={styles.giftHeroPattern}>
-                    {[...Array(6)].map((_, i) => (
-                      <View
-                        key={i}
-                        style={[styles.giftCircleDecor, {
-                          top: (i % 3) * 60 - 20,
-                          right: (i % 2) * 80 - 30,
-                          width: 60 + (i * 10),
-                          height: 60 + (i * 10),
-                          borderRadius: 30 + (i * 5),
-                        }]}
-                      />
-                    ))}
+              {/* === GIFT CARD UI === */}
+              <View style={[styles.cardContainer, { height: 210 }]}>
+                <LinearGradient colors={['#F43F5E', '#BE123C']} style={styles.cardFront} start={{x:0, y:0}} end={{x:1, y:1}}>
+                  <View style={styles.cardHeader}>
+                    <Text style={styles.cardTitle}>GIFT CARD</Text>
+                    <Icon name="gift-outline" size={32} color="#FFF" />
                   </View>
-                  <View style={styles.giftHeroTop}>
+                  <Text style={[styles.cardNumber, { marginTop: 20 }]}>**** **** **** 8892</Text>
+                  
+                  <View style={styles.cardFooter}>
                     <View>
-                      <Text style={styles.giftHeroTitle}>🎁 Gift Card</Text>
-                      <Text style={styles.giftHeroSub}>Pune Metro Digital Gift</Text>
+                      <Text style={styles.cardLabel}>BALANCE</Text>
+                      <Text style={styles.cardBalance}>₹ 1,250</Text>
                     </View>
-                    <View style={styles.giftHeroIconWrap}>
-                      <Icon name="gift" size={36} color="#fff" />
-                    </View>
-                  </View>
-                  <View style={styles.giftHeroBottom}>
-                    <Text style={styles.giftHeroDesc}>
-                      तुमच्या मित्रांना Gift Card पाठवा!{'\n'}Tickets, Shops आणि बरंच काही...
-                    </Text>
-                    <View style={styles.giftHeroBadge}>
-                      <Text style={styles.giftHeroBadgeText}>₹50 – ₹5,000</Text>
+                    <View style={{ alignItems: 'flex-end' }}>
+                      <Text style={styles.cardLabel}>VALID THRU</Text>
+                      <Text style={styles.cardHolder}>12/28</Text>
                     </View>
                   </View>
                 </LinearGradient>
-              </Animated.View>
+              </View>
 
-              {/* Action Buttons */}
-              <View style={styles.giftActionsRow}>
-                <TouchableOpacity style={styles.giftActionBtn} onPress={openSendModal}>
-                  <LinearGradient colors={['#FF6B6B', '#EE5A24']} style={styles.giftActionIconWrap} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
-                    <Icon name="send" size={24} color="#fff" />
-                  </LinearGradient>
-                  <Text style={styles.giftActionText}>Send Gift</Text>
-                  <Text style={styles.giftActionSub}>मित्राला पाठवा</Text>
+              {/* Gift Card Actions */}
+              <View style={styles.actionRow}>
+                <TouchableOpacity style={styles.actionBtn}>
+                  <View style={[styles.actionIconBg, { backgroundColor: 'rgba(244, 63, 94, 0.1)' }]}>
+                    <Icon name="plus" size={28} color="#F43F5E" />
+                  </View>
+                  <Text style={styles.actionText}>Add Money</Text>
                 </TouchableOpacity>
-
-                <TouchableOpacity style={styles.giftActionBtn} onPress={openRedeemModal}>
-                  <LinearGradient colors={['#00C9A7', '#00B894']} style={styles.giftActionIconWrap} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
-                    <Icon name="qrcode-scan" size={24} color="#fff" />
-                  </LinearGradient>
-                  <Text style={styles.giftActionText}>Redeem</Text>
-                  <Text style={styles.giftActionSub}>Code वापरा</Text>
+                <TouchableOpacity style={styles.actionBtn}>
+                  <View style={[styles.actionIconBg, { backgroundColor: 'rgba(244, 63, 94, 0.1)' }]}>
+                    <Icon name="gift" size={28} color="#F43F5E" />
+                  </View>
+                  <Text style={styles.actionText}>Send Gift</Text>
                 </TouchableOpacity>
-
-                <TouchableOpacity style={styles.giftActionBtn} onPress={() => {
-                  shareGiftCode('XXXX-XXXX-XXXX', 0);
-                }}>
-                  <LinearGradient colors={['#6F1E51', '#B33771']} style={styles.giftActionIconWrap} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
-                    <Icon name="share-variant" size={24} color="#fff" />
-                  </LinearGradient>
-                  <Text style={styles.giftActionText}>Share</Text>
-                  <Text style={styles.giftActionSub}>Share करा</Text>
+                <TouchableOpacity style={styles.actionBtn}>
+                  <View style={[styles.actionIconBg, { backgroundColor: 'rgba(244, 63, 94, 0.1)' }]}>
+                    <Icon name="history" size={28} color="#F43F5E" />
+                  </View>
+                  <Text style={styles.actionText}>History</Text>
                 </TouchableOpacity>
               </View>
 
-              {/* How It Works */}
-              <View style={styles.howItWorksCard}>
-                <Text style={styles.howItWorksTitle}>How It Works</Text>
-                <View style={styles.howItWorksStep}>
-                  <View style={[styles.stepNumber, { backgroundColor: '#FF6B6B22' }]}>
-                    <Text style={[styles.stepNumberText, { color: '#FF6B6B' }]}>1</Text>
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.stepTitle}>Gift Card तयार करा</Text>
-                    <Text style={styles.stepDesc}>Amount निवडा, मित्राचा email टाका</Text>
-                  </View>
-                </View>
-                <View style={styles.howItWorksStep}>
-                  <View style={[styles.stepNumber, { backgroundColor: '#00C9A722' }]}>
-                    <Text style={[styles.stepNumberText, { color: '#00C9A7' }]}>2</Text>
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.stepTitle}>Code शेअर करा</Text>
-                    <Text style={styles.stepDesc}>WhatsApp, SMS किंवा कोणत्याही app ने पाठवा</Text>
-                  </View>
-                </View>
-                <View style={styles.howItWorksStep}>
-                  <View style={[styles.stepNumber, { backgroundColor: '#6F1E5122' }]}>
-                    <Text style={[styles.stepNumberText, { color: '#6F1E51' }]}>3</Text>
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.stepTitle}>Redeem करा</Text>
-                    <Text style={styles.stepDesc}>Code टाकून पैसे Wallet मध्ये add करा</Text>
-                  </View>
-                </View>
-              </View>
-
-              {/* Sent & Received Sub-tabs */}
-              <View style={styles.giftSubTabRow}>
-                <TouchableOpacity
-                  style={[styles.giftSubTabBtn, giftSubTab === 'sent' && styles.giftSubTabActive]}
-                  onPress={() => setGiftSubTab('sent')}
-                >
-                  <Icon name="arrow-up-bold" size={16} color={giftSubTab === 'sent' ? '#FF6B6B' : COLORS.textLight} />
-                  <Text style={[styles.giftSubTabText, giftSubTab === 'sent' && { color: '#FF6B6B' }]}>
-                    Sent ({sentGifts.length})
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.giftSubTabBtn, giftSubTab === 'received' && styles.giftSubTabActive]}
-                  onPress={() => setGiftSubTab('received')}
-                >
-                  <Icon name="arrow-down-bold" size={16} color={giftSubTab === 'received' ? '#00C9A7' : COLORS.textLight} />
-                  <Text style={[styles.giftSubTabText, giftSubTab === 'received' && { color: '#00C9A7' }]}>
-                    Received ({receivedGifts.length})
-                  </Text>
-                </TouchableOpacity>
-              </View>
-
-              {/* Gift Card List */}
-              {(giftSubTab === 'sent' ? sentGifts : receivedGifts).length === 0 ? (
-                <View style={styles.emptyGiftCard}>
-                  <Icon name={giftSubTab === 'sent' ? 'gift-open-outline' : 'inbox-arrow-down-outline'} size={48} color={COLORS.textLight} />
-                  <Text style={styles.emptyGiftText}>
-                    {giftSubTab === 'sent' ? 'No gift cards sent yet' : 'No gift cards received yet'}
-                  </Text>
-                  <Text style={styles.emptyGiftSub}>
-                    {giftSubTab === 'sent' ? 'मित्रांना gift card पाठवा! 🎁' : 'कोणी gift card पाठवेल तेव्हा दिसेल! ✨'}
-                  </Text>
-                </View>
-              ) : (
-                (giftSubTab === 'sent' ? sentGifts : receivedGifts).map((gift, index) => (
-                  <TouchableOpacity
-                    key={gift._id || index}
-                    style={styles.giftListItem}
-                    onPress={() => {
-                      if (gift.code && gift.status === 'active' && giftSubTab === 'sent') {
-                        Alert.alert(
-                          '🎁 Gift Card Code',
-                          `Code: ${gift.code}\nAmount: ₹${gift.amount}\nTo: ${gift.receiverEmail || 'N/A'}`,
-                          [
-                            { text: 'Share', onPress: () => shareGiftCode(gift.code, gift.amount) },
-                            { text: 'OK' }
-                          ]
-                        );
-                      }
-                    }}
-                    activeOpacity={0.8}
-                  >
-                    <LinearGradient
-                      colors={gift.status === 'redeemed' ? ['#8B5CF6', '#6D28D9'] : gift.status === 'expired' ? ['#6B7280', '#4B5563'] : ['#FF6B6B', '#EE5A24']}
-                      style={styles.giftListIcon}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 1 }}
-                    >
-                      <Icon
-                        name={gift.status === 'redeemed' ? 'check-circle' : gift.status === 'expired' ? 'clock-alert' : 'gift'}
-                        size={20}
-                        color="#fff"
-                      />
-                    </LinearGradient>
-                    <View style={{ flex: 1, marginLeft: 14 }}>
-                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Text style={styles.giftListAmount}>₹{gift.amount}</Text>
-                        <View style={[styles.giftStatusBadge, { backgroundColor: getStatusColor(gift.status) + '22' }]}>
-                          <Text style={[styles.giftStatusText, { color: getStatusColor(gift.status) }]}>
-                            {gift.status?.toUpperCase()}
-                          </Text>
-                        </View>
-                      </View>
-                      <Text style={styles.giftListPhone}>
-                        {giftSubTab === 'sent' ? `To: ${gift.receiverEmail || '—'}` : `From: ${gift.senderName || '—'}`}
-                      </Text>
-                      {gift.message && <Text style={styles.giftListMsg} numberOfLines={1}>💬 {gift.message}</Text>}
-                      <Text style={styles.giftListDate}>{formatDate(gift.createdAt)}</Text>
+              {/* MEMBERSHIP SECTION */}
+              <View style={[styles.recentSection, { marginTop: 30 }]}>
+                <Text style={styles.sectionTitle}>Gift Card Membership</Text>
+                
+                <LinearGradient colors={['#FFD700', '#F59E0B']} style={styles.membershipCard} start={{x:0, y:0}} end={{x:1, y:1}}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <View>
+                      <Text style={styles.membershipTitle}>Premium Member</Text>
+                      <Text style={styles.membershipSubtitle}>Unlock Exclusive Metro Perks</Text>
                     </View>
-                  </TouchableOpacity>
-                ))
-              )}
+                    <Icon name="crown" size={40} color="#FFF" />
+                  </View>
+                  
+                  <View style={styles.membershipPerks}>
+                    <View style={styles.perkRow}>
+                      <Icon name="check-circle" size={16} color="#FFF" />
+                      <Text style={styles.perkText}> 5% Extra Cashback on Recharge</Text>
+                    </View>
+                    <View style={styles.perkRow}>
+                      <Icon name="check-circle" size={16} color="#FFF" />
+                      <Text style={styles.perkText}> Free Access to Partner Merchant Offers</Text>
+                    </View>
+                  </View>
 
-              <View style={{ height: 40 }} />
+                  <TouchableOpacity style={styles.upgradeBtn}>
+                    <Text style={styles.upgradeBtnText}>Upgrade Now - ₹499/year</Text>
+                  </TouchableOpacity>
+                </LinearGradient>
+              </View>
             </>
           )}
         </ScrollView>
       </SafeAreaView>
-
-      {/* ============ SEND GIFT MODAL ============ */}
-      <Modal visible={sendModalVisible} transparent animationType="none" onRequestClose={closeSendModal}>
-        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={closeSendModal}>
-          <Animated.View style={[
-            styles.giftModalContent,
-            {
-              transform: [{ scale: modalScaleAnim.interpolate({ inputRange: [0, 1], outputRange: [0.8, 1] }) }],
-              opacity: modalScaleAnim,
-            }
-          ]}>
-            <TouchableOpacity activeOpacity={1}>
-              <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 520 }}>
-                <View style={styles.giftModalHeader}>
-                  <Text style={styles.giftModalTitle}>🎁 Send Gift Card</Text>
-                  <TouchableOpacity onPress={closeSendModal}>
-                    <Icon name="close-circle" size={28} color={COLORS.textLight} />
-                  </TouchableOpacity>
-                </View>
-
-                {/* Theme Selection */}
-                <Text style={styles.giftModalLabel}>Choose Theme</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 16 }}>
-                  {GIFT_THEMES.map(theme => (
-                    <TouchableOpacity
-                      key={theme.id}
-                      onPress={() => setSelectedTheme(theme)}
-                      style={[styles.themeCircle, selectedTheme.id === theme.id && styles.themeCircleSelected]}
-                    >
-                      <LinearGradient colors={theme.colors} style={styles.themeCircleInner}>
-                        <Text style={{ fontSize: 18 }}>{theme.emoji}</Text>
-                      </LinearGradient>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-
-                {/* Amount */}
-                <Text style={styles.giftModalLabel}>Amount (₹)</Text>
-                <View style={styles.quickAmountsRow}>
-                  {quickAmounts.map(amt => (
-                    <TouchableOpacity
-                      key={amt}
-                      style={[styles.quickAmountBtn, giftAmount === String(amt) && styles.quickAmountBtnActive]}
-                      onPress={() => setGiftAmount(String(amt))}
-                    >
-                      <Text style={[styles.quickAmountText, giftAmount === String(amt) && styles.quickAmountTextActive]}>
-                        ₹{amt}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-                <TextInput
-                  style={styles.giftInput}
-                  placeholder="Enter custom amount"
-                  placeholderTextColor={COLORS.textLight}
-                  keyboardType="numeric"
-                  value={giftAmount}
-                  onChangeText={setGiftAmount}
-                  maxLength={5}
-                />
-
-                {/* Email Address */}
-                <Text style={styles.giftModalLabel}>Friend's Email Address</Text>
-                <TextInput
-                  style={styles.giftInput}
-                  placeholder="friend@email.com"
-                  placeholderTextColor={COLORS.textLight}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  value={giftEmail}
-                  onChangeText={setGiftEmail}
-                />
-
-                {/* Message */}
-                <Text style={styles.giftModalLabel}>Personal Message (Optional)</Text>
-                <TextInput
-                  style={[styles.giftInput, { height: 70, textAlignVertical: 'top' }]}
-                  placeholder="Write a personal message..."
-                  placeholderTextColor={COLORS.textLight}
-                  multiline
-                  value={giftMessage}
-                  onChangeText={setGiftMessage}
-                  maxLength={200}
-                />
-
-                {/* Wallet Balance Info */}
-                <View style={styles.walletInfoRow}>
-                  <Icon name="wallet" size={18} color="#00C9A7" />
-                  <Text style={styles.walletInfoText}>Wallet Balance: ₹{walletBalance || 0}</Text>
-                </View>
-
-                {/* Send Button */}
-                <TouchableOpacity
-                  onPress={handleSendGiftCard}
-                  disabled={giftLoading}
-                  style={{ borderRadius: 16, overflow: 'hidden', marginTop: 10 }}
-                >
-                  <LinearGradient colors={selectedTheme.colors} style={styles.giftSendBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-                    {giftLoading ? (
-                      <ActivityIndicator color="#fff" />
-                    ) : (
-                      <>
-                        <Icon name="gift-outline" size={22} color="#fff" />
-                        <Text style={styles.giftSendBtnText}>Send Gift Card 🎁</Text>
-                      </>
-                    )}
-                  </LinearGradient>
-                </TouchableOpacity>
-              </ScrollView>
-            </TouchableOpacity>
-          </Animated.View>
-        </TouchableOpacity>
-      </Modal>
-
-      {/* ============ REDEEM MODAL ============ */}
-      <Modal visible={redeemModalVisible} transparent animationType="none" onRequestClose={closeRedeemModal}>
-        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={closeRedeemModal}>
-          <Animated.View style={[
-            styles.giftModalContent,
-            {
-              transform: [{ scale: modalScaleAnim.interpolate({ inputRange: [0, 1], outputRange: [0.8, 1] }) }],
-              opacity: modalScaleAnim,
-            }
-          ]}>
-            <TouchableOpacity activeOpacity={1}>
-              <View style={styles.giftModalHeader}>
-                <Text style={styles.giftModalTitle}>🎊 Redeem Gift Card</Text>
-                <TouchableOpacity onPress={closeRedeemModal}>
-                  <Icon name="close-circle" size={28} color={COLORS.textLight} />
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.redeemIllustration}>
-                <LinearGradient colors={['#00C9A7', '#00B894']} style={styles.redeemIconBig}>
-                  <Icon name="gift-open" size={48} color="#fff" />
-                </LinearGradient>
-                <Text style={styles.redeemHeroText}>Gift Card Code टाका</Text>
-                <Text style={styles.redeemSubText}>
-                  तुम्हाला मिळालेला 12-digit code खाली enter करा
-                </Text>
-              </View>
-
-              <TextInput
-                style={[styles.giftInput, styles.redeemInput]}
-                placeholder="XXXX-XXXX-XXXX"
-                placeholderTextColor={COLORS.textLight}
-                value={redeemCode}
-                onChangeText={(text) => {
-                  // Auto-format with dashes
-                  const clean = text.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
-                  const formatted = clean.match(/.{1,4}/g)?.join('-') || clean;
-                  setRedeemCode(formatted);
-                }}
-                maxLength={14}
-                autoCapitalize="characters"
-              />
-
-              <TouchableOpacity
-                onPress={handleRedeemGiftCard}
-                disabled={giftLoading}
-                style={{ borderRadius: 16, overflow: 'hidden', marginTop: 16 }}
-              >
-                <LinearGradient colors={['#00C9A7', '#00B894']} style={styles.giftSendBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-                  {giftLoading ? (
-                    <ActivityIndicator color="#fff" />
-                  ) : (
-                    <>
-                      <Icon name="check-decagram" size={22} color="#fff" />
-                      <Text style={styles.giftSendBtnText}>Redeem Now 🎊</Text>
-                    </>
-                  )}
-                </LinearGradient>
-              </TouchableOpacity>
-            </TouchableOpacity>
-          </Animated.View>
-        </TouchableOpacity>
-      </Modal>
-
     </LinearGradient>
   );
 }
 
 const getStyles = (COLORS) => StyleSheet.create({
   container: { flex: 1 },
-  scrollContent: { padding: 20, paddingBottom: 40 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 40 : 10, marginBottom: 10 },
+  headerTitle: { fontSize: 20, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
   backButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg, borderRadius: 22, borderWidth: 1, borderColor: COLORS.border },
-  headerTitle: { fontSize: 22, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
-  
-  // Tab Switcher
-  tabContainer: { flexDirection: 'row', marginHorizontal: 20, marginBottom: 16, backgroundColor: COLORS.cardBg, borderRadius: 16, padding: 4, borderWidth: 1, borderColor: COLORS.border },
   tabBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 12, borderRadius: 14, gap: 6 },
   tabBtnActive: { backgroundColor: '#00C9A7' },
   tabText: { fontSize: 14, fontWeight: '700', color: COLORS.textLight },
@@ -1173,4 +682,27 @@ const getStyles = (COLORS) => StyleSheet.create({
   redeemHeroText: { fontSize: 18, fontWeight: '900', color: COLORS.text, marginBottom: 4 },
   redeemSubText: { fontSize: 13, color: COLORS.textLight, textAlign: 'center' },
   redeemInput: { textAlign: 'center', fontSize: 22, fontWeight: '900', letterSpacing: 4, fontFamily: Platform.OS === 'ios' ? 'Courier New' : 'monospace' },
+  // New Gift Card UI Styles
+  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  cardTitle: { fontSize: 24, fontWeight: '900', color: '#FFF', letterSpacing: 1.5, textTransform: 'uppercase' },
+  cardFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 'auto' },
+  cardLabel: { fontSize: 10, color: 'rgba(255,255,255,0.7)', fontWeight: '700', letterSpacing: 1, marginBottom: 4 },
+  cardHolder: { fontSize: 16, fontWeight: '800', color: '#FFF', letterSpacing: 1 },
+  
+  actionRow: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 10, marginTop: 20 },
+  actionBtn: { alignItems: 'center', flex: 1 },
+  actionIconBg: { width: 56, height: 56, borderRadius: 20, justifyContent: 'center', alignItems: 'center', marginBottom: 8 },
+  actionText: { fontSize: 12, fontWeight: '700', color: COLORS.text, textAlign: 'center' },
+
+  // Membership Section
+  recentSection: { paddingHorizontal: 5 },
+  sectionTitle: { fontSize: 18, fontWeight: '900', color: COLORS.text, marginBottom: 15, letterSpacing: 0.5 },
+  membershipCard: { borderRadius: 20, padding: 20, elevation: 8, shadowColor: '#F59E0B', shadowOpacity: 0.3, shadowRadius: 10, shadowOffset: { width: 0, height: 4 } },
+  membershipTitle: { fontSize: 22, fontWeight: '900', color: '#fff', marginBottom: 2 },
+  membershipSubtitle: { fontSize: 13, color: 'rgba(255,255,255,0.9)', fontWeight: '600' },
+  membershipPerks: { marginTop: 20, marginBottom: 20, gap: 10 },
+  perkRow: { flexDirection: 'row', alignItems: 'center' },
+  perkText: { color: '#fff', fontSize: 14, fontWeight: '700', marginLeft: 8 },
+  upgradeBtn: { backgroundColor: '#fff', paddingVertical: 12, borderRadius: 14, alignItems: 'center' },
+  upgradeBtnText: { color: '#F59E0B', fontSize: 15, fontWeight: '900' },
 });

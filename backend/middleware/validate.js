@@ -13,7 +13,7 @@ function validate(schema) {
       if (err instanceof ZodError) {
         return res.status(422).json({
           error: 'Validation failed',
-          issues: err.errors.map(e => ({
+          issues: (err.issues || err.errors || []).map(e => ({
             field: e.path.join('.'),
             message: e.message,
           })),

@@ -23,7 +23,7 @@ razorpayBreaker.fallback(() => ({ id: 'fallback_order_id', amount: 0, currency: 
 // @route   POST /api/tickets/calculate-fare
 // @access  Public
 const calculateFare = async (req, res) => {
-  const { source, destination, passengers, isReturn } = req.body;
+  const { source, destination, passengers, isReturn, isMember } = req.body;
 
   if (!source || !destination) {
     return res.status(400).json({ message: 'Source and destination stations are required.' });
@@ -33,6 +33,7 @@ const calculateFare = async (req, res) => {
     const passengersCount = parseInt(passengers) || 1;
     const returnFlag = isReturn === true || isReturn === 'true';
     const fareInfo = computeFare(source, destination, passengersCount, returnFlag);
+    
     res.status(200).json({ success: true, ...fareInfo });
   } catch (error) {
     console.error('Calculate Fare Error:', error);
@@ -194,24 +195,37 @@ const processPayment = async (req, res) => {
       ticket.qrData = encryptQR(qrPayload);
       await ticket.save();
 
-      // 3. Issue Cashback for Tickets over ₹100
+      // 3. Issue Cashback for Premium Members
       let wallet = await Wallet.findOne({ userId: req.user.id });
       if (!wallet) {
         wallet = new Wallet({ userId: req.user.id, balance: 0, transactions: [] });
       }
 
-      if (ticket.totalAmount >= 100) {
-        const cashbackAmount = Math.floor(ticket.totalAmount * 0.05); // 5% cashback
+      // Find user to check role
+      const buyer = await require('../models/User').findById(req.user.id);
+      let cashbackEarned = 0;
+      let newNxlCredits = buyer ? (buyer.nxlCredits || 0) : 0;
+      
+      if (buyer) {
+        // 5% cashback for all users (promotional / testing), minimum 1 NXL credit
+        const cashbackAmount = Math.max(1, Math.floor(ticket.totalAmount * 0.05));
         
         if (cashbackAmount > 0) {
+          cashbackEarned = cashbackAmount;
           // Add to user wallet
           wallet.balance += cashbackAmount;
           wallet.transactions.push({
             type: 'credit',
             amount: cashbackAmount,
-            description: `5% Cashback for Metro Ticket (${ticket.source} to ${ticket.destination})`,
+            description: `Premium Member 5% Cashback for Metro Ticket (${ticket.source} to ${ticket.destination})`,
             date: new Date()
           });
+
+          // Add to NXL Credits
+          buyer.nxlCredits = (buyer.nxlCredits || 0) + cashbackAmount;
+          buyer.lifetimeCashback = (buyer.lifetimeCashback || 0) + cashbackAmount;
+          newNxlCredits = buyer.nxlCredits;
+          await buyer.save();
 
           // Deduct from Admin wallet
           const adminUser = await require('../models/User').findOne({ role: 'admin' });
@@ -224,7 +238,7 @@ const processPayment = async (req, res) => {
             adminWallet.transactions.push({
               type: 'debit',
               amount: cashbackAmount,
-              description: `Funded 5% cashback to user for ticket purchase (ID: ${ticket.ticketId})`,
+              description: `Funded 5% cashback to premium user for ticket purchase (ID: ${ticket.ticketId})`,
               date: new Date()
             });
             await adminWallet.save();
@@ -236,7 +250,9 @@ const processPayment = async (req, res) => {
       return res.status(200).json({
         success: true,
         message: 'Payment completed and ticket activated.',
-        ticket
+        ticket,
+        cashbackEarned,
+        newNxlCredits
       });
     } else {
       ticket.paymentStatus = 'failed';

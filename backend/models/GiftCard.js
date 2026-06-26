@@ -1,9 +1,13 @@
 const mongoose = require('mongoose');
 
 const GiftCardSchema = new mongoose.Schema({
-  code: {
+  cardId: {
     type: String,
     unique: true,
+    required: true
+  },
+  hashedPin: {
+    type: String,
     required: true
   },
   senderId: {
@@ -17,9 +21,9 @@ const GiftCardSchema = new mongoose.Schema({
   },
   receiverEmail: {
     type: String,
-    required: true,
     trim: true,
     lowercase: true,
+    sparse: true,
     match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
   },
   receiverId: {

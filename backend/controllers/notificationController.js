@@ -2,7 +2,13 @@ const Notification = require('../models/Notification');
 
 const getNotifications = async (req, res) => {
   try {
-    const notifications = await Notification.find({ recipientId: req.user._id })
+    const notifications = await Notification.find({
+      $or: [
+        { recipientId: req.user._id },
+        { recipientId: { $exists: false } },
+        { recipientId: null }
+      ]
+    })
       .sort({ createdAt: -1 })
       .limit(50);
     res.json({ success: true, data: notifications });
