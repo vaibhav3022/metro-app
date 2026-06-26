@@ -164,30 +164,108 @@ const sendGiftCard = async (req, res) => {
     giftCard.receiverEmail = receiverEmail.toLowerCase().trim();
     if (message) giftCard.message = message;
     
+    // Generate a fresh PIN for the recipient to ensure security
+    const newPin = generateRandomString(8);
+    giftCard.hashedPin = await bcrypt.hash(newPin, 10);
+    
     await giftCard.save();
 
     // Send Email
     const mailOptions = {
       from: '"Pune Metro" <dhotrev384@gmail.com>',
       to: giftCard.receiverEmail,
-      subject: `🎁 You received a ₹${giftCard.amount} Pune Metro Gift Card!`,
+      subject: `🎁 You received a ₹${giftCard.amount} METRO GEIA Gift Card!`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden;">
-          <div style="background: linear-gradient(135deg, #FF6B6B, #EE5A24); padding: 30px; text-align: center; color: white;">
-            <h1 style="margin: 0; font-size: 28px;">Pune Metro Gift Card</h1>
-            <p style="margin: 10px 0 0 0; font-size: 16px;">You have received a special gift!</p>
+
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #E53935, #FF6B6B); padding: 28px 30px; text-align: center; color: white;">
+            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/f/fa/Pune_Metro_Logo.svg/1200px-Pune_Metro_Logo.svg.png" alt="Pune Metro Logo" style="height: 52px; width: auto; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;" />
+            <h1 style="margin: 0; font-size: 26px; font-weight: 900; letter-spacing: 1px;">METRO GEIA Gift Card</h1>
+            <p style="margin: 8px 0 0 0; font-size: 14px; opacity: 0.9;">Someone special sent you a gift! 🎁</p>
           </div>
-          <div style="padding: 30px; background-color: #f9f9f9;">
-            <p style="font-size: 18px; color: #333;">Hi there,</p>
-            <p style="font-size: 16px; color: #555;"><strong>${giftCard.senderName}</strong> has sent you a Pune Metro Digital Gift Card worth <strong>₹${giftCard.amount}</strong>.</p>
-            ${giftCard.message ? `<p style="font-size: 16px; color: #555; font-style: italic; background: #fff; padding: 15px; border-left: 4px solid #EE5A24;">"${giftCard.message}"</p>` : ''}
-            <div style="margin: 30px 0; text-align: center;">
-              <p style="font-size: 14px; color: #888; margin-bottom: 5px;">Your Gift Card Code</p>
-              <div style="background-color: #fff; border: 2px dashed #00C9A7; display: inline-block; padding: 15px 25px; border-radius: 8px; font-size: 24px; font-weight: bold; letter-spacing: 2px; color: #333;">
-                ${giftCard.cardId}-********
-              </div>
+
+          <!-- Body -->
+          <div style="padding: 30px; background-color: #ffffff;">
+            <p style="font-size: 16px; color: #333; margin-bottom: 8px;">Hi there,</p>
+            <p style="font-size: 15px; color: #555; margin-bottom: 20px;">
+              <strong style="color:#E53935;">${giftCard.senderName}</strong> has sent you a Pune Metro – METRO GEIA Gift Card worth
+              <strong style="color:#00C9A7; font-size: 18px;">₹${giftCard.amount}</strong>.
+              Use it to top up your Metro Wallet!
+            </p>
+
+            ${giftCard.message ? `<div style="background:#FFF5F5; border-left: 4px solid #E53935; padding: 14px 16px; border-radius: 6px; margin-bottom: 20px; font-size: 14px; color: #555; font-style: italic;">"${giftCard.message}"</div>` : ''}
+
+            <!-- No code shown here - sender will share it separately -->
+            <div style="background: #FFF8E1; border: 2px solid #FFC107; border-radius: 12px; padding: 22px; text-align: center; margin: 20px 0;">
+              <p style="font-size: 22px; margin: 0 0 8px 0;">🔐</p>
+              <p style="font-size: 15px; font-weight: bold; color: #333; margin: 0 0 6px 0;">Your secret gift code is on its way!</p>
+              <p style="font-size: 14px; color: #666; margin: 0;">Ask <strong style="color:#E53935;">${giftCard.senderName}</strong> to share the full code with you via WhatsApp or SMS. Then follow the steps below to redeem it.</p>
             </div>
-            <p style="font-size: 14px; color: #666; text-align: center;">Ask the sender for the secret PIN, then go to Smart Card > Gift Cards and click Redeem in the Pune Metro App.</p>
+
+            <!-- Steps -->
+            <div style="background: #F9F9F9; border-radius: 10px; padding: 22px; margin-top: 20px;">
+              <p style="font-size: 16px; font-weight: bold; color: #222; margin: 0 0 18px 0;">📲 How to Redeem — Step by Step:</p>
+
+              <table style="width:100%; border-collapse:collapse;">
+                <tr>
+                  <td style="width:36px; vertical-align:top; padding:8px 0;">
+                    <div style="background:#E53935; color:#fff; border-radius:50%; width:30px; height:30px; text-align:center; line-height:30px; font-weight:bold; font-size:14px;">1</div>
+                  </td>
+                  <td style="padding:8px 0 8px 12px; font-size:14px; color:#444; vertical-align:top;">
+                    Download the <strong>Pune Metro – METRO GEIA App</strong> from Google Play Store or Apple App Store.
+                  </td>
+                </tr>
+                <tr>
+                  <td style="width:36px; vertical-align:top; padding:8px 0;">
+                    <div style="background:#E53935; color:#fff; border-radius:50%; width:30px; height:30px; text-align:center; line-height:30px; font-weight:bold; font-size:14px;">2</div>
+                  </td>
+                  <td style="padding:8px 0 8px 12px; font-size:14px; color:#444; vertical-align:top;">
+                    Open the app and <strong>Login</strong> with your mobile number (or create a new account).
+                  </td>
+                </tr>
+                <tr>
+                  <td style="width:36px; vertical-align:top; padding:8px 0;">
+                    <div style="background:#E53935; color:#fff; border-radius:50%; width:30px; height:30px; text-align:center; line-height:30px; font-weight:bold; font-size:14px;">3</div>
+                  </td>
+                  <td style="padding:8px 0 8px 12px; font-size:14px; color:#444; vertical-align:top;">
+                    From the home screen, tap on the <strong>Smart Card</strong> tab in the bottom menu.
+                  </td>
+                </tr>
+                <tr>
+                  <td style="width:36px; vertical-align:top; padding:8px 0;">
+                    <div style="background:#E53935; color:#fff; border-radius:50%; width:30px; height:30px; text-align:center; line-height:30px; font-weight:bold; font-size:14px;">4</div>
+                  </td>
+                  <td style="padding:8px 0 8px 12px; font-size:14px; color:#444; vertical-align:top;">
+                    On the Smart Card screen, tap on <strong>Gift Cards</strong>.
+                  </td>
+                </tr>
+                <tr>
+                  <td style="width:36px; vertical-align:top; padding:8px 0;">
+                    <div style="background:#E53935; color:#fff; border-radius:50%; width:30px; height:30px; text-align:center; line-height:30px; font-weight:bold; font-size:14px;">5</div>
+                  </td>
+                  <td style="padding:8px 0 8px 12px; font-size:14px; color:#444; vertical-align:top;">
+                    Tap the green <strong>Redeem</strong> button on the Gift Cards screen.
+                  </td>
+                </tr>
+                <tr>
+                  <td style="width:36px; vertical-align:top; padding:8px 0;">
+                    <div style="background:#00C9A7; color:#fff; border-radius:50%; width:30px; height:30px; text-align:center; line-height:30px; font-weight:bold; font-size:14px;">6</div>
+                  </td>
+                  <td style="padding:8px 0 8px 12px; font-size:14px; color:#444; vertical-align:top;">
+                    Ask <strong style="color:#E53935;">${giftCard.senderName}</strong> to share the <strong>secret full code</strong> with you via WhatsApp or SMS.<br/>
+                    Enter that code in the Redeem field and tap <strong>Redeem Code</strong> — <strong style="color:#00C9A7;">₹${giftCard.amount}</strong> will be added to your Metro Wallet instantly! 🎉
+                  </td>
+                </tr>
+              </table>
+            </div>
+
+            <p style="font-size: 12px; color: #bbb; margin-top: 24px; text-align: center;">This gift card is valid for 6 months from the date of issue. For support, contact Pune Metro helpdesk.</p>
+          </div>
+
+          <!-- Footer -->
+          <div style="background: #E53935; padding: 14px 20px; text-align: center;">
+            <p style="margin: 0; color: #fff; font-size: 13px; font-weight: 600;">Pune Metro — METRO GEIA &nbsp;|&nbsp; Pune, Maharashtra, India</p>
           </div>
         </div>
       `
@@ -199,7 +277,7 @@ const sendGiftCard = async (req, res) => {
       console.error('Failed to send gift card email:', mailErr);
     }
 
-    res.status(200).json({ success: true, message: 'Gift card sent successfully', giftCard });
+    res.status(200).json({ success: true, message: 'Gift card sent successfully', giftCard, newPin });
   } catch (error) {
     console.error('Send Gift Card Error:', error);
     res.status(500).json({ message: 'Server error sending gift card.' });

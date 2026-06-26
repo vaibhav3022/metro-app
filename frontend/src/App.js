@@ -35,7 +35,7 @@ import TouristPlacesScreen from './screens/TouristPlacesScreen';
 import PlaceDetailsScreen from './screens/PlaceDetailsScreen';
 import SyncService from './services/SyncService';
 import NXLCreditsScreen from './screens/NXLCreditsScreen';
-
+import GiftCardScreen from './screens/GiftCardScreen';
 // User sub-screens
 import TokenEconomyScreen from './screens/User/TokenEconomyScreen';
 import NotificationScreen from './screens/User/NotificationScreen';
@@ -118,7 +118,7 @@ function AppNavigator() {
             <Stack.Screen name="PlaceDetails" component={PlaceDetailsScreen} />
 
             <Stack.Screen name="NXLCredits" component={NXLCreditsScreen} />
-
+            <Stack.Screen name="GiftCard" component={GiftCardScreen} />
             {/* User Sub-screens */}
             <Stack.Screen name="Tokens" component={TokenEconomyScreen} />
             <Stack.Screen name="UserNotification" component={NotificationScreen} />
