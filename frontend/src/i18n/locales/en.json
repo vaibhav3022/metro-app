@@ -1,4 +1,4 @@
-{
+﻿{
   "common": {
     "save": "Save",
     "cancel": "Cancel",
@@ -44,7 +44,7 @@
     "greeting_afternoon": "Good Afternoon",
     "greeting_evening": "Good Evening",
     "greeting_night": "Good Night",
-    "puneMetro": "ENERGEIA METRO",
+    "puneMetro": "METROGEIA",
     "passenger": "Passenger",
     "slider1": "Smart Metro Travel",
     "slider2": "Station Retail Shops",
@@ -129,7 +129,7 @@
     "errorLoginFailed": "Login Failed",
     "errorInvalid": "Invalid credentials",
     "errorSendOtp": "Could not send OTP",
-    "footer": "ENERGEIA METRO Rail Corporation Ltd.",
+    "footer": "METROGEIA Rail Corporation Ltd.",
     "adminPortal": "Admin Portal",
     "adminEmailLabel": "Admin Email",
     "adminPasswordLabel": "Password",
@@ -275,11 +275,11 @@
     "cardholder": "CARDHOLDER",
     "balance": "BALANCE",
     "cvv": "CVV",
-    "instructions": "For entry/exit scan at AFC gates. Property of ENERGEIA METRO.",
+    "instructions": "For entry/exit scan at AFC gates. Property of METROGEIA.",
     "helpline": "Helpline: 1800 270 5555",
     "hintText": "Tap card to flip and view Back/Front",
     "simulatorTitle": "AFC Gate Simulator",
-    "simulatorDesc": "Use this to simulate scanning your digital smart card at entry/exit gates of ENERGEIA METRO.",
+    "simulatorDesc": "Use this to simulate scanning your digital smart card at entry/exit gates of METROGEIA.",
     "scanning": "SCANNING CARD...",
     "tapToEnter": "TAP TO ENTER STATION",
     "tapToExit": "TAP TO EXIT STATION",
@@ -291,7 +291,7 @@
       "entrySuccessTitle": "Gate Entry Successful",
       "entrySuccessDesc": "Scan Success at Pune Municipal Corporation (PMC) station.\n\nGate Open. Happy Journey!",
       "exitSuccessTitle": "Gate Exit Successful",
-      "exitSuccessDesc": "Scan Success at District Court station.\n\nJourney: PMC → District Court\nFare Deducted: ₹{{fare}}\nRemaining Balance: ₹{{newBalance}}\n\nThank you for travelling with ENERGEIA METRO!"
+      "exitSuccessDesc": "Scan Success at District Court station.\n\nJourney: PMC → District Court\nFare Deducted: ₹{{fare}}\nRemaining Balance: ₹{{newBalance}}\n\nThank you for travelling with METROGEIA!"
     }
   },
   "help": {
@@ -338,7 +338,7 @@
   "feeder": {
     "title": "Feeder Services",
     "bannerTitle": "Last Mile Connectivity",
-    "bannerSubtitle": "ENERGEIA METRO provides seamless feeder services to help you reach your final destination easily.",
+    "bannerSubtitle": "METROGEIA provides seamless feeder services to help you reach your final destination easily.",
     "availableServices": "Available Services",
     "services": {
       "pmpml": {

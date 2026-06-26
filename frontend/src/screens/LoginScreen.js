@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
+  ActivityIndicator, Alert, KeyboardAvoidingView, Platform,
   ScrollView, StatusBar, Modal, Image, Animated, Easing
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -27,6 +28,16 @@ export default function LoginScreen() {
   
   const [activeTab, setActiveTab] = useState('passenger');
   const [isRegister, setIsRegister] = useState(false);
+  
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState(''); // Used for Merchant/Admin login and Merchant register
+  const [name, setName] = useState(''); // Passenger/Merchant Name
+  const [phone, setPhone] = useState(''); // Merchant Phone
+  const [shopName, setShopName] = useState(''); // Merchant Shop
+  const [address, setAddress] = useState(''); // Merchant Address
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [adminModalVisible, setAdminModalVisible] = useState(false); // Hidden Admin Login
 
   const logoAnim = useRef(new Animated.Value(0)).current;
 
@@ -40,16 +51,6 @@ export default function LoginScreen() {
       })
     ).start();
   }, [logoAnim]);
-  
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState(''); // Used for Merchant/Admin login and Merchant register
-  const [name, setName] = useState(''); // Passenger/Merchant Name
-  const [phone, setPhone] = useState(''); // Merchant Phone
-  const [shopName, setShopName] = useState(''); // Merchant Shop
-  const [address, setAddress] = useState(''); // Merchant Address
-
-  const [showPassword, setShowPassword] = useState(false);
-  const [adminModalVisible, setAdminModalVisible] = useState(false); // Hidden Admin Login
 
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -121,10 +122,6 @@ export default function LoginScreen() {
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.gradient}>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
-      
-      <TouchableOpacity style={styles.themeToggle} onPress={toggleTheme}>
-        <Icon name={isDark ? 'weather-sunny' : 'weather-night'} size={22} color={COLORS.text} />
-      </TouchableOpacity>
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
@@ -147,7 +144,7 @@ export default function LoginScreen() {
                   resizeMode="contain" 
                 />
               </View>
-              <Text style={styles.title}>{t('login.appTitle')}</Text>
+              <Text style={styles.title}><Text style={{ color: '#EF4444' }}>METRO</Text><Text style={{ color: '#222222' }}>GEIA</Text></Text>
               <Text style={styles.subtitle}>{t('login.appSubtitle')}</Text>
             </TouchableOpacity>
           </View>
@@ -377,7 +374,7 @@ const getStyles = (COLORS) => StyleSheet.create({
     shadowOffset: { width: 0, height: 2 }
   },
   logoArea: { alignItems: 'center', marginBottom: 32 },
-  logoBg: { width: 110, height: 110, borderRadius: 55, backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center', marginBottom: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 10, elevation: 4, padding: 8 },
+  logoBg: { width: 110, height: 110, borderRadius: 55, backgroundColor: '#F5F5F5', justifyContent: 'center', alignItems: 'center', marginBottom: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 10, elevation: 4, padding: 8 },
   logoImage: { width: '100%', height: '100%' },
   title: { fontSize: 28, fontWeight: '900', color: COLORS.text, letterSpacing: 3 },
   subtitle: { fontSize: 14, color: COLORS.textLight, marginTop: 4, letterSpacing: 0.5 },

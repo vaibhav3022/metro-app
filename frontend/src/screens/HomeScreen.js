@@ -112,7 +112,7 @@ export default function HomeScreen({ navigation }) {
       icon: 'calendar-star',
       gradient: ['#A78BFA', '#6D28D9'],
       color: '#6D28D9',
-      emoji: '🎉',
+      emoji: '🎟️',
       url: 'https://energeia369.com/events'
     },
   ];
@@ -142,8 +142,8 @@ export default function HomeScreen({ navigation }) {
     { id: 'v2', source: require('../../assets/slider/oasis_cafe.jpg'), title: 'Oasis T-Cafe', isVertical: true, vertical: verticalsData[1] },
     { id: 'v3', source: require('../../assets/slider/ll_beauty.png'), title: 'LL Beauty', isVertical: true, vertical: verticalsData[2] },
     { id: 'v5', source: require('../../assets/slider/coworking.png'), title: 'CoWorking Space', isVertical: true, vertical: verticalsData[3] },
-    { id: 'eva1', source: require('../../assets/slider/eva_salon.png'), title: 'EVA', isVertical: true, vertical: verticalsData[4] },
-    { id: 'v6', source: require('../../assets/slider/events.jpg'), title: 'Events', isVertical: true, vertical: verticalsData[5] },
+    { id: 'v6', source: require('../../assets/slider/eva_salon.png'), title: 'EVA', isVertical: true, vertical: verticalsData[4] },
+    { id: 'v7', source: require('../../assets/slider/events.jpg'), title: 'Events', isVertical: true, vertical: verticalsData[5] },
   ];
 
   const flatListRef = useRef(null);
@@ -248,9 +248,7 @@ export default function HomeScreen({ navigation }) {
               resizeMode="contain" 
             />
             <View style={{ flex: 1 }}>
-              <Text style={styles.headerTitle}>
-                ENERGEIA <Text style={{ color: '#EF4444' }}>METRO</Text>
-              </Text>
+              <Text style={styles.headerTitle}><Text style={{ color: '#EF4444' }}>METRO</Text><Text style={{ color: '#222222' }}>GEIA</Text></Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
                 <Icon name="map-marker" size={14} color="#EF4444" />
                 <Text style={[styles.greeting, { marginTop: 0, marginLeft: 2 }]} numberOfLines={1} ellipsizeMode="tail">Pune, Maharashtra</Text>
@@ -258,7 +256,7 @@ export default function HomeScreen({ navigation }) {
             </View>
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 0 }}>
-            <TouchableOpacity onPress={() => navigation.navigate('NXLCredits')} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: isDark ? 'rgba(245,158,11,0.15)' : 'rgba(245,158,11,0.1)', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 28, borderWidth: 2, borderColor: '#F59E0B' }}>
+            <TouchableOpacity onPress={() => navigation.navigate('NXLCredits')} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', minWidth: 90, backgroundColor: isDark ? 'rgba(245,158,11,0.15)' : 'rgba(245,158,11,0.1)', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 28, borderWidth: 2, borderColor: '#F59E0B' }}>
               <Animated.Image 
                 source={require('../assets/images/nxl_icon.png')} 
                 style={{ 
@@ -269,7 +267,7 @@ export default function HomeScreen({ navigation }) {
                 }} 
                 resizeMode="contain" 
               />
-              <Text style={{ color: '#D97706', fontWeight: '900', fontSize: 16 }}>₹{user?.nxlCredits || 0}</Text>
+              <Text style={{ color: '#D97706', fontWeight: '900', fontSize: 16 }}>{'\u20B9'}{user?.nxlCredits || 0}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -300,7 +298,7 @@ export default function HomeScreen({ navigation }) {
                     </View>
                     {item.isVertical && (
                       <View style={styles.exploreBadge}>
-                        <Text style={styles.exploreBadgeText}>Explore →</Text>
+                        <Text style={styles.exploreBadgeText}>Explore ➔</Text>
                       </View>
                     )}
                   </View>
@@ -340,7 +338,7 @@ export default function HomeScreen({ navigation }) {
                 <Text style={[styles.verticalCardName, { color: COLORS.text }]}>{v.name}</Text>
                 <Text style={[styles.verticalCardTag, { color: COLORS.textLight }]} numberOfLines={2}>{v.tagline}</Text>
                 <View style={[styles.verticalBadge, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)' }]}>
-                  <Text style={[styles.verticalBadgeText, { color: COLORS.text }]}>Explore →</Text>
+                  <Text style={[styles.verticalBadgeText, { color: COLORS.text }]}>Explore ➔</Text>
                 </View>
               </View>
             </TouchableOpacity>
@@ -384,14 +382,14 @@ export default function HomeScreen({ navigation }) {
                 <Icon name="ticket-confirmation-outline" size={26} color="#00C9A7" />
               </View>
               <View style={styles.ticketInfo}>
-                <Text style={styles.ticketRoute}>{activeTicket.source} → {activeTicket.destination}</Text>
+                <Text style={styles.ticketRoute}>{activeTicket.source} ➔ {activeTicket.destination}</Text>
                 <Text style={styles.ticketStatusText}>{activeTicket.ticketStatus === 'entered' ? t('home.inTransit') : t('home.activeQR')}</Text>
               </View>
               <Icon name="qrcode-scan" size={28} color="#00C9A7" />
             </View>
             <View style={styles.ticketFooter}>
               <Text style={styles.ticketDetails}>{activeTicket.passengers} {t('home.passengersCount')}</Text>
-              <Text style={styles.ticketFare}>₹{activeTicket.totalAmount || activeTicket.fare}</Text>
+              <Text style={styles.ticketFare}>{'\u20B9'}{activeTicket.totalAmount || activeTicket.fare}</Text>
             </View>
           </TouchableOpacity>
         ) : (
@@ -486,7 +484,7 @@ export default function HomeScreen({ navigation }) {
                 </View>
 
                 <Text style={styles.modalDesc}>
-                  We're working hard to bring {comingSoonModal.vertical.name} to every ENERGEIA METRO station. Stay tuned for an amazing experience!
+                  We're working hard to bring {comingSoonModal.vertical.name} to every METROGEIA station. Stay tuned for an amazing experience!
                 </Text>
 
                 <TouchableOpacity style={styles.modalCloseBtn} onPress={hideComingSoon}>
@@ -518,7 +516,7 @@ const getStyles = (COLORS) => StyleSheet.create({
   },
   scroll: { paddingTop: 10, paddingBottom: 30 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, marginBottom: 22 },
-  headerLogo: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'transparent', padding: 2 },
+  headerLogo: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#F5F5F5', padding: 2 },
   headerTitle: { fontSize: 18, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
   greeting: { fontSize: 13, color: COLORS.textLight, marginTop: 1 },
   userName: { fontSize: 22, fontWeight: '800', color: COLORS.text, marginTop: 2 },

@@ -52,6 +52,18 @@ const sendOTP = async (req, res) => {
       console.log(`[OTP DEV FALLBACK] ${normalizedEmail}: ${otp} (Master OTP 123456 is also active)`);
     });
 
+    // Send SMS via Twilio if configured
+    if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER && req.body.phone) {
+      const twilio = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+      const appHash = process.env.APP_SMS_HASH || 'YOUR_APP_HASH';
+      twilio.messages.create({
+        body: `<#> Your Pune Metro OTP is ${otp}. Hash: ${appHash}`,
+        from: process.env.TWILIO_PHONE_NUMBER,
+        to: '+91' + req.body.phone
+      }).then(message => console.log(`[SMS] Sent to ${req.body.phone}: ${message.sid}`))
+        .catch(err => console.error('[SMS Warning] Twilio failed:', err));
+    }
+
     res.status(200).json({ success: true, message: 'OTP sent' });
   } catch (error) {
     console.error('Send OTP Error:', error);

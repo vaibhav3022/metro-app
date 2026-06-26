@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, StatusBar } from 'react-native';
+import RNOtpVerify from 'react-native-otp-verify';
 import { useDispatch, useSelector } from 'react-redux';
 import { authStart, authSuccess, authFailure, clearError } from '../redux/slices/authSlice';
 import api from '../api/axiosConfig';
@@ -15,6 +16,33 @@ export default function OTPScreen({ route, navigation }) {
   const { email, name, phone, shopName, password, address, role, isRegister } = route.params || {};
   const [otp, setOtp] = useState('');
   
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      RNOtpVerify.getOtp()
+        .then(() => RNOtpVerify.addListener(otpHandler))
+        .catch(console.log);
+
+      // Log hash for developer reference when setting up backend SMS
+      RNOtpVerify.getHash().then(hash => console.log('App Hash:', hash)).catch(console.log);
+    }
+
+    return () => {
+      if (Platform.OS === 'android') {
+        RNOtpVerify.removeListener();
+      }
+    };
+  }, []);
+
+  const otpHandler = (message) => {
+    if (message && message !== 'Timeout Error') {
+      const match = /(\d{6})/.exec(message);
+      if (match && match[1]) {
+        setOtp(match[1]);
+        RNOtpVerify.removeListener();
+      }
+    }
+  };
+
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => state.auth);
 

@@ -13,35 +13,12 @@ export const ThemeProvider = ({ children }) => {
   const systemScheme = useColorScheme();
   const [themeMode, setThemeMode] = useState('light');
 
-  useEffect(() => {
-    const loadTheme = async () => {
-      try {
-        const savedTheme = await AsyncStorage.getItem('@pune_metro_theme');
-        if (savedTheme) {
-          setThemeMode(savedTheme);
-        } else {
-          setThemeMode(systemScheme || 'light');
-        }
-      } catch (e) {
-        console.error('Error loading theme', e);
-        setThemeMode(systemScheme || 'light');
-      }
-    };
-    loadTheme();
-  }, [systemScheme]);
-
   const toggleTheme = async () => {
-    try {
-      const nextTheme = themeMode === 'light' ? 'dark' : 'light';
-      setThemeMode(nextTheme);
-      await AsyncStorage.setItem('@pune_metro_theme', nextTheme);
-    } catch (e) {
-      console.error('Error saving theme', e);
-    }
+    // Theme toggling disabled, locked to light mode
   };
 
-  const theme = themeMode === 'light' ? LIGHT_THEME : DARK_THEME;
-  const isDark = themeMode === 'dark';
+  const theme = LIGHT_THEME;
+  const isDark = false;
 
   return (
     <ThemeContext.Provider value={{ theme, isDark, toggleTheme }}>

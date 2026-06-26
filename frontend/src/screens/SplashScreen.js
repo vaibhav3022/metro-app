@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { StyleSheet, Text, View, ActivityIndicator, StatusBar, Image, Animated, Easing } from 'react-native';
+import React, { useEffect } from 'react';
+import { StyleSheet, Text, View, ActivityIndicator, StatusBar, Image } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { useTheme } from '../context/ThemeContext';
 import { storage } from '../utils/storage';
@@ -10,19 +10,6 @@ export default function SplashScreen({ navigation }) {
   const dispatch = useDispatch();
   const { theme: COLORS, isDark } = useTheme();
   const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
-
-  const logoAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.loop(
-      Animated.timing(logoAnim, {
-        toValue: 1,
-        duration: 15000,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      })
-    ).start();
-  }, [logoAnim]);
 
   useEffect(() => {
     const checkAuthStatus = async () => {
@@ -81,18 +68,15 @@ export default function SplashScreen({ navigation }) {
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={COLORS.background} />
       
       <View style={styles.logoContainer}>
-        <View style={styles.logoContainer}>
-          <Animated.Image 
+        <View style={styles.logoBg}>
+          <Image 
             source={require('../assets/images/app_logo.png')} 
-            style={[
-              styles.logo,
-              { transform: [{ rotate: logoAnim.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] }) }] }
-            ]} 
+            style={styles.logoImage} 
             resizeMode="contain" 
           />
         </View>
-        <Text style={styles.title}>PUNE METRO</Text>
-        <Text style={styles.subtitle}>आली आपली मेट्रो! 🚇</Text>
+        <Text style={styles.title}><Text style={{color: '#EF4444'}}>METRO</Text><Text style={{color: '#222222'}}>GEIA</Text></Text>
+        <Text style={styles.subtitle}>{'आली आपली मेट्रो! 🚇'}</Text>
       </View>
       
       <View style={styles.loadingContainer}>
@@ -121,7 +105,7 @@ const getStyles = (COLORS) => StyleSheet.create({
     width: 140,
     height: 140,
     borderRadius: 70,
-    backgroundColor: 'transparent',
+    backgroundColor: '#F5F5F5',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',

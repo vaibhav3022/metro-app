@@ -111,11 +111,11 @@ export default function NXLCreditsScreen() {
           />
           <View>
             <Text style={styles.cardBrandLabel}>NXL CREDITS</Text>
-            <Text style={styles.cardSubLabel}>ENERGEIA METRO</Text>
+            <Text style={styles.cardSubLabel}>METROGEIA</Text>
           </View>
         </View>
 
-        <Text style={styles.balanceAmount}>₹{nxlBalance}</Text>
+        <Text style={styles.balanceAmount}>{'\u20B9'}{nxlBalance}</Text>
         <Text style={styles.balanceLabel}>Available Balance</Text>
 
         <View style={styles.cardDivider} />
@@ -132,7 +132,7 @@ export default function NXLCreditsScreen() {
       <View style={styles.hintCard}>
         <Icon name="information-outline" size={18} color="#F59E0B" />
         <Text style={styles.hintText}>
-          You earn NXL cashback on every ticket purchase & shop transaction at ENERGEIA METRO.
+          You earn NXL cashback on every ticket purchase & shop transaction at METROGEIA.
         </Text>
       </View>
 
@@ -222,7 +222,7 @@ const getStyles = (COLORS, isDark) => StyleSheet.create({
   balanceCardTop: {
     flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 20,
   },
-  cardLogo: { width: 40, height: 40 },
+  cardLogo: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#F5F5F5', padding: 2 },
   cardBrandLabel: { color: '#fff', fontSize: 14, fontWeight: '900', letterSpacing: 1 },
   cardSubLabel:   { color: 'rgba(255,255,255,0.75)', fontSize: 11, marginTop: 1 },
   balanceAmount: { color: '#fff', fontSize: 48, fontWeight: '900', letterSpacing: 1 },

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, RefreshControl, TextInput, ActivityIndicator, StatusBar, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -64,7 +64,7 @@ export default function TokenEconomyScreen({ navigation }) {
                 currency: 'INR',
                 key: 'rzp_test_St6f7LZjydxbQ0',
                 amount: orderAmount || totalPayable * 100, // backend returns GST-included paise
-                name: 'ENERGEIA METRO',
+                name: 'METROGEIA',
                 order_id: orderId,
                 theme: { color: COLORS.primary }
               };

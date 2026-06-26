@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ActivityIndicator, Alert, SafeAreaView, KeyboardAvoidingView, Platform, StatusBar, Modal } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -58,7 +58,7 @@ export default function ScanAndPayScreen({ route, navigation }) {
               data.businessName ||
               data.shopName ||
               data.name ||
-              'ENERGEIA METRO Shop',
+              'METROGEIA Shop',
             type: data.type || 'MERCHANT_PAYMENT',
           });
         } else {
@@ -97,7 +97,7 @@ export default function ScanAndPayScreen({ route, navigation }) {
         currency: orderData.currency || 'INR',
         key: orderData.key_id,
         amount: String(orderData.amount), // already in paise from backend
-        name: 'ENERGEIA METRO',
+        name: 'METROGEIA',
         order_id: orderData.orderId,
         prefill: {
           email: user?.email || 'user@punemetro.com',

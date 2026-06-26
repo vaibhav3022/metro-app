@@ -1,4 +1,4 @@
-import { METRO_LINES } from '../constants/metroLines';
+﻿import { METRO_LINES } from '../constants/metroLines';
 
 /**
  * Calculates transit distance (in KM) between source and destination stations.
@@ -49,7 +49,7 @@ export const calculateDistance = (source, destination) => {
 
 /**
  * Calculates ticket fare based on computed distance and number of passengers
- * ENERGEIA METRO Rates:
+ * METROGEIA Rates:
  *  0 - 2 km: ₹10
  *  2 - 5 km: ₹20
  *  5 - 12 km: ₹30
