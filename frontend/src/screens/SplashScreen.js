@@ -75,7 +75,7 @@ export default function SplashScreen({ navigation }) {
             resizeMode="contain" 
           />
         </View>
-        <Text style={styles.title}><Text style={{color: '#EF4444'}}>METRO</Text><Text style={{color: '#222222'}}>GEIA</Text></Text>
+        <Text style={styles.title}><Text style={{color: '#EF4444'}}>METRO</Text><Text style={{color: '#000000'}}>XIA</Text></Text>
         <Text style={styles.subtitle}>{'आली आपली मेट्रो! 🚇'}</Text>
       </View>
       

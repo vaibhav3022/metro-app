@@ -98,7 +98,7 @@ export default function AdminDashboardScreen() {
         <View style={styles.header}>
           <View>
             <Text style={styles.headerTitle}>Admin Panel</Text>
-            <Text style={styles.headerSubtitle}>METROGEIA Control Center</Text>
+            <Text style={styles.headerSubtitle}>METROXIA Control Center</Text>
           </View>
           <View style={styles.headerActions}>
             <TouchableOpacity style={styles.headerBtn} onPress={onRefresh}>

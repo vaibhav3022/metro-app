@@ -160,7 +160,7 @@ export default function GiftCardScreen() {
             {
               text: '📤 Share with Friend',
               onPress: () => Share.share({
-                message: `🎁 Pune Metro – METRO GEIA Gift Card!\n\n*Secret Code:* ${fullCode}\n\nSteps to Redeem:\n1. Download METRO GEIA App\n2. Go to Smart Card → Gift Cards\n3. Tap Redeem & enter this code\n4. ₹${amount} added to your Metro Wallet instantly! 🎉`,
+                message: `🎁 Pune Metro – METROXIA Gift Card!\n\n*Secret Code:* ${fullCode}\n\nSteps to Redeem:\n1. Download METROXIA App\n2. Go to Smart Card → Gift Cards\n3. Tap Redeem & enter this code\n4. ₹${amount} added to your Metro Wallet instantly! 🎉`,
                 title: 'Gift Card Code'
               })
             },
@@ -209,7 +209,7 @@ export default function GiftCardScreen() {
           {
             text: 'Share via WhatsApp/SMS',
             onPress: () => Share.share({
-              message: `🎁 Your Pune Metro Gift Card Code:\n\n*Code:* ${fullCode}\n\nDownload the METRO GEIA App → Go to Gift Cards → Tap Redeem → Enter this code to claim ₹${inputAmount}!`,
+              message: `🎁 Your Pune Metro Gift Card Code:\n\n*Code:* ${fullCode}\n\nDownload the METROXIA App → Go to Gift Cards → Tap Redeem → Enter this code to claim ₹${inputAmount}!`,
               title: 'Gift Card Code'
             })
           },

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   ActivityIndicator, Alert, KeyboardAvoidingView, Platform,
@@ -144,7 +144,7 @@ export default function LoginScreen() {
                   resizeMode="contain" 
                 />
               </View>
-              <Text style={styles.title}><Text style={{ color: '#EF4444' }}>METRO</Text><Text style={{ color: '#222222' }}>GEIA</Text></Text>
+              <Text style={styles.title}><Text style={{ color: '#EF4444' }}>METRO</Text><Text style={{ color: '#000000' }}>XIA</Text></Text>
               <Text style={styles.subtitle}>{t('login.appSubtitle')}</Text>
             </TouchableOpacity>
           </View>

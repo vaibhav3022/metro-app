@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StatusBar, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StatusBar, Image, Modal } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchWallet, addMoney } from '../redux/slices/walletSlice';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -19,6 +19,7 @@ export default function WalletScreen({ navigation }) {
   
   const [amount, setAmount] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [selectedTx, setSelectedTx] = useState(null);
 
   useEffect(() => {
     dispatch(fetchWallet());
@@ -171,20 +172,20 @@ export default function WalletScreen({ navigation }) {
             <Text style={styles.sectionTitle}>{t('wallet.recentTransactions')}</Text>
             {transactions && transactions.length > 0 ? (
               transactions.map((tx, index) => (
-                <View key={index} style={styles.transactionItem}>
+                <TouchableOpacity key={index} style={styles.transactionItem} onPress={() => setSelectedTx(tx)}>
                   <View style={styles.txLeft}>
                     <View style={[styles.txIconBox, { backgroundColor: tx.type?.toLowerCase() === 'credit' ? 'rgba(46,125,50,0.15)' : 'rgba(211,47,47,0.15)' }]}>
                       <Icon name={tx.type?.toLowerCase() === 'credit' ? 'arrow-down-left' : 'arrow-up-right'} size={20} color={tx.type?.toLowerCase() === 'credit' ? '#2E7D32' : '#D32F2F'} />
                     </View>
-                    <View>
-                      <Text style={styles.txTitle}>{tx.description || (tx.type?.toLowerCase() === 'credit' ? t('wallet.topup') : t('wallet.ticketPurchase'))}</Text>
+                    <View style={{ flex: 1, paddingRight: 10 }}>
+                      <Text style={styles.txTitle} numberOfLines={1}>{tx.description || (tx.type?.toLowerCase() === 'credit' ? t('wallet.topup') : t('wallet.ticketPurchase'))}</Text>
                       <Text style={styles.txDate}>{new Date(tx.date || tx.createdAt).toLocaleDateString()}</Text>
                     </View>
                   </View>
                   <Text style={[styles.txAmount, { color: tx.type?.toLowerCase() === 'credit' ? '#2E7D32' : COLORS.text }]}>
                     {tx.type?.toLowerCase() === 'credit' ? '+' : '-'}₹{parseFloat(tx.amount).toFixed(2)}
                   </Text>
-                </View>
+                </TouchableOpacity>
               ))
             ) : (
               <Text style={styles.noTransactionsText}>{t('wallet.noTransactions')}</Text>
@@ -192,6 +193,42 @@ export default function WalletScreen({ navigation }) {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Transaction Details Modal */}
+      <Modal visible={!!selectedTx} transparent animationType="fade" onRequestClose={() => setSelectedTx(null)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{t('wallet.recentTransactions')}</Text>
+              <TouchableOpacity onPress={() => setSelectedTx(null)}>
+                <Icon name="close" size={24} color={COLORS.text} />
+              </TouchableOpacity>
+            </View>
+            {selectedTx && (
+              <View style={styles.modalBody}>
+                <View style={[styles.txIconBox, { backgroundColor: selectedTx.type?.toLowerCase() === 'credit' ? 'rgba(46,125,50,0.15)' : 'rgba(211,47,47,0.15)', width: 60, height: 60, borderRadius: 30, alignSelf: 'center', marginBottom: 16 }]}>
+                  <Icon name={selectedTx.type?.toLowerCase() === 'credit' ? 'arrow-down-left' : 'arrow-up-right'} size={30} color={selectedTx.type?.toLowerCase() === 'credit' ? '#2E7D32' : '#D32F2F'} />
+                </View>
+                <Text style={[styles.modalAmount, { color: selectedTx.type?.toLowerCase() === 'credit' ? '#2E7D32' : COLORS.text }]}>
+                  {selectedTx.type?.toLowerCase() === 'credit' ? '+' : '-'}₹{parseFloat(selectedTx.amount).toFixed(2)}
+                </Text>
+                <View style={styles.modalRow}>
+                  <Text style={styles.modalLabel}>Date</Text>
+                  <Text style={styles.modalValue}>{new Date(selectedTx.date || selectedTx.createdAt).toLocaleDateString()}</Text>
+                </View>
+                <View style={styles.modalRow}>
+                  <Text style={styles.modalLabel}>Type</Text>
+                  <Text style={styles.modalValue}>{selectedTx.type?.toUpperCase()}</Text>
+                </View>
+                <View style={styles.modalRowColumn}>
+                  <Text style={styles.modalLabel}>Description</Text>
+                  <Text style={styles.modalValueDesc}>{selectedTx.description}</Text>
+                </View>
+              </View>
+            )}
+          </View>
+        </View>
+      </Modal>
     </LinearGradient>
   );
 }
@@ -235,5 +272,18 @@ const getStyles = (COLORS) => StyleSheet.create({
   txTitle: { fontSize: 15, fontWeight: '700', color: COLORS.text, marginBottom: 2 },
   txDate: { fontSize: 12, color: COLORS.textLight },
   txAmount: { fontSize: 16, fontWeight: '800' },
-  noTransactionsText: { color: COLORS.textLight, fontStyle: 'italic', marginTop: 10, textAlign: 'center' }
+  noTransactionsText: { color: COLORS.textLight, fontStyle: 'italic', marginTop: 10, textAlign: 'center' },
+
+  /* Modal Styles */
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
+  modalContent: { width: '85%', backgroundColor: COLORS.cardBg, borderRadius: 20, padding: 20, elevation: 5 },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+  modalTitle: { fontSize: 18, fontWeight: '800', color: COLORS.text },
+  modalBody: { width: '100%' },
+  modalAmount: { fontSize: 32, fontWeight: '900', textAlign: 'center', marginBottom: 24 },
+  modalRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: COLORS.border },
+  modalRowColumn: { paddingVertical: 12 },
+  modalLabel: { fontSize: 14, color: COLORS.textLight, fontWeight: '600' },
+  modalValue: { fontSize: 14, color: COLORS.text, fontWeight: '700' },
+  modalValueDesc: { fontSize: 15, color: COLORS.text, fontWeight: '700', marginTop: 6, lineHeight: 22 },
 });

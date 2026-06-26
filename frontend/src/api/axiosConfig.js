@@ -4,7 +4,7 @@ import { updateToken, logout } from '../redux/slices/authSlice';
 
 // Use LAN IP address for testing on physical devices
 // PC WiFi IP: 192.168.32.101 (update this if IP changes)
-export const API_BASE_URL = 'http://192.168.32.100:5001/api';
+export const API_BASE_URL = 'http://192.168.32.107:5001/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -49,9 +49,9 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     // Avoid infinite loop and check for 401
-    const isAuthRoute = originalRequest.url.includes('/auth/login-password') || 
-                        originalRequest.url.includes('/auth/verify-otp') ||
-                        originalRequest.url.includes('/auth/send-otp');
+    const isAuthRoute = originalRequest.url.includes('/auth/login-password') ||
+      originalRequest.url.includes('/auth/verify-otp') ||
+      originalRequest.url.includes('/auth/send-otp');
 
     if (error.response && error.response.status === 401 && !originalRequest._retry && !isAuthRoute) {
       if (isRefreshing) {
@@ -100,13 +100,13 @@ api.interceptors.response.use(
 
         processQueue(null, newAccessToken);
         originalRequest.headers['Authorization'] = 'Bearer ' + newAccessToken;
-        
+
         isRefreshing = false;
         return api(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
         isRefreshing = false;
-        
+
         // Refresh token failed, force logout
         const { store } = require('../redux/store');
         store.dispatch(logout());

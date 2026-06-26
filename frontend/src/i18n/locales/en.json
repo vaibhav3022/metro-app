@@ -1,4 +1,4 @@
-﻿{
+{
   "common": {
     "save": "Save",
     "cancel": "Cancel",
@@ -44,7 +44,7 @@
     "greeting_afternoon": "Good Afternoon",
     "greeting_evening": "Good Evening",
     "greeting_night": "Good Night",
-    "puneMetro": "METROGEIA",
+    "puneMetro": "METROXIA",
     "passenger": "Passenger",
     "slider1": "Smart Metro Travel",
     "slider2": "Station Retail Shops",
@@ -57,7 +57,7 @@
     "feederBus": "Feeder Bus",
     "stationInfo": "Station Info",
     "touristPlaces": "Tourist Places",
-    "smartCard": "Smart Card",
+    "smartCard": "Oasis-Smart Card",
     "metroMap": "Metro Map",
     "recentTickets": "Recent Tickets",
     "viewAll": "View All →",
@@ -105,7 +105,7 @@
     "viewQR": "View QR Code"
   },
   "login": {
-    "appTitle": "PUNE METRO",
+    "appTitle": "METROXIA",
     "appSubtitle": "आली आपली मेट्रो! 🚇",
     "register": "Register",
     "signIn": "Sign In",
@@ -129,7 +129,7 @@
     "errorLoginFailed": "Login Failed",
     "errorInvalid": "Invalid credentials",
     "errorSendOtp": "Could not send OTP",
-    "footer": "METROGEIA Rail Corporation Ltd.",
+    "footer": "METROXIA Rail Corporation Ltd.",
     "adminPortal": "Admin Portal",
     "adminEmailLabel": "Admin Email",
     "adminPasswordLabel": "Password",
@@ -268,18 +268,18 @@
   },
   "smartcard": {
     "title": "Digital Smart Card",
-    "onePune": "ONE PUNE",
+    "onePune": "",
     "subtitle": "Metro Smart Card",
     "ncmc": "NCMC",
     "inTransit": "IN TRANSIT",
     "cardholder": "CARDHOLDER",
     "balance": "BALANCE",
     "cvv": "CVV",
-    "instructions": "For entry/exit scan at AFC gates. Property of METROGEIA.",
+    "instructions": "For entry/exit scan at AFC gates. Property of METROXIA.",
     "helpline": "Helpline: 1800 270 5555",
     "hintText": "Tap card to flip and view Back/Front",
     "simulatorTitle": "AFC Gate Simulator",
-    "simulatorDesc": "Use this to simulate scanning your digital smart card at entry/exit gates of METROGEIA.",
+    "simulatorDesc": "Use this to simulate scanning your digital smart card at entry/exit gates of METROXIA.",
     "scanning": "SCANNING CARD...",
     "tapToEnter": "TAP TO ENTER STATION",
     "tapToExit": "TAP TO EXIT STATION",
@@ -291,7 +291,7 @@
       "entrySuccessTitle": "Gate Entry Successful",
       "entrySuccessDesc": "Scan Success at Pune Municipal Corporation (PMC) station.\n\nGate Open. Happy Journey!",
       "exitSuccessTitle": "Gate Exit Successful",
-      "exitSuccessDesc": "Scan Success at District Court station.\n\nJourney: PMC → District Court\nFare Deducted: ₹{{fare}}\nRemaining Balance: ₹{{newBalance}}\n\nThank you for travelling with METROGEIA!"
+      "exitSuccessDesc": "Scan Success at District Court station.\n\nJourney: PMC → District Court\nFare Deducted: ₹{{fare}}\nRemaining Balance: ₹{{newBalance}}\n\nThank you for travelling with METROXIA!"
     }
   },
   "help": {
@@ -338,7 +338,7 @@
   "feeder": {
     "title": "Feeder Services",
     "bannerTitle": "Last Mile Connectivity",
-    "bannerSubtitle": "METROGEIA provides seamless feeder services to help you reach your final destination easily.",
+    "bannerSubtitle": "METROXIA provides seamless feeder services to help you reach your final destination easily.",
     "availableServices": "Available Services",
     "services": {
       "pmpml": {

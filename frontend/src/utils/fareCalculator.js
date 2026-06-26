@@ -49,7 +49,7 @@ export const calculateDistance = (source, destination) => {
 
 /**
  * Calculates ticket fare based on computed distance and number of passengers
- * METROGEIA Rates:
+ * METROXIA Rates:
  *  0 - 2 km: ₹10
  *  2 - 5 km: ₹20
  *  5 - 12 km: ₹30

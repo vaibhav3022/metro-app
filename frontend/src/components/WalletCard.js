@@ -18,7 +18,7 @@ export default function WalletCard({ balance = 0, onAddMoney, onScanQR }) {
       <View style={styles.cardHeader}>
         <View style={styles.leftInfo}>
           <MaterialCommunityIcons name="wallet" size={24} color={COLORS.white} />
-          <Text style={styles.title}>METROGEIA Wallet</Text>
+          <Text style={styles.title}>METROXIA Wallet</Text>
         </View>
         <MaterialCommunityIcons name="nfc" size={24} color="rgba(255, 255, 255, 0.4)" />
       </View>

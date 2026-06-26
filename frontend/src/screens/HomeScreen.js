@@ -248,7 +248,7 @@ export default function HomeScreen({ navigation }) {
               resizeMode="contain" 
             />
             <View style={{ flex: 1 }}>
-              <Text style={styles.headerTitle}><Text style={{ color: '#EF4444' }}>METRO</Text><Text style={{ color: '#222222' }}>GEIA</Text></Text>
+              <Text style={styles.headerTitle}><Text style={{ color: '#EF4444' }}>METRO</Text><Text style={{ color: '#000000' }}>XIA</Text></Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
                 <Icon name="map-marker" size={14} color="#EF4444" />
                 <Text style={[styles.greeting, { marginTop: 0, marginLeft: 2 }]} numberOfLines={1} ellipsizeMode="tail">Pune, Maharashtra</Text>
@@ -484,7 +484,7 @@ export default function HomeScreen({ navigation }) {
                 </View>
 
                 <Text style={styles.modalDesc}>
-                  We're working hard to bring {comingSoonModal.vertical.name} to every METROGEIA station. Stay tuned for an amazing experience!
+                  We're working hard to bring {comingSoonModal.vertical.name} to every METROXIA station. Stay tuned for an amazing experience!
                 </Text>
 
                 <TouchableOpacity style={styles.modalCloseBtn} onPress={hideComingSoon}>

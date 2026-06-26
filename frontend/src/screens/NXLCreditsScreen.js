@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
-  ActivityIndicator, StatusBar, RefreshControl, Image,
+  ActivityIndicator, StatusBar, RefreshControl, Image, Modal,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateProfileSuccess } from '../redux/slices/authSlice';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import { useTheme } from '../context/ThemeContext';
@@ -39,12 +40,14 @@ export default function NXLCreditsScreen() {
   const navigation = useNavigation();
   const styles = getStyles(COLORS, isDark);
 
+  const dispatch = useDispatch();
   const user = useSelector(state => state.auth.user);
 
   const [loading,    setLoading]    = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [history,    setHistory]    = useState([]);
   const [error,      setError]      = useState(null);
+  const [selectedTx, setSelectedTx] = useState(null);
 
   const nxlBalance     = user?.nxlCredits     || 0;
   const lifetimeEarned = user?.lifetimeCashback || 0;
@@ -52,6 +55,15 @@ export default function NXLCreditsScreen() {
   const fetchHistory = useCallback(async () => {
     try {
       setError(null);
+      
+      // Fetch latest profile to update NXL balance
+      try {
+        const userRes = await api.get('/auth/me');
+        if (userRes.data?.success && userRes.data.user) {
+          dispatch(updateProfileSuccess(userRes.data.user));
+        }
+      } catch (err) {}
+
       const res = await api.get('/wallet/cashback-history');
       const txs = res.data?.transactions || [];
       setHistory(txs);
@@ -72,7 +84,7 @@ export default function NXLCreditsScreen() {
   const renderItem = ({ item }) => {
     const meta = getTypeMeta(item);
     return (
-      <View style={styles.txCard}>
+      <TouchableOpacity style={styles.txCard} onPress={() => setSelectedTx(item)}>
         {/* Icon circle */}
         <View style={[styles.txIconCircle, { backgroundColor: meta.color + '20' }]}>
           <Icon name={meta.icon} size={22} color={meta.color} />
@@ -90,7 +102,7 @@ export default function NXLCreditsScreen() {
         <Text style={[styles.txAmount, { color: meta.color }]}>
           {meta.sign}₹{Math.abs(item.amount || 0)}
         </Text>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -111,7 +123,7 @@ export default function NXLCreditsScreen() {
           />
           <View>
             <Text style={styles.cardBrandLabel}>NXL CREDITS</Text>
-            <Text style={styles.cardSubLabel}>METROGEIA</Text>
+            <Text style={styles.cardSubLabel}>METROXIA</Text>
           </View>
         </View>
 
@@ -132,7 +144,7 @@ export default function NXLCreditsScreen() {
       <View style={styles.hintCard}>
         <Icon name="information-outline" size={18} color="#F59E0B" />
         <Text style={styles.hintText}>
-          You earn NXL cashback on every ticket purchase & shop transaction at METROGEIA.
+          You earn NXL cashback on every ticket purchase & shop transaction at METROXIA.
         </Text>
       </View>
 
@@ -191,6 +203,42 @@ export default function NXLCreditsScreen() {
           }
         />
       )}
+
+      {/* Transaction Details Modal */}
+      <Modal visible={!!selectedTx} transparent animationType="fade" onRequestClose={() => setSelectedTx(null)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Transaction Details</Text>
+              <TouchableOpacity onPress={() => setSelectedTx(null)}>
+                <Icon name="close" size={24} color={COLORS.text} />
+              </TouchableOpacity>
+            </View>
+            {selectedTx && (
+              <View style={styles.modalBody}>
+                <View style={[styles.txIconCircle, { backgroundColor: getTypeMeta(selectedTx).color + '20', width: 60, height: 60, borderRadius: 30, alignSelf: 'center', marginBottom: 16 }]}>
+                  <Icon name={getTypeMeta(selectedTx).icon} size={30} color={getTypeMeta(selectedTx).color} />
+                </View>
+                <Text style={[styles.modalAmount, { color: getTypeMeta(selectedTx).color }]}>
+                  {getTypeMeta(selectedTx).sign}₹{Math.abs(selectedTx.amount || 0)}
+                </Text>
+                <View style={styles.modalRow}>
+                  <Text style={styles.modalLabel}>Date</Text>
+                  <Text style={styles.modalValue}>{formatDate(selectedTx.date || selectedTx.createdAt)}</Text>
+                </View>
+                <View style={styles.modalRow}>
+                  <Text style={styles.modalLabel}>Type</Text>
+                  <Text style={styles.modalValue}>{getTypeMeta(selectedTx).label}</Text>
+                </View>
+                <View style={styles.modalRowColumn}>
+                  <Text style={styles.modalLabel}>Description</Text>
+                  <Text style={styles.modalValueDesc}>{selectedTx.description}</Text>
+                </View>
+              </View>
+            )}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -278,4 +326,17 @@ const getStyles = (COLORS, isDark) => StyleSheet.create({
   },
 
   loaderWrap: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+
+  /* Modal */
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
+  modalContent: { width: '85%', backgroundColor: COLORS.cardBg, borderRadius: 20, padding: 20, elevation: 5 },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+  modalTitle: { fontSize: 18, fontWeight: '800', color: COLORS.text },
+  modalBody: { width: '100%' },
+  modalAmount: { fontSize: 32, fontWeight: '900', textAlign: 'center', marginBottom: 24 },
+  modalRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: COLORS.border },
+  modalRowColumn: { paddingVertical: 12 },
+  modalLabel: { fontSize: 14, color: COLORS.textLight, fontWeight: '600' },
+  modalValue: { fontSize: 14, color: COLORS.text, fontWeight: '700' },
+  modalValueDesc: { fontSize: 15, color: COLORS.text, fontWeight: '700', marginTop: 6, lineHeight: 22 },
 });

@@ -78,12 +78,12 @@ export default function FareScreen() {
       setLoading(false);
       
       const options = {
-        description: 'METROGEIA Ticket Booking',
+        description: 'METROXIA Ticket Booking',
         image: 'https://cdn.pixabay.com/photo/2021/08/11/11/15/train-6538260_960_720.png',
         currency: orderRes.currency,
         key: 'rzp_test_St6f7LZjydxbQ0', // Using the test key from backend env
         amount: orderRes.amount,
-        name: 'METROGEIA',
+        name: 'METROXIA',
         order_id: orderRes.orderId,
         prefill: {
           email: user?.email || 'test@test.com',

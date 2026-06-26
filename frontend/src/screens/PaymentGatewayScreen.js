@@ -95,7 +95,7 @@ export default function PaymentGatewayScreen({ route, navigation }) {
             <View style={styles.iconCircle}>
               <Icon name="shield-check" size={36} color="#00C9A7" />
             </View>
-            <Text style={styles.merchantName}>METROGEIA Rail</Text>
+            <Text style={styles.merchantName}>METROXIA Rail</Text>
             <Text style={styles.amountText}>₹{amount}</Text>
           </View>
 

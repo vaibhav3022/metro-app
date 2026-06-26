@@ -58,7 +58,7 @@ export default function ScanAndPayScreen({ route, navigation }) {
               data.businessName ||
               data.shopName ||
               data.name ||
-              'METROGEIA Shop',
+              'METROXIA Shop',
             type: data.type || 'MERCHANT_PAYMENT',
           });
         } else {
@@ -97,7 +97,7 @@ export default function ScanAndPayScreen({ route, navigation }) {
         currency: orderData.currency || 'INR',
         key: orderData.key_id,
         amount: String(orderData.amount), // already in paise from backend
-        name: 'METROGEIA',
+        name: 'METROXIA',
         order_id: orderData.orderId,
         prefill: {
           email: user?.email || 'user@punemetro.com',

@@ -246,29 +246,13 @@ export default function SmartCardScreen({ route }) {
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <Icon name="arrow-left" size={24} color={COLORS.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>{activeTab === 'gift' ? t('smartcard.giftCardTitle', 'Gift Cards') : t('smartcard.title', 'Smart Card')}</Text>
+          <Text style={styles.headerTitle}>{t('smartcard.title', 'Smart Card')}</Text>
           <View style={{ width: 44 }} />
         </View>
 
-        {/* --- TABS --- */}
-        <View style={styles.tabContainer}>
-          <TouchableOpacity 
-            style={[styles.tabButton, activeTab === 'smartcard' && styles.tabButtonActive]}
-            onPress={() => setActiveTab('smartcard')}
-          >
-            <Text style={[styles.tabText, activeTab === 'smartcard' && styles.tabTextActive]}>Smart Card</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={[styles.tabButton, activeTab === 'gift' && styles.tabButtonActive]}
-            onPress={() => setActiveTab('gift')}
-          >
-            <Text style={[styles.tabText, activeTab === 'gift' && styles.tabTextActive]}>Gift Card</Text>
-          </TouchableOpacity>
-        </View>
 
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-          {activeTab === 'smartcard' ? (
-            <>
+          <>
               {/* === SMART CARD UI === */}
               {initLoading ? (
                 <View style={styles.centered}>
@@ -290,7 +274,6 @@ export default function SmartCardScreen({ route }) {
                           <View style={styles.cardOverlayPattern} />
                           <View style={styles.cardHeader2}>
                             <View>
-                              <Text style={styles.cardBrandText}>{t('smartcard.onePune')}</Text>
                               <Text style={styles.cardSubText}>{t('smartcard.subtitle')}</Text>
                             </View>
                             <View style={styles.ncmcLogoWrap}>
@@ -415,83 +398,6 @@ export default function SmartCardScreen({ route }) {
                 </>
               )}
             </>
-          ) : (
-            <>
-              {/* === GIFT CARD UI === */}
-              <View style={[styles.cardContainer, { height: 210 }]}>
-                <LinearGradient colors={['#F43F5E', '#BE123C']} style={styles.cardFront} start={{x:0, y:0}} end={{x:1, y:1}}>
-                  <View style={styles.cardHeader}>
-                    <Text style={styles.cardTitle}>GIFT CARD</Text>
-                    <Icon name="gift-outline" size={32} color="#FFF" />
-                  </View>
-                  <Text style={[styles.cardNumber, { marginTop: 20 }]}>**** **** **** 8892</Text>
-                  
-                  <View style={styles.cardFooter}>
-                    <View>
-                      <Text style={styles.cardLabel}>BALANCE</Text>
-                      <Text style={styles.cardBalance}>₹ 1,250</Text>
-                    </View>
-                    <View style={{ alignItems: 'flex-end' }}>
-                      <Text style={styles.cardLabel}>VALID THRU</Text>
-                      <Text style={styles.cardHolder}>12/28</Text>
-                    </View>
-                  </View>
-                </LinearGradient>
-              </View>
-
-              {/* Gift Card Actions */}
-              <View style={styles.actionRow}>
-                <TouchableOpacity style={styles.actionBtn}>
-                  <View style={[styles.actionIconBg, { backgroundColor: 'rgba(244, 63, 94, 0.1)' }]}>
-                    <Icon name="plus" size={28} color="#F43F5E" />
-                  </View>
-                  <Text style={styles.actionText}>Add Money</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.actionBtn}>
-                  <View style={[styles.actionIconBg, { backgroundColor: 'rgba(244, 63, 94, 0.1)' }]}>
-                    <Icon name="gift" size={28} color="#F43F5E" />
-                  </View>
-                  <Text style={styles.actionText}>Send Gift</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.actionBtn}>
-                  <View style={[styles.actionIconBg, { backgroundColor: 'rgba(244, 63, 94, 0.1)' }]}>
-                    <Icon name="history" size={28} color="#F43F5E" />
-                  </View>
-                  <Text style={styles.actionText}>History</Text>
-                </TouchableOpacity>
-              </View>
-
-              {/* MEMBERSHIP SECTION */}
-              <View style={[styles.recentSection, { marginTop: 30 }]}>
-                <Text style={styles.sectionTitle}>Gift Card Membership</Text>
-                
-                <LinearGradient colors={['#FFD700', '#F59E0B']} style={styles.membershipCard} start={{x:0, y:0}} end={{x:1, y:1}}>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <View>
-                      <Text style={styles.membershipTitle}>Premium Member</Text>
-                      <Text style={styles.membershipSubtitle}>Unlock Exclusive Metro Perks</Text>
-                    </View>
-                    <Icon name="crown" size={40} color="#FFF" />
-                  </View>
-                  
-                  <View style={styles.membershipPerks}>
-                    <View style={styles.perkRow}>
-                      <Icon name="check-circle" size={16} color="#FFF" />
-                      <Text style={styles.perkText}> 5% Extra Cashback on Recharge</Text>
-                    </View>
-                    <View style={styles.perkRow}>
-                      <Icon name="check-circle" size={16} color="#FFF" />
-                      <Text style={styles.perkText}> Free Access to Partner Merchant Offers</Text>
-                    </View>
-                  </View>
-
-                  <TouchableOpacity style={styles.upgradeBtn}>
-                    <Text style={styles.upgradeBtnText}>Upgrade Now - ₹499/year</Text>
-                  </TouchableOpacity>
-                </LinearGradient>
-              </View>
-            </>
-          )}
         </ScrollView>
       </SafeAreaView>
     </LinearGradient>
@@ -520,7 +426,7 @@ const getStyles = (COLORS) => StyleSheet.create({
   cardOverlayPattern: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(255,255,255,0.03)', opacity: 0.2 },
   cardHeader2: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   cardBrandText: { fontSize: 20, fontWeight: '900', color: '#FFF', letterSpacing: 1 },
-  cardSubText: { fontSize: 11, color: 'rgba(255,255,255,0.7)', fontWeight: '600', letterSpacing: 0.5 },
+  cardSubText: { fontSize: 20, color: '#FFF', fontWeight: '900', letterSpacing: 1 },
   ncmcLogoWrap: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   ncmcBadge: { backgroundColor: '#F59E0B', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
   ncmcText: { fontSize: 9, fontWeight: '900', color: '#000' },

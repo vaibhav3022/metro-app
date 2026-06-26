@@ -217,7 +217,7 @@ const processPayment = async (req, res) => {
           wallet.transactions.push({
             type: 'credit',
             amount: cashbackAmount,
-            description: `Premium Member 5% Cashback for Metro Ticket (${ticket.source} to ${ticket.destination})`,
+            description: `Premium Member 5% Cashback for Metro Ticket (${ticket.source} to ${ticket.destination}) | Ticket Price: ₹${ticket.totalAmount}`,
             date: new Date()
           });
 

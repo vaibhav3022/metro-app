@@ -347,22 +347,6 @@ export default function ProfileScreen() {
           ))}
         </View>
 
-        {/* Preferences */}
-        <Text style={styles.sectionTitle}>{t('profile.preferences')}</Text>
-        <View style={styles.menuCard}>
-          {/* Theme Toggle */}
-          <TouchableOpacity style={[styles.menuItem, styles.menuItemBorder]} onPress={toggleTheme}>
-            <View style={[styles.menuIconWrap, { backgroundColor: isDark ? 'rgba(245,158,11,0.15)' : COLORS.primary + '22' }]}>
-              <Icon name={isDark ? "weather-sunny" : "weather-night"} size={22} color={isDark ? "#F59E0B" : COLORS.primary} />
-            </View>
-            <View style={styles.menuTextWrap}>
-              <Text style={styles.menuTitle}>{t('profile.themeMode')}</Text>
-              <Text style={styles.menuSubtitle}>{t('profile.currently')}: {isDark ? t('profile.darkMode') : t('profile.lightMode')}</Text>
-            </View>
-            <Icon name="chevron-right" size={22} color={isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.25)'} />
-          </TouchableOpacity>
-        </View>
-
         {/* Logout */}
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Icon name="logout" size={20} color="#EF4444" />
