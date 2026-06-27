@@ -6,7 +6,26 @@ import { updateToken, logout } from '../redux/slices/authSlice';
 const LOCAL_API_BASE_URL = 'http://10.0.2.2:5001/api';
 const LIVE_API_BASE_URL = 'https://metro-app-1-vt0n.onrender.com/api';
 
-export const API_BASE_URL = __DEV__ ? LOCAL_API_BASE_URL : LIVE_API_BASE_URL;
+// Allow an easy local override: create `src/api/localConfig.js` with
+// `export default { API_BASE_URL: 'http://<YOUR_PC_IP>:5001/api' }`
+let resolvedApiBase = LIVE_API_BASE_URL;
+if (__DEV__) {
+  try {
+    // attempt to load a developer local override (kept out of VCS)
+    // eslint-disable-next-line global-require, import/no-dynamic-require
+    const localConfig = require('./localConfig').default;
+    if (localConfig && localConfig.API_BASE_URL) {
+      resolvedApiBase = localConfig.API_BASE_URL;
+    } else {
+      resolvedApiBase = LOCAL_API_BASE_URL;
+    }
+  } catch (e) {
+    // no local config present — fall back to emulator default
+    resolvedApiBase = LOCAL_API_BASE_URL;
+  }
+}
+
+export const API_BASE_URL = resolvedApiBase;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
