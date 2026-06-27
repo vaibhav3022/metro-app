@@ -97,7 +97,7 @@ export default function HomeScreen({ navigation }) {
       bgColor: '#DCFCE7',
       color: '#059669',
       emoji: '🏢',
-      url: null
+      url: 'https://cybeorch.com/coworking/index.html'
     },
     {
       id: 'eva',
@@ -108,7 +108,7 @@ export default function HomeScreen({ navigation }) {
       bgColor: '#FEE2E2',
       color: '#E11D48',
       emoji: '✨',
-      url: null
+      url: 'https://cybeorch.com/coworking/index.html'
     },
     {
       id: 'events',
