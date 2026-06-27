@@ -2,8 +2,11 @@ import axios from 'axios';
 import { storage } from '../utils/storage';
 import { updateToken, logout } from '../redux/slices/authSlice';
 
-// Use live backend URL for installed APK / remote backend
-export const API_BASE_URL = 'https://metro-app-1-vt0n.onrender.com/api';
+// Use local backend during development runs and live backend for release APKs
+const LOCAL_API_BASE_URL = 'http://10.0.2.2:5001/api';
+const LIVE_API_BASE_URL = 'https://metro-app-1-vt0n.onrender.com/api';
+
+export const API_BASE_URL = __DEV__ ? LOCAL_API_BASE_URL : LIVE_API_BASE_URL;
 
 const api = axios.create({
   baseURL: API_BASE_URL,

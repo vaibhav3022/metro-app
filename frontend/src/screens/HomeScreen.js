@@ -108,7 +108,7 @@ export default function HomeScreen({ navigation }) {
       bgColor: '#FEE2E2',
       color: '#E11D48',
       emoji: '✨',
-      url: 'https://cybeorch.com/coworking/index.html'
+      url: 'https://cybeorch.com/evaone'
     },
     {
       id: 'events',
