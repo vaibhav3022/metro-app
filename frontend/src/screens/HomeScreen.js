@@ -298,6 +298,17 @@ export default function HomeScreen({ navigation }) {
             showsHorizontalScrollIndicator={false}
             onViewableItemsChanged={onViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}
+            // Provide getItemLayout so scrollToIndex can compute offsets for offscreen items
+            getItemLayout={(data, index) => ({ length: sliderWidth, offset: sliderWidth * index, index })}
+            // Fallback when scrollToIndex cannot find measured item (prevents invariant)
+            onScrollToIndexFailed={({ index, highestMeasuredFrameIndex, averageItemLength }) => {
+              const safeIndex = Math.max(0, Math.min(index, sliderImages.length - 1));
+              try {
+                flatListRef.current?.scrollToOffset({ offset: sliderWidth * safeIndex, animated: true });
+              } catch (e) {
+                // swallow — best-effort fallback
+              }
+            }}
             renderItem={({ item }) => (
               <TouchableOpacity
                 activeOpacity={0.9}

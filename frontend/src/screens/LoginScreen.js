@@ -14,9 +14,9 @@ import { storage } from '../utils/storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTheme } from '../context/ThemeContext';
 
-const getTABS = (t) => [
-  { key: 'passenger', label: t('login.tabPassenger'), icon: 'train-car' },
-  { key: 'merchant', label: t('login.tabMerchant'), icon: 'storefront-outline' },
+const getTABS = () => [
+  { key: 'user', label: 'User', icon: 'train-car' },
+  { key: 'merchant', label: 'Merchant', icon: 'storefront-outline' },
 ];
 
 export default function LoginScreen() {
@@ -26,18 +26,18 @@ export default function LoginScreen() {
   const TABS = getTABS(t);
   const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
   
-  const [activeTab, setActiveTab] = useState('passenger');
+  const [activeTab, setActiveTab] = useState('user');
   const [isRegister, setIsRegister] = useState(false);
   
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState(''); // Used for Merchant/Admin login and Merchant register
-  const [name, setName] = useState(''); // Passenger/Merchant Name
-  const [phone, setPhone] = useState(''); // Merchant Phone
-  const [shopName, setShopName] = useState(''); // Merchant Shop
-  const [address, setAddress] = useState(''); // Merchant Address
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [shopName, setShopName] = useState('');
+  const [address, setAddress] = useState('');
 
   const [showPassword, setShowPassword] = useState(false);
-  const [adminModalVisible, setAdminModalVisible] = useState(false); // Hidden Admin Login
+  const [adminModalVisible, setAdminModalVisible] = useState(false);
 
   const logoAnim = useRef(new Animated.Value(0)).current;
 
@@ -59,7 +59,7 @@ export default function LoginScreen() {
   const handleSendOTP = async () => {
     if (!email) return Alert.alert('Error', 'Please enter your email.');
     if (isRegister) {
-      if (activeTab === 'passenger' && (!name || !phone || !password)) return Alert.alert('Error', 'Please fill all fields (Name, Phone, Password).');
+      if (activeTab === 'user' && (!name || !phone || !password)) return Alert.alert('Error', 'Please fill all fields (Name, Phone, Password).');
       if (activeTab === 'merchant' && (!name || !shopName || !phone || !password)) {
         return Alert.alert('Error', 'Please fill all merchant fields.');
       }
@@ -72,7 +72,7 @@ export default function LoginScreen() {
         dispatch(authFailure(null));
         navigation.navigate('OTP', { 
           email, name, phone, shopName, password, address, 
-          role: activeTab === 'passenger' ? 'user' : activeTab, isRegister 
+          role: activeTab === 'user' ? 'user' : activeTab, isRegister 
         });
       } else {
         dispatch(authFailure(res.data.message || t('login.errorSendOtp', {defaultValue: 'Failed to send OTP'})));
@@ -145,13 +145,13 @@ export default function LoginScreen() {
                 />
               </View>
               <Text style={styles.title}><Text style={{ color: '#EF4444' }}>METRO</Text><Text style={{ color: '#000000' }}>XIA</Text></Text>
-              <Text style={styles.subtitle}>{t('login.appSubtitle')}</Text>
+              <Text style={styles.subtitle}>{'URBAN LifeStyle!'}</Text>
             </TouchableOpacity>
           </View>
 
           {/* Card */}
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>{isRegister ? t('login.register') : t('login.signIn')}</Text>
+            <Text style={styles.cardTitle}>{''}</Text>
 
             {/* Tabs */}
             <View style={styles.tabRow}>
@@ -176,7 +176,7 @@ export default function LoginScreen() {
               </TouchableOpacity>
               <View style={styles.toggleDivider} />
               <TouchableOpacity onPress={() => setIsRegister(true)}>
-                <Text style={[styles.toggleText, isRegister && styles.toggleTextActive]}>{t('login.toggleRegister')}</Text>
+                <Text style={[styles.toggleText, isRegister && styles.toggleTextActive]}>Register</Text>
               </TouchableOpacity>
             </View>
 
@@ -195,8 +195,8 @@ export default function LoginScreen() {
               />
             </View>
 
-            {/* Passenger Register Fields */}
-            {activeTab === 'passenger' && isRegister && (
+            {/* User Register Fields */}
+            {activeTab === 'user' && isRegister && (
               <>
                 <Text style={styles.label}>{t('login.nameLabel')}</Text>
                 <View style={styles.inputRow}>
@@ -379,8 +379,8 @@ const getStyles = (COLORS) => StyleSheet.create({
   title: { fontSize: 28, fontWeight: '900', color: COLORS.text, letterSpacing: 3 },
   subtitle: { fontSize: 14, color: COLORS.textLight, marginTop: 4, letterSpacing: 0.5 },
   card: { backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 22, borderWidth: 1, borderColor: COLORS.border, elevation: 6, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 12, shadowOffset: { width: 0, height: 4 } },
-  cardTitle: { fontSize: 22, fontWeight: '900', color: COLORS.text, marginBottom: 18, textAlign: 'center', letterSpacing: 0.5 },
-  tabRow: { flexDirection: 'row', backgroundColor: COLORS.inputBg, borderRadius: 12, marginBottom: 20, overflow: 'hidden', borderWidth: 1, borderColor: COLORS.border },
+  cardTitle: { fontSize: 22, fontWeight: '900', color: COLORS.text, marginBottom: 0, textAlign: 'center', letterSpacing: 0.5 },
+  tabRow: { flexDirection: 'row', backgroundColor: COLORS.inputBg, borderRadius: 12, marginBottom: 20, marginTop: 0, overflow: 'hidden', borderWidth: 1, borderColor: COLORS.border },
   tab: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 12, gap: 5 },
   tabActive: { backgroundColor: 'rgba(13,71,161,0.12)' },
   tabText: { fontSize: 13, color: COLORS.textLight, fontWeight: '700' },
