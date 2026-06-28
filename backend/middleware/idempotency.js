@@ -9,7 +9,7 @@ async function idempotency(req, res, next) {
   const key = req.headers['x-idempotency-key'];
 
   if (!key) {
-    return res.status(400).json({ error: 'X-Idempotency-Key header required' });
+    return res.status(400).json({ message: 'X-Idempotency-Key header required' });
   }
 
   const cacheKey = `idem:${req.user?.id || 'guest'}:${key}`;
