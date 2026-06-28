@@ -270,7 +270,7 @@ export default function HomeScreen({ navigation }) {
               resizeMode="contain" 
             />
             <View style={{ flex: 1 }}>
-              <Text style={styles.headerTitle}><Text style={{ color: '#EF4444' }}>METRO</Text><Text style={{ color: '#000000' }}>XIA</Text></Text>
+              <Text style={styles.headerTitle}><Text style={{ color: '#EF4444' }}>METRO</Text><Text style={{ color: '#000000' }}>X</Text><Text style={{ color: '#EF4444' }}>I</Text><Text style={{ color: '#000000' }}>A</Text></Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
                 <Icon name="map-marker" size={14} color="#EF4444" style={{ marginRight: 2, marginLeft: -2 }} />
                 <Text style={[styles.greeting, { marginTop: 0, marginLeft: 0 }]} numberOfLines={1} ellipsizeMode="tail">Pune, Maharashtra</Text>
@@ -282,7 +282,7 @@ export default function HomeScreen({ navigation }) {
               <Animated.View style={{ width: 30, height: 30, borderRadius: 16, backgroundColor: '#EF4444', borderWidth: 2, borderColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center', marginRight: 10 }}>
                 <Text style={{ color: '#FFFFFF', fontWeight: '900', fontSize: 12 }}>NXL</Text>
               </Animated.View>
-              <Text style={{ color: '#FBBF24', fontWeight: '900', fontSize: 16 }}>{'\u20B9'}999</Text>
+              <Text style={{ color: '#FBBF24', fontWeight: '900', fontSize: 16 }}>999 Credits</Text>
             </TouchableOpacity>
           </View>
         </View>

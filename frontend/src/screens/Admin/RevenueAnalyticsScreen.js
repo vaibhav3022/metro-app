@@ -173,7 +173,7 @@ export default function RevenueAnalyticsScreen({ navigation }) {
                 ) : <Text style={styles.noDataText}>No Data Available</Text>}
               </ChartCard>
 
-              <ChartCard title="Revenue Breakdown">
+              <ChartCard styles={styles} title="Revenue Breakdown">
                 <PieChart
                   data={pieData} width={width - 80} height={200}
                   chartConfig={chartConfig} accessor={"revenue"} backgroundColor={"transparent"} paddingLeft={"15"}

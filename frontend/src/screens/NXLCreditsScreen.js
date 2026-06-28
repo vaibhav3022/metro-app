@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
   ActivityIndicator, StatusBar, RefreshControl, Image, Modal,
@@ -100,7 +100,7 @@ export default function NXLCreditsScreen() {
 
         {/* Amount */}
         <Text style={[styles.txAmount, { color: meta.color }]}>
-          {meta.sign}₹{Math.abs(item.amount || 0)}
+          {meta.sign}{Math.abs(item.amount || 0)} Credits
         </Text>
       </TouchableOpacity>
     );
@@ -127,7 +127,7 @@ export default function NXLCreditsScreen() {
           </View>
         </View>
 
-        <Text style={styles.balanceAmount}>{'\u20B9'}{nxlBalance}</Text>
+        <Text style={styles.balanceAmount}>{nxlBalance} Credits</Text>
         <Text style={styles.balanceLabel}>Available Balance</Text>
 
         <View style={styles.cardDivider} />
@@ -135,7 +135,7 @@ export default function NXLCreditsScreen() {
         <View style={styles.lifetimeRow}>
           <Icon name="trophy-outline" size={16} color="rgba(255,255,255,0.85)" />
           <Text style={styles.lifetimeText}>
-            Lifetime Earned: <Text style={{ fontWeight: '900' }}>₹{lifetimeEarned}</Text>
+            Lifetime Earned: <Text style={{ fontWeight: '900' }}>{lifetimeEarned} Credits</Text>
           </Text>
         </View>
       </LinearGradient>
@@ -220,7 +220,7 @@ export default function NXLCreditsScreen() {
                   <Icon name={getTypeMeta(selectedTx).icon} size={30} color={getTypeMeta(selectedTx).color} />
                 </View>
                 <Text style={[styles.modalAmount, { color: getTypeMeta(selectedTx).color }]}>
-                  {getTypeMeta(selectedTx).sign}₹{Math.abs(selectedTx.amount || 0)}
+                  {getTypeMeta(selectedTx).sign}{Math.abs(selectedTx.amount || 0)} Credits
                 </Text>
                 <View style={styles.modalRow}>
                   <Text style={styles.modalLabel}>Date</Text>

@@ -85,8 +85,14 @@ export default function SplashScreen({ navigation }) {
             resizeMode="contain" 
           />
         </View>
-        <Text style={styles.title}><Text style={{color: '#EF4444'}}>METRO</Text><Text style={{color: '#000000'}}>XIA</Text></Text>
-        <Text style={styles.subtitle}>{'आली आपली मेट्रो! 🚇'}</Text>
+        <View style={{ alignItems: 'flex-end' }}>
+          <Text style={styles.title}>
+            <Text style={{color: '#EF4444'}}>METRO</Text><Text style={{color: '#000000'}}>X</Text><Text style={{color: '#EF4444'}}>I</Text><Text style={{color: '#000000'}}>A</Text>
+          </Text>
+          <Text style={styles.subtitle}>
+            Urban L<Text style={{ color: '#EF4444' }}>i</Text>fest<Text style={{ color: '#EF4444' }}>i</Text>le <Text style={{ color: '#EF4444' }}>!</Text>
+          </Text>
+        </View>
       </View>
       
       <View style={styles.loadingContainer}>
@@ -115,33 +121,36 @@ const getStyles = (COLORS) => StyleSheet.create({
     width: 140,
     height: 140,
     borderRadius: 70,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 10,
-    elevation: 4,
-    marginBottom: 24,
-    padding: 10,
+    elevation: 0,
+    marginBottom: 8,
   },
   logoImage: {
-    width: '100%',
-    height: '100%',
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    overflow: 'hidden',
   },
   title: {
     fontSize: 28,
     fontWeight: '900',
     color: COLORS.primary,
-    letterSpacing: 2,
+    letterSpacing: 6,
+    marginBottom: -2,
   },
   subtitle: {
     fontSize: 15,
     color: COLORS.secondary,
-    marginTop: 8,
+    marginTop: -2,
     fontWeight: '700',
     letterSpacing: 0.5,
+    fontStyle: 'italic',
   },
   loadingContainer: {
     alignItems: 'center',

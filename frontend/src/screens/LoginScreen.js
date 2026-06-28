@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   ActivityIndicator, Alert, KeyboardAvoidingView, Platform,
-  ScrollView, StatusBar, Modal, Image, Animated, Easing
+  ScrollView, StatusBar, Modal, Image, Animated, Easing, ImageBackground, Dimensions
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useDispatch, useSelector } from 'react-redux';
@@ -25,16 +25,18 @@ export default function LoginScreen() {
   const t = i18n.getFixedT('en');
   const TABS = getTABS(t);
   const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
-  
+
   const [activeTab, setActiveTab] = useState('user');
   const [isRegister, setIsRegister] = useState(false);
-  
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [shopName, setShopName] = useState('');
   const [address, setAddress] = useState('');
+  const [gender, setGender] = useState('Male');
+  const [dob, setDob] = useState('');
 
   const [showPassword, setShowPassword] = useState(false);
   const [adminModalVisible, setAdminModalVisible] = useState(false);
@@ -70,57 +72,62 @@ export default function LoginScreen() {
       const res = await api.post('/auth/send-otp', { email, isRegister });
       if (res.data.success) {
         dispatch(authFailure(null));
-        navigation.navigate('OTP', { 
-          email, name, phone, shopName, password, address, 
-          role: activeTab === 'user' ? 'user' : activeTab, isRegister 
+        navigation.navigate('OTP', {
+          email, name, phone, shopName, password, address, gender, dob,
+          role: activeTab === 'user' ? 'user' : activeTab, isRegister
         });
       } else {
-        dispatch(authFailure(res.data.message || t('login.errorSendOtp', {defaultValue: 'Failed to send OTP'})));
-        Alert.alert(t('common.error'), res.data.message || t('login.errorSendOtp', {defaultValue: 'Failed to send OTP'}));
+        dispatch(authFailure(res.data.message || t('login.errorSendOtp', { defaultValue: 'Failed to send OTP' })));
+        Alert.alert(t('common.error'), res.data.message || t('login.errorSendOtp', { defaultValue: 'Failed to send OTP' }));
       }
     } catch (err) {
-      const msg = err.response?.data?.message || t('login.errorSendOtp', {defaultValue: 'Could not send OTP'});
+      const msg = err.response?.data?.message || t('login.errorSendOtp', { defaultValue: 'Could not send OTP' });
       dispatch(authFailure(msg));
       Alert.alert(t('common.error'), msg);
     }
   };
 
   const handlePasswordLogin = async (role) => {
-    if (!email || !password) return Alert.alert(t('common.error'), t('login.errorEmpty', {defaultValue: 'Please enter email and password.'}));
-    
+    if (!email || !password) return Alert.alert(t('common.error'), t('login.errorEmpty', { defaultValue: 'Please enter email and password.' }));
+
     dispatch(authStart());
     try {
       const res = await api.post('/auth/login-password', { email, password });
       if (res.data.success) {
         const userRole = res.data.user?.role;
         if (role === 'admin' && userRole !== 'admin') {
-          dispatch(authFailure(t('login.errorAdminOnly', {defaultValue: 'Access Denied. Admins only.'})));
-          Alert.alert(t('common.error'), t('login.errorAdminOnly', {defaultValue: 'Access Denied. Admins only.'}));
+          dispatch(authFailure(t('login.errorAdminOnly', { defaultValue: 'Access Denied. Admins only.' })));
+          Alert.alert(t('common.error'), t('login.errorAdminOnly', { defaultValue: 'Access Denied. Admins only.' }));
           return;
         }
         await storage.saveToken(res.data.token);
         if (res.data.refreshToken) await storage.saveRefreshToken(res.data.refreshToken);
         await storage.saveUser(res.data.user);
 
-        dispatch(authSuccess({ 
-          user: res.data.user, 
-          token: res.data.token, 
-          refreshToken: res.data.refreshToken 
+        dispatch(authSuccess({
+          user: res.data.user,
+          token: res.data.token,
+          refreshToken: res.data.refreshToken
         }));
         setAdminModalVisible(false);
       } else {
-        dispatch(authFailure(res.data.message || t('login.errorLoginFailed', {defaultValue: 'Login failed'})));
-        Alert.alert(t('login.errorLoginFailed', {defaultValue: 'Login Failed'}), res.data.message || t('login.errorInvalid', {defaultValue: 'Invalid credentials'}));
+        dispatch(authFailure(res.data.message || t('login.errorLoginFailed', { defaultValue: 'Login failed' })));
+        Alert.alert(t('login.errorLoginFailed', { defaultValue: 'Login Failed' }), res.data.message || t('login.errorInvalid', { defaultValue: 'Invalid credentials' }));
       }
     } catch (err) {
-      const msg = err.response?.data?.message || t('login.errorInvalid', {defaultValue: 'Invalid credentials'});
+      const msg = err.response?.data?.message || t('login.errorInvalid', { defaultValue: 'Invalid credentials' });
       dispatch(authFailure(msg));
-      Alert.alert(t('login.errorLoginFailed', {defaultValue: 'Login Failed'}), msg);
+      Alert.alert(t('login.errorLoginFailed', { defaultValue: 'Login Failed' }), msg);
     }
   };
 
   return (
-    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.gradient}>
+    <View style={styles.gradient}>
+      <Image 
+        source={require('../assets/images/vitthal.png')} 
+        style={{ position: 'absolute', top: 0, left: 0, width: Dimensions.get('screen').width, height: Dimensions.get('screen').height, opacity: 0.15 }}
+        resizeMode="cover"
+      />
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
@@ -128,30 +135,35 @@ export default function LoginScreen() {
 
           {/* Logo Area - Long press for Admin Login */}
           <View style={styles.logoArea}>
-            <TouchableOpacity 
-              activeOpacity={0.8} 
-              onLongPress={() => setAdminModalVisible(true)} 
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onLongPress={() => setAdminModalVisible(true)}
               delayLongPress={1000}
               style={{ alignItems: 'center' }}
             >
               <View style={styles.logoBg}>
-                <Animated.Image 
-                  source={require('../assets/images/app_logo.png')} 
+                <Animated.Image
+                  source={require('../assets/images/app_logo.png')}
                   style={[
                     styles.logoImage,
                     { transform: [{ rotate: logoAnim.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] }) }] }
-                  ]} 
-                  resizeMode="contain" 
+                  ]}
+                  resizeMode="contain"
                 />
               </View>
-              <Text style={styles.title}><Text style={{ color: '#EF4444' }}>METRO</Text><Text style={{ color: '#000000' }}>XIA</Text></Text>
-              <Text style={styles.subtitle}>{'URBAN LifeStyle!'}</Text>
+              <View style={{ alignItems: 'flex-end' }}>
+                <Text style={styles.title}>
+                  <Text style={{ color: '#EF4444' }}>METRO</Text><Text style={{ color: '#000000' }}>X</Text><Text style={{ color: '#EF4444' }}>I</Text><Text style={{ color: '#000000' }}>A</Text>
+                </Text>
+                <Text style={styles.subtitle}>
+                  Urban L<Text style={{ color: '#EF4444' }}>i</Text>fest<Text style={{ color: '#EF4444' }}>i</Text>le <Text style={{ color: '#EF4444' }}>!</Text>
+                </Text>
+              </View>
             </TouchableOpacity>
           </View>
 
           {/* Card */}
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>{''}</Text>
 
             {/* Tabs */}
             <View style={styles.tabRow}>
@@ -161,7 +173,7 @@ export default function LoginScreen() {
                   style={[styles.tab, activeTab === tab.key && styles.tabActive]}
                   onPress={() => { setActiveTab(tab.key); setIsRegister(false); }}
                 >
-                  <Icon name={tab.icon} size={16} color={activeTab === tab.key ? COLORS.primary : '#888888'} />
+                  <Icon name={tab.icon} size={16} color={tab.key === 'merchant' ? '#EF4444' : (activeTab === tab.key ? COLORS.primary : '#888888')} />
                   <Text style={[styles.tabText, activeTab === tab.key && styles.tabTextActive]}>
                     {tab.label}
                   </Text>
@@ -181,7 +193,7 @@ export default function LoginScreen() {
             </View>
 
             {/* Common Email Field */}
-            <Text style={styles.label}>{t('login.emailLabel')}</Text>
+            <Text style={[styles.label, { fontWeight: 'normal' }]}>{t('login.emailLabel')}</Text>
             <View style={styles.inputRow}>
               <Icon name="email-outline" size={20} color="#00C9A7" />
               <TextInput
@@ -209,7 +221,7 @@ export default function LoginScreen() {
                     onChangeText={setName}
                   />
                 </View>
-                
+
                 <Text style={styles.label}>{t('login.phoneLabel')}</Text>
                 <View style={styles.inputRow}>
                   <Icon name="phone-outline" size={20} color="#00C9A7" />
@@ -237,6 +249,41 @@ export default function LoginScreen() {
                   <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
                     <Icon name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color={COLORS.textLight} />
                   </TouchableOpacity>
+                </View>
+
+                {/* Gender */}
+                <Text style={styles.label}>Gender</Text>
+                <View style={styles.genderRow}>
+                  {['Male', 'Female', 'Other'].map((g) => (
+                    <TouchableOpacity
+                      key={g}
+                      style={[styles.genderBtn, gender === g && styles.genderBtnActive]}
+                      onPress={() => setGender(g)}
+                      activeOpacity={0.8}
+                    >
+                      <Icon
+                        name={g === 'Male' ? 'gender-male' : g === 'Female' ? 'gender-female' : 'gender-non-binary'}
+                        size={18}
+                        color={gender === g ? '#00C9A7' : COLORS.textLight}
+                      />
+                      <Text style={[styles.genderBtnText, gender === g && styles.genderBtnTextActive]}>{g}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+
+                {/* Date of Birth */}
+                <Text style={styles.label}>Date of Birth</Text>
+                <View style={styles.inputRow}>
+                  <Icon name="calendar-outline" size={20} color="#00C9A7" />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="YYYY-MM-DD"
+                    placeholderTextColor="#AAAAAA"
+                    value={dob}
+                    onChangeText={setDob}
+                    keyboardType="numeric"
+                    maxLength={10}
+                  />
                 </View>
               </>
             )}
@@ -310,7 +357,14 @@ export default function LoginScreen() {
             )}
           </View>
 
-          <Text style={styles.footer}>{t('login.footer')}</Text>
+          <Text style={styles.footer}>{t('login.footer', { defaultValue: 'Powered by Metroxia' })}</Text>
+          <View style={{ width: Dimensions.get('window').width, height: 120, marginTop: 20, marginBottom: 20, alignSelf: 'center' }}>
+            <Image 
+              source={require('../assets/images/wonders.png')} 
+              style={{ width: Dimensions.get('window').width, height: 120, opacity: 0.8 }} 
+              resizeMode="stretch" 
+            />
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
 
@@ -347,7 +401,7 @@ export default function LoginScreen() {
         </View>
       </Modal>
 
-    </LinearGradient>
+    </View>
   );
 }
 
@@ -373,35 +427,48 @@ const getStyles = (COLORS) => StyleSheet.create({
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 }
   },
-  logoArea: { alignItems: 'center', marginBottom: 32 },
-  logoBg: { width: 110, height: 110, borderRadius: 55, backgroundColor: '#F5F5F5', justifyContent: 'center', alignItems: 'center', marginBottom: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 10, elevation: 4, padding: 8 },
-  logoImage: { width: '100%', height: '100%' },
-  title: { fontSize: 28, fontWeight: '900', color: COLORS.text, letterSpacing: 3 },
-  subtitle: { fontSize: 14, color: COLORS.textLight, marginTop: 4, letterSpacing: 0.5 },
-  card: { backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 22, borderWidth: 1, borderColor: COLORS.border, elevation: 6, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 12, shadowOffset: { width: 0, height: 4 } },
+  logoArea: { alignItems: 'center', marginBottom: 50 },
+  logoBg: { width: 110, height: 110, borderRadius: 55, backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center', marginBottom: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 10, elevation: 0 },
+  logoImage: { width: 110, height: 110, borderRadius: 55, overflow: 'hidden' },
+  title: { fontSize: 28, fontWeight: '900', color: COLORS.text, letterSpacing: 6, marginBottom: -2 },
+  subtitle: { fontSize: 14, color: COLORS.textLight, marginTop: -2, letterSpacing: 0.5, fontStyle: 'italic' },
+  card: { backgroundColor: 'transparent', borderRadius: 24, padding: 22, borderWidth: 1, borderColor: COLORS.border, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 12, shadowOffset: { width: 0, height: 4 } },
   cardTitle: { fontSize: 22, fontWeight: '900', color: COLORS.text, marginBottom: 0, textAlign: 'center', letterSpacing: 0.5 },
-  tabRow: { flexDirection: 'row', backgroundColor: COLORS.inputBg, borderRadius: 12, marginBottom: 20, marginTop: 0, overflow: 'hidden', borderWidth: 1, borderColor: COLORS.border },
+  tabRow: { flexDirection: 'row', backgroundColor: COLORS.inputBg, borderRadius: 12, marginBottom: 28, marginTop: 0, overflow: 'hidden', borderWidth: 1, borderColor: COLORS.border },
   tab: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 12, gap: 5 },
   tabActive: { backgroundColor: 'rgba(13,71,161,0.12)' },
   tabText: { fontSize: 13, color: COLORS.textLight, fontWeight: '700' },
   tabTextActive: { color: COLORS.primary },
-  
-  toggleRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 20, gap: 15 },
+
+  toggleRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 14, gap: 15 },
   toggleText: { fontSize: 15, color: COLORS.textLight, fontWeight: '700' },
   toggleTextActive: { color: COLORS.text, fontWeight: '900' },
   toggleDivider: { width: 2, height: 16, backgroundColor: COLORS.border },
 
   label: { fontSize: 13, color: COLORS.textLight, marginBottom: 6, marginTop: 14, fontWeight: '600' },
-  inputRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.inputBg, borderWidth: 1, borderColor: COLORS.inputBorder, borderRadius: 12, paddingHorizontal: 14, height: 52, gap: 10 },
+  inputRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'transparent', borderWidth: 1, borderColor: COLORS.inputBorder, borderRadius: 12, paddingHorizontal: 14, height: 52, gap: 10 },
   input: { flex: 1, fontSize: 15, color: COLORS.inputText },
   btn: { marginTop: 24, borderRadius: 14, overflow: 'hidden', elevation: 5 },
   btnGrad: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 16, gap: 8 },
   btnText: { color: '#fff', fontSize: 16, fontWeight: '800', letterSpacing: 0.5 },
   footer: { textAlign: 'center', color: COLORS.textLight, marginTop: 28, fontSize: 12, fontWeight: '600' },
-  
+
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', alignItems: 'center', padding: 20 },
   adminCard: { width: '100%', backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 24, borderWidth: 1, borderColor: 'rgba(155,89,182,0.3)', position: 'relative' },
   closeAdmin: { position: 'absolute', top: 15, right: 15, zIndex: 10, padding: 5 },
   adminHeader: { alignItems: 'center', marginBottom: 20 },
-  adminTitle: { fontSize: 20, fontWeight: '900', color: COLORS.text, marginTop: 10, letterSpacing: 1 }
+  adminTitle: { fontSize: 20, fontWeight: '900', color: COLORS.text, marginTop: 10, letterSpacing: 1 },
+  genderRow: { flexDirection: 'row', gap: 10, marginTop: 4 },
+  genderBtn: {
+    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    gap: 6, paddingVertical: 12, borderRadius: 12,
+    borderWidth: 1.5, borderColor: COLORS.border,
+    backgroundColor: COLORS.inputBg,
+  },
+  genderBtnActive: {
+    borderColor: '#00C9A7',
+    backgroundColor: 'rgba(0,201,167,0.1)',
+  },
+  genderBtnText: { fontSize: 13, fontWeight: '700', color: COLORS.textLight },
+  genderBtnTextActive: { color: '#00C9A7', fontWeight: '800' },
 });

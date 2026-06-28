@@ -123,7 +123,7 @@ export default function WalletScreen({ navigation }) {
             {loading ? (
               <ActivityIndicator color="#fff" style={{ marginTop: 10, alignSelf: 'flex-start' }} />
             ) : (
-              <Text style={styles.balanceAmount}>₹ {parseFloat(balance || 0).toFixed(2)}</Text>
+              <Text style={styles.balanceAmount}>{parseFloat(balance || 0).toFixed(2)} Credits</Text>
             )}
 
             <View style={styles.cardFooter}>
@@ -137,7 +137,6 @@ export default function WalletScreen({ navigation }) {
             <Text style={styles.sectionTitle}>{t('wallet.rechargeWallet')}</Text>
             
             <View style={styles.inputContainer}>
-              <Text style={styles.currencySymbol}>₹</Text>
               <TextInput
                 style={styles.amountInput}
                 placeholder="0.00"
@@ -151,7 +150,7 @@ export default function WalletScreen({ navigation }) {
             <View style={styles.chipContainer}>
               {predefinedAmounts.map((amt) => (
                 <TouchableOpacity key={amt} style={styles.chip} onPress={() => setAmount(amt)}>
-                  <Text style={styles.chipText}>+₹{amt}</Text>
+                  <Text style={styles.chipText}>+{amt} Crd</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -183,7 +182,7 @@ export default function WalletScreen({ navigation }) {
                     </View>
                   </View>
                   <Text style={[styles.txAmount, { color: tx.type?.toLowerCase() === 'credit' ? '#2E7D32' : COLORS.text }]}>
-                    {tx.type?.toLowerCase() === 'credit' ? '+' : '-'}₹{parseFloat(tx.amount).toFixed(2)}
+                    {tx.type?.toLowerCase() === 'credit' ? '+' : '-'}{parseFloat(tx.amount).toFixed(2)} Credits
                   </Text>
                 </TouchableOpacity>
               ))
@@ -210,7 +209,7 @@ export default function WalletScreen({ navigation }) {
                   <Icon name={selectedTx.type?.toLowerCase() === 'credit' ? 'arrow-down-left' : 'arrow-up-right'} size={30} color={selectedTx.type?.toLowerCase() === 'credit' ? '#2E7D32' : '#D32F2F'} />
                 </View>
                 <Text style={[styles.modalAmount, { color: selectedTx.type?.toLowerCase() === 'credit' ? '#2E7D32' : COLORS.text }]}>
-                  {selectedTx.type?.toLowerCase() === 'credit' ? '+' : '-'}₹{parseFloat(selectedTx.amount).toFixed(2)}
+                  {selectedTx.type?.toLowerCase() === 'credit' ? '+' : '-'}{parseFloat(selectedTx.amount).toFixed(2)} Credits
                 </Text>
                 <View style={styles.modalRow}>
                   <Text style={styles.modalLabel}>Date</Text>
