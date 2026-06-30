@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity,
+  View, Text, StyleSheet, TouchableOpacity, TextInput,
   ScrollView, ActivityIndicator, Alert, SafeAreaView, StatusBar, Platform,
   Animated, Vibration
 } from 'react-native';
@@ -12,6 +12,8 @@ import { useSelector } from 'react-redux';
 import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import api from '../api/axiosConfig';
+import RazorpayCheckout from 'react-native-razorpay';
+import { ticketAPI } from '../api/ticketAPI';
 
 export default function SmartCardScreen({ route }) {
   const { theme: COLORS, isDark } = useTheme();
@@ -29,9 +31,12 @@ export default function SmartCardScreen({ route }) {
   const [activeTab, setActiveTab] = useState(route?.params?.initialTab === 'gift' ? 'gift' : 'smartcard');
 
   // --- Smart Card State ---
+  const [hasCard, setHasCard] = useState(false);
+  const [rechargeAmount, setRechargeAmount] = useState('');
+  const [isRecharging, setIsRecharging] = useState(false);
   const [card, setCard] = useState({
     cardNumber: '8081402198765432',
-    balance: 450,
+    balance: 0,
     travelState: 'idle',
     entryStation: null
   });
@@ -57,18 +62,14 @@ export default function SmartCardScreen({ route }) {
   const loadCardData = async () => {
     setInitLoading(true);
     try {
+      const owned = await AsyncStorage.getItem('@has_synergia_card');
       const savedCard = await AsyncStorage.getItem('@pune_metro_smartcard');
-      if (savedCard) {
+      
+      if (owned === 'true' && savedCard) {
+        setHasCard(true);
         setCard(JSON.parse(savedCard));
       } else {
-        const defaultCard = {
-          cardNumber: '8081402198765432',
-          balance: 450,
-          travelState: 'idle',
-          entryStation: null
-        };
-        await AsyncStorage.setItem('@pune_metro_smartcard', JSON.stringify(defaultCard));
-        setCard(defaultCard);
+        setHasCard(false);
       }
     } catch (e) {
       console.error('Error loading smart card details', e);
@@ -83,6 +84,106 @@ export default function SmartCardScreen({ route }) {
       await AsyncStorage.setItem('@pune_metro_smartcard', JSON.stringify(updatedCard));
     } catch (e) {
       console.error('Error saving smart card details', e);
+    }
+  };
+
+  const handleGetCard = async () => {
+    setInitLoading(true);
+    try {
+      const randomDigits = Math.floor(100000000000 + Math.random() * 900000000000).toString();
+      const cardNumber = '8081' + randomDigits;
+      const defaultCard = {
+        cardNumber: cardNumber,
+        balance: 0,
+        travelState: 'idle',
+        entryStation: null
+      };
+      await AsyncStorage.setItem('@has_synergia_card', 'true');
+      await AsyncStorage.setItem('@pune_metro_smartcard', JSON.stringify(defaultCard));
+      setCard(defaultCard);
+      setHasCard(true);
+      Alert.alert(
+        "Card Issued! 🎉",
+        "Your Digital Synergia Card has been successfully generated. Add balance to start scanning and paying at metro shops!"
+      );
+    } catch (e) {
+      console.error('Error issuing card', e);
+      Alert.alert("Error", "Could not issue card. Please try again.");
+    } finally {
+      setInitLoading(false);
+    }
+  };
+
+  const handleCardRecharge = async () => {
+    const amt = parseFloat(rechargeAmount);
+    if (isNaN(amt) || amt <= 0) {
+      Alert.alert("Invalid Amount", "Please enter a valid amount to recharge.");
+      return;
+    }
+    
+    setIsRecharging(true);
+    
+    try {
+      // 1. Create Razorpay order on backend
+      const orderRes = await ticketAPI.createRazorpayOrder(amt);
+      
+      // 2. Setup checkout options
+      const options = {
+        description: 'Synergia Card Top-up',
+        image: 'https://cdn.pixabay.com/photo/2021/08/11/11/15/train-6538260_960_720.png',
+        currency: orderRes.currency || 'INR',
+        key: orderRes.key_id || 'rzp_test_St6f7LZjydxbQ0', 
+        amount: orderRes.amount,
+        name: 'Synergia Card',
+        order_id: orderRes.orderId,
+        prefill: {
+          email: user?.email || 'test@test.com',
+          contact: user?.phone || '9999999999',
+          name: user?.name || 'User'
+        },
+        theme: { color: '#00C9A7' }
+      };
+
+      // Mock order fallback
+      if (orderRes.orderId && orderRes.orderId.startsWith('order_mock_')) {
+        delete options.order_id;
+      }
+
+      setIsRecharging(false);
+      
+      // 3. Open Razorpay checkout
+      RazorpayCheckout.open(options).then(async (data) => {
+        setIsRecharging(true);
+        try {
+          const bonus = amt * 0.05; // 5% Cashback
+          const credit = amt + bonus;
+          const updatedCard = {
+            ...card,
+            balance: card.balance + credit
+          };
+          await saveCardData(updatedCard);
+          setRechargeAmount('');
+          
+          Alert.alert(
+            "Recharge Successful! 💳",
+            `₹${amt.toFixed(2)} + ₹${bonus.toFixed(2)} (5% Cashback Bonus) credited to your Synergia Card successfully!\n\nNew Balance: ₹${updatedCard.balance.toFixed(2)}`
+          );
+        } catch (err) {
+          Alert.alert("Recharge Failed", "Could not credit card balance. Please contact support.");
+        } finally {
+          setIsRecharging(false);
+        }
+      }).catch((error) => {
+        setIsRecharging(false);
+        if (error.code !== 0) {
+          Alert.alert("Payment Cancelled/Failed", error.description || "The transaction was declined.");
+        }
+      });
+      
+    } catch (err) {
+      setIsRecharging(false);
+      console.error("Razorpay order creation error", err);
+      Alert.alert("Payment Initiation Failed", "Could not initiate payment. Please try again.");
     }
   };
 
@@ -236,6 +337,73 @@ export default function SmartCardScreen({ route }) {
 
 
 
+  const renderGetCardView = () => {
+    return (
+      <View style={{ padding: 22, alignItems: 'center', width: '100%' }}>
+        {/* Mock card design with locks */}
+        <View style={{ height: 210, width: '100%', borderRadius: 22, overflow: 'hidden', elevation: 8, shadowColor: '#000', shadowOpacity: 0.25, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, marginBottom: 24 }}>
+          <LinearGradient colors={['#1F2937', '#111827', '#030712']} style={styles.cardGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: 'rgba(255,255,255,0.4)', letterSpacing: 1 }}>SYNERGIA CARD</Text>
+              <Icon name="lock-outline" size={24} color="rgba(255,255,255,0.3)" />
+            </View>
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+              <Icon name="card-plus-outline" size={44} color="rgba(255,255,255,0.2)" />
+              <Text style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11, fontWeight: '800', marginTop: 4, letterSpacing: 2 }}>NOT ISSUED</Text>
+            </View>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+              <Text style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11, fontWeight: '800', letterSpacing: 0.5 }}>GET DIGITAL CARD</Text>
+              <Text style={{ color: 'rgba(255,255,255,0.3)', fontSize: 18, fontWeight: '900' }}>₹0.00</Text>
+            </View>
+          </LinearGradient>
+        </View>
+
+        <Text style={{ fontSize: 22, fontWeight: '900', color: COLORS.text, marginBottom: 8, textAlign: 'center', letterSpacing: 0.5 }}>Get Your Synergia Card</Text>
+        <Text style={{ fontSize: 13, color: COLORS.textLight, textAlign: 'center', marginBottom: 24, lineHeight: 18, paddingHorizontal: 10 }}>
+          Generate your digital metro card instantly. Use it at all vertical shops and enjoy cashback on top-ups!
+        </Text>
+
+        <View style={{ width: '100%', backgroundColor: COLORS.cardBg, borderRadius: 20, padding: 18, borderWidth: 1, borderColor: COLORS.border, marginBottom: 24, gap: 14 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: '#00C9A722', justifyContent: 'center', alignItems: 'center' }}>
+              <Icon name="storefront-outline" size={20} color="#00C9A7" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 14, fontWeight: '800', color: COLORS.text }}>Pay at Metro Shops</Text>
+              <Text style={{ fontSize: 11, color: COLORS.textLight, marginTop: 1 }}>Scan and purchase snacks, tea/coffee, salon services, and cowork pods.</Text>
+            </View>
+          </View>
+          
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: '#F59E0B22', justifyContent: 'center', alignItems: 'center' }}>
+              <Icon name="gift-outline" size={20} color="#F59E0B" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 14, fontWeight: '800', color: COLORS.text }}>5% Unlimited Cashback</Text>
+              <Text style={{ fontSize: 11, color: COLORS.textLight, marginTop: 1 }}>Get an extra 5% cash reward added instantly to your balance on every card recharge.</Text>
+            </View>
+          </View>
+
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: '#3B82F622', justifyContent: 'center', alignItems: 'center' }}>
+              <Icon name="cellphone-nfc" size={20} color="#3B82F6" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 14, fontWeight: '800', color: COLORS.text }}>Gate Entry Simulator</Text>
+              <Text style={{ fontSize: 11, color: COLORS.textLight, marginTop: 1 }}>Simulate scanning at AFC entry/exit gates for Pune Metro.</Text>
+            </View>
+          </View>
+        </View>
+
+        <TouchableOpacity style={{ width: '100%', borderRadius: 16, overflow: 'hidden', elevation: 3 }} onPress={handleGetCard}>
+          <LinearGradient colors={['#00C9A7', '#009688']} style={{ paddingVertical: 16, alignItems: 'center' }} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+            <Text style={{ color: '#FFF', fontWeight: '800', fontSize: 16, letterSpacing: 0.5 }}>Issue Digital Card Now</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
   // --- RENDER ---
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
@@ -258,6 +426,8 @@ export default function SmartCardScreen({ route }) {
                 <View style={styles.centered}>
                   <ActivityIndicator size="large" color="#00C9A7" />
                 </View>
+              ) : !hasCard ? (
+                renderGetCardView()
               ) : (
                 <>
                   {/* 3D Flip Card Container */}
@@ -394,6 +564,64 @@ export default function SmartCardScreen({ route }) {
                           : t('smartcard.statusInTransit', { station: card.entryStation || 'PMC' })}
                       </Text>
                     </View>
+                  </View>
+
+                  {/* Card Recharge Action */}
+                  <View style={styles.actionCard}>
+                    <Text style={styles.actionTitle}>Top-up Synergia Card</Text>
+                    <Text style={styles.actionDesc}>
+                      Recharge your card and get an instant 5% cashback bonus added to your balance.
+                    </Text>
+
+                    <View style={styles.amountInputContainer}>
+                      <Text style={styles.currencySymbol}>₹</Text>
+                      <TextInput
+                        style={styles.amountInput}
+                        placeholder="Enter Amount"
+                        placeholderTextColor="#AAAAAA"
+                        keyboardType="numeric"
+                        value={rechargeAmount}
+                        onChangeText={setRechargeAmount}
+                      />
+                    </View>
+
+                    <View style={styles.quickAmountsRow}>
+                      {[100, 200, 500, 1000].map((amt) => (
+                        <TouchableOpacity
+                          key={amt}
+                          style={styles.quickAmountBtn}
+                          onPress={() => setRechargeAmount(amt.toString())}
+                        >
+                          <Text style={styles.quickAmountText}>+ ₹{amt}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+
+                    {parseFloat(rechargeAmount) > 0 && (
+                      <View style={styles.infoBox}>
+                        <Icon name="gift-outline" size={16} color="#00C9A7" style={{ marginRight: 4 }} />
+                        <Text style={{ fontSize: 12, color: COLORS.text, fontWeight: '700' }}>
+                          5% Cashback: +₹{(parseFloat(rechargeAmount) * 0.05).toFixed(2)} (Total: ₹{(parseFloat(rechargeAmount) * 1.05).toFixed(2)})
+                        </Text>
+                      </View>
+                    )}
+
+                    <TouchableOpacity
+                      style={[styles.scanBtn, { marginTop: 14 }, isRecharging && styles.scanBtnDisabled]}
+                      onPress={handleCardRecharge}
+                      disabled={isRecharging}
+                    >
+                      <LinearGradient colors={['#00C9A7', '#009688']} style={styles.scanBtnGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                        {isRecharging ? (
+                          <ActivityIndicator color="#fff" />
+                        ) : (
+                          <>
+                            <Icon name="card-plus-outline" size={22} color="#fff" />
+                            <Text style={styles.scanBtnText}>Recharge Now</Text>
+                          </>
+                        )}
+                      </LinearGradient>
+                    </TouchableOpacity>
                   </View>
                 </>
               )}
@@ -611,4 +839,7 @@ const getStyles = (COLORS) => StyleSheet.create({
   perkText: { color: '#fff', fontSize: 14, fontWeight: '700', marginLeft: 8 },
   upgradeBtn: { backgroundColor: '#fff', paddingVertical: 12, borderRadius: 14, alignItems: 'center' },
   upgradeBtnText: { color: '#F59E0B', fontSize: 15, fontWeight: '900' },
+  amountInputContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.background, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border, paddingHorizontal: 16, marginVertical: 12 },
+  currencySymbol: { fontSize: 24, fontWeight: '800', color: COLORS.text, marginRight: 8 },
+  amountInput: { flex: 1, paddingVertical: 12, fontSize: 18, fontWeight: '800', color: COLORS.text },
 });

@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ActivityIndicator, Alert, SafeAreaView, KeyboardAvoidingView, Platform, StatusBar, Modal } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -9,6 +9,7 @@ import shopAPI from '../api/shopAPI';
 import { ticketAPI } from '../api/ticketAPI';
 import RazorpayCheckout from 'react-native-razorpay';
 import { useTranslation } from 'react-i18next';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function ScanAndPayScreen({ route, navigation }) {
   const { theme: COLORS, isDark } = useTheme();
@@ -185,6 +186,69 @@ export default function ScanAndPayScreen({ route, navigation }) {
     }
   };
 
+  const handleSynergiaPayment = async () => {
+    if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
+      Alert.alert(t('scan.alert.errorTitle'), t('scan.alert.invalidAmount'));
+      return;
+    }
+
+    const amt = parseFloat(amount);
+    setProcessingMethod('synergia');
+
+    try {
+      const owned = await AsyncStorage.getItem('@has_synergia_card');
+      const savedCard = await AsyncStorage.getItem('@pune_metro_smartcard');
+      
+      if (owned !== 'true' || !savedCard) {
+        setProcessingMethod(null);
+        Alert.alert(
+          "No Synergia Card 💳",
+          "You do not own a Synergia Card yet. Please generate a digital Synergia Card from the Card screen first."
+        );
+        return;
+      }
+
+      const card = JSON.parse(savedCard);
+      
+      if (card.balance < amt) {
+        setProcessingMethod(null);
+        Alert.alert(
+          "Insufficient Card Balance ❌",
+          `Your Synergia Card balance (₹${card.balance.toFixed(2)}) is insufficient for this payment.\n\nPlease top-up your card.`
+        );
+        return;
+      }
+
+      const updatedCard = {
+        ...card,
+        balance: card.balance - amt
+      };
+      await AsyncStorage.setItem('@pune_metro_smartcard', JSON.stringify(updatedCard));
+
+      // Record direct payment transaction
+      await shopAPI.payShop(
+        merchantData.shopId,
+        amt,
+        'synergia_card',
+        `SYNERGIA-PAY-${Date.now()}`
+      );
+
+      setProcessingMethod(null);
+      setSuccessData({
+        amount: amt,
+        merchant: merchantData.businessName || 'Merchant',
+        method: 'Synergia Card'
+      });
+    } catch (error) {
+      setProcessingMethod(null);
+      Alert.alert(
+        t('scan.alert.paymentFailedTitle'),
+        error?.response?.data?.message || "Could not process card payment. Please try again.",
+        [{ text: 'OK' }]
+      );
+    }
+  };
+
   // Token success UI removed as payment is now direct
 
   return (
@@ -252,6 +316,16 @@ export default function ScanAndPayScreen({ route, navigation }) {
             >
               <LinearGradient colors={processingMethod === 'wallet' ? ['#555', '#444'] : ['#8E44AD', '#9B59B6']} style={styles.primaryButtonGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
                 {processingMethod === 'wallet' ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>{t('scan.payWithWallet')}</Text>}
+              </LinearGradient>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={[styles.walletButton, { marginTop: 12 }]}
+              onPress={handleSynergiaPayment}
+              disabled={!!processingMethod}
+            >
+              <LinearGradient colors={processingMethod === 'synergia' ? ['#555', '#444'] : ['#1A2A6C', '#275E9B']} style={styles.primaryButtonGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                {processingMethod === 'synergia' ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Pay with Synergia Card</Text>}
               </LinearGradient>
             </TouchableOpacity>
 

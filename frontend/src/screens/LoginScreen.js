@@ -15,6 +15,60 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTheme } from '../context/ThemeContext';
 import DatePickerModal from '../components/DatePickerModal';
 
+const COUNTRY_CODES = [
+  { code: '+91', flag: '🇮🇳', name: 'India' },
+  { code: '+1', flag: '🇺🇸', name: 'United States' },
+  { code: '+44', flag: '🇬🇧', name: 'United Kingdom' },
+  { code: '+65', flag: '🇸🇬', name: 'Singapore' },
+  { code: '+66', flag: '🇹🇭', name: 'Thailand' },
+  { code: '+84', flag: '🇻🇳', name: 'Vietnam' },
+  { code: '+852', flag: '🇭🇰', name: 'Hong Kong' },
+  { code: '+61', flag: '🇦🇺', name: 'Australia' },
+  { code: '+49', flag: '🇩🇪', name: 'Germany' },
+  { code: '+971', flag: '🇦🇪', name: 'United Arab Emirates' },
+  { code: '+81', flag: '🇯🇵', name: 'Japan' },
+  { code: '+33', flag: '🇫🇷', name: 'France' },
+  { code: '+39', flag: '🇮🇹', name: 'Italy' },
+  { code: '+34', flag: '🇪🇸', name: 'Spain' },
+  { code: '+31', flag: '🇳🇱', name: 'Netherlands' },
+  { code: '+41', flag: '🇨🇭', name: 'Switzerland' },
+  { code: '+46', flag: '🇸🇪', name: 'Sweden' },
+  { code: '+64', flag: '🇳🇿', name: 'New Zealand' },
+  { code: '+27', flag: '🇿🇦', name: 'South Africa' },
+  { code: '+55', flag: '🇧🇷', name: 'Brazil' },
+  { code: '+52', flag: '🇲🇽', name: 'Mexico' },
+  { code: '+7', flag: '🇷🇺', name: 'Russia' },
+  { code: '+86', flag: '🇨🇳', name: 'China' },
+  { code: '+82', flag: '🇰🇷', name: 'South Korea' },
+  { code: '+966', flag: '🇸🇦', name: 'Saudi Arabia' },
+  { code: '+60', flag: '🇲🇾', name: 'Malaysia' },
+  { code: '+62', flag: '🇮🇩', name: 'Indonesia' },
+  { code: '+63', flag: '🇵🇭', name: 'Philippines' },
+  { code: '+90', flag: '🇹🇷', name: 'Turkey' },
+  { code: '+20', flag: '🇪🇬', name: 'Egypt' },
+  { code: '+234', flag: '🇳🇬', name: 'Nigeria' },
+  { code: '+254', flag: '🇰🇪', name: 'Kenya' },
+  { code: '+880', flag: '🇧🇩', name: 'Bangladesh' },
+  { code: '+92', flag: '🇵🇰', name: 'Pakistan' },
+  { code: '+94', flag: '🇱🇰', name: 'Sri Lanka' },
+  { code: '+977', flag: '🇳🇵', name: 'Nepal' },
+  { code: '+54', flag: '🇦🇷', name: 'Argentina' },
+  { code: '+57', flag: '🇨🇴', name: 'Colombia' },
+  { code: '+56', flag: '🇨🇱', name: 'Chile' },
+  { code: '+51', flag: '🇵🇪', name: 'Peru' },
+  { code: '+353', flag: '🇮🇪', name: 'Ireland' },
+  { code: '+32', flag: '🇧🇪', name: 'Belgium' },
+  { code: '+43', flag: '🇦🇹', name: 'Austria' },
+  { code: '+351', flag: '🇵🇹', name: 'Portugal' },
+  { code: '+47', flag: '🇳🇴', name: 'Norway' },
+  { code: '+45', flag: '🇩🇰', name: 'Denmark' },
+  { code: '+358', flag: '🇫🇮', name: 'Finland' },
+  { code: '+48', flag: '🇵🇱', name: 'Poland' },
+  { code: '+30', flag: '🇬🇷', name: 'Greece' },
+  { code: '+380', flag: '🇺🇦', name: 'Ukraine' },
+  { code: '+972', flag: '🇮🇱', name: 'Israel' }
+];
+
 const getTABS = () => [
   { key: 'user', label: 'User', icon: 'train-car' },
   { key: 'merchant', label: 'Merchant', icon: 'storefront-outline' },
@@ -34,6 +88,8 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState(COUNTRY_CODES[0]);
+  const [countryPickerVisible, setCountryPickerVisible] = useState(false);
   const [shopName, setShopName] = useState('');
   const [address, setAddress] = useState('');
   const [gender, setGender] = useState('Male');
@@ -71,13 +127,15 @@ export default function LoginScreen() {
       }
     }
 
+    const fullPhone = selectedCountry.code + phone;
+
     dispatch(authStart());
     try {
       const res = await api.post('/auth/send-otp', { email, isRegister });
       if (res.data.success) {
         dispatch(authFailure(null));
         navigation.navigate('OTP', {
-          email, name, phone, shopName, password, address, gender, dob,
+          email, name, phone: fullPhone, shopName, password, address, gender, dob,
           role: activeTab === 'user' ? 'user' : activeTab, isRegister
         });
       } else {
@@ -171,18 +229,25 @@ export default function LoginScreen() {
 
             {/* Tabs */}
             <View style={styles.tabRow}>
-              {TABS.map((tab) => (
-                <TouchableOpacity
-                  key={tab.key}
-                  style={[styles.tab, activeTab === tab.key && styles.tabActive]}
-                  onPress={() => { setActiveTab(tab.key); setIsRegister(false); }}
-                >
-                  <Icon name={tab.icon} size={16} color={tab.key === 'merchant' ? '#EF4444' : (activeTab === tab.key ? COLORS.primary : '#888888')} />
-                  <Text style={[styles.tabText, activeTab === tab.key && styles.tabTextActive]}>
-                    {tab.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+              {TABS.map((tab) => {
+                const isActive = activeTab === tab.key;
+                const activeColor = tab.key === 'merchant' ? '#EF4444' : '#3498DB';
+                return (
+                  <TouchableOpacity
+                    key={tab.key}
+                    style={[
+                      styles.tab,
+                      isActive && { backgroundColor: tab.key === 'merchant' ? 'rgba(239,68,68,0.08)' : 'rgba(52,152,219,0.08)' }
+                    ]}
+                    onPress={() => { setActiveTab(tab.key); setIsRegister(false); }}
+                  >
+                    <Icon name={tab.icon} size={16} color={isActive ? activeColor : '#888888'} />
+                    <Text style={[styles.tabText, isActive && { color: activeColor, fontWeight: '900' }]}>
+                      {tab.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
 
             {/* Toggle Login/Register */}
@@ -199,7 +264,7 @@ export default function LoginScreen() {
             {/* Common Email Field */}
             <Text style={[styles.label, { fontWeight: 'normal' }]}>{t('login.emailLabel')}</Text>
             <View style={styles.inputRow}>
-              <Icon name="email-outline" size={20} color="#00C9A7" />
+              <Icon name="email-outline" size={20} color={activeTab === 'merchant' ? '#3498DB' : '#00C9A7'} />
               <TextInput
                 style={styles.input}
                 placeholder={t('login.emailPlaceholder')}
@@ -228,7 +293,14 @@ export default function LoginScreen() {
 
                 <Text style={styles.label}>{t('login.phoneLabel')}</Text>
                 <View style={styles.inputRow}>
-                  <Icon name="phone-outline" size={20} color="#00C9A7" />
+                  <TouchableOpacity
+                    style={{ flexDirection: 'row', alignItems: 'center', marginRight: 10, gap: 4, borderRightWidth: 1, borderRightColor: COLORS.border, paddingRight: 10 }}
+                    onPress={() => setCountryPickerVisible(true)}
+                  >
+                    <Text style={{ fontSize: 18 }}>{selectedCountry.flag}</Text>
+                    <Text style={{ fontSize: 14, fontWeight: 'bold', color: COLORS.text }}>{selectedCountry.code}</Text>
+                    <Icon name="chevron-down" size={16} color={COLORS.textLight} />
+                  </TouchableOpacity>
                   <TextInput
                     style={styles.input}
                     placeholder={t('login.phonePlaceholder')}
@@ -319,7 +391,14 @@ export default function LoginScreen() {
                 </View>
                 <Text style={styles.label}>{t('login.phoneLabel')}</Text>
                 <View style={styles.inputRow}>
-                  <Icon name="phone-outline" size={20} color="#3498DB" />
+                  <TouchableOpacity
+                    style={{ flexDirection: 'row', alignItems: 'center', marginRight: 10, gap: 4, borderRightWidth: 1, borderRightColor: COLORS.border, paddingRight: 10 }}
+                    onPress={() => setCountryPickerVisible(true)}
+                  >
+                    <Text style={{ fontSize: 18 }}>{selectedCountry.flag}</Text>
+                    <Text style={{ fontSize: 14, fontWeight: 'bold', color: COLORS.text }}>{selectedCountry.code}</Text>
+                    <Icon name="chevron-down" size={16} color={COLORS.textLight} />
+                  </TouchableOpacity>
                   <TextInput style={styles.input} placeholder={t('login.phonePlaceholder')} placeholderTextColor="#AAAAAA" keyboardType="phone-pad" value={phone} onChangeText={setPhone} />
                 </View>
                 <Text style={styles.label}>{t('login.setPasswordLabel')}</Text>
@@ -415,6 +494,40 @@ export default function LoginScreen() {
             </TouchableOpacity>
           </View>
         </View>
+      </Modal>
+
+      {/* Country Code Picker Modal */}
+      <Modal
+        visible={countryPickerVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setCountryPickerVisible(false)}
+      >
+        <TouchableOpacity 
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' }} 
+          activeOpacity={1} 
+          onPress={() => setCountryPickerVisible(false)}
+        >
+          <View style={{ backgroundColor: COLORS.cardBg, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 22, maxHeight: 400 }}>
+            <Text style={{ fontSize: 18, fontWeight: '900', color: COLORS.text, marginBottom: 16 }}>Select Country Code</Text>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {COUNTRY_CODES.map((item, idx) => (
+                <TouchableOpacity
+                  key={idx}
+                  style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: COLORS.border, gap: 12 }}
+                  onPress={() => {
+                    setSelectedCountry(item);
+                    setCountryPickerVisible(false);
+                  }}
+                >
+                  <Text style={{ fontSize: 24 }}>{item.flag}</Text>
+                  <Text style={{ fontSize: 15, fontWeight: '700', color: COLORS.text, flex: 1 }}>{item.name}</Text>
+                  <Text style={{ fontSize: 15, fontWeight: '900', color: COLORS.primary }}>{item.code}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </TouchableOpacity>
       </Modal>
 
     </View>

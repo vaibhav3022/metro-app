@@ -26,8 +26,23 @@ export default function HomeScreen({ navigation }) {
   const [greeting, setGreeting] = useState('');
   const [currentSlide, setCurrentSlide] = useState(0);
   const [comingSoonModal, setComingSoonModal] = useState({ visible: false, vertical: null });
+  const [rideModal, setRideModal] = useState({ visible: false, service: null });
   const modalAnim = useRef(new Animated.Value(0)).current;
+  const rideModalAnim = useRef(new Animated.Value(0)).current;
   const logoAnim = useRef(new Animated.Value(0)).current;
+
+  const countriesData = [
+    { code: 'IN', flag: '🇮🇳', name: 'India' },
+    { code: 'HK', flag: '🇭🇰', name: 'Hong Kong' },
+    { code: 'SG', flag: '🇸🇬', name: 'Singapore' },
+    { code: 'TH', flag: '🇹🇭', name: 'Thailand' },
+    { code: 'VN', flag: '🇻🇳', name: 'Vietnam' }
+  ];
+
+  const flagsScrollRef = useRef(null);
+  const flagsOffsetRef = useRef(0);
+  const isFlagsDragging = useRef(false);
+  const [flagsContentWidth, setFlagsContentWidth] = useState(0);
 
   // Header logo slow continuous rotation
   useEffect(() => {
@@ -164,6 +179,17 @@ export default function HomeScreen({ navigation }) {
     });
   };
 
+  const showRideModal = (service) => {
+    setRideModal({ visible: true, service });
+    Animated.spring(rideModalAnim, { toValue: 1, useNativeDriver: true, tension: 65, friction: 8 }).start();
+  };
+
+  const hideRideModal = () => {
+    Animated.timing(rideModalAnim, { toValue: 0, duration: 200, useNativeDriver: true }).start(() => {
+      setRideModal({ visible: false, service: null });
+    });
+  };
+
   const sliderImages = [
     { id: 's1', source: require('../../assets/slider/metro_train.png'), title: t('home.slider1'), isVertical: false },
     { id: 'v1', source: require('../assets/slider/energia.png'), title: 'Energia', displayTitle: 'Energia', isVertical: true, vertical: verticalsData[0] },
@@ -233,6 +259,23 @@ export default function HomeScreen({ navigation }) {
     return () => clearInterval(scrollInterval);
   }, [verticalsData.length]);
 
+  useEffect(() => {
+    const scrollInterval = setInterval(() => {
+      if (flagsScrollRef.current && !isFlagsDragging.current && flagsContentWidth > 0) {
+        let nextOffset = flagsOffsetRef.current + 0.8; // smooth horizontal scrolling speed
+        if (nextOffset >= flagsContentWidth) {
+          nextOffset = 0;
+          flagsScrollRef.current.scrollTo({ x: 0, animated: false });
+        } else {
+          flagsScrollRef.current.scrollTo({ x: nextOffset, animated: false });
+        }
+        flagsOffsetRef.current = nextOffset;
+      }
+    }, 20); // buttery smooth panning
+
+    return () => clearInterval(scrollInterval);
+  }, [flagsContentWidth]);
+
   useFocusEffect(
     useCallback(() => {
       // Fetch tickets for recent tickets section
@@ -275,12 +318,29 @@ export default function HomeScreen({ navigation }) {
     { title: t('home.smartCard'), icon: 'card-account-details-outline', route: 'SmartCard', color: '#00796B' },
     { title: t('home.metroMap'), icon: 'map-outline', route: 'MetroMap', color: '#E64A19' },
     { title: 'Wallet', icon: 'wallet-outline', route: 'Wallet', color: '#00C9A7' },
-    { title: 'Help & Support', icon: 'help-circle-outline', route: 'HelpSupport', color: '#EC4899' },
-    { title: 'Metro Alerts', icon: 'bell-alert-outline', route: 'Notifications', color: '#FF9800' },
     { title: 'Gift Cards', icon: 'gift-outline', route: 'GiftCard', color: '#FF6B6B' },
+    // Custom booking/ride services grouped at the end
+    { title: 'Airplane', icon: 'airplane', isRideService: true, type: 'airplane', color: '#0EA5E9', eta: '15 mins to boarding', fare: '₹2,500 - ₹5,000', desc: 'Book direct airport flight transits or helicopter shuttle rides directly from the nearest station terminal.' },
+    { title: 'Auto Ride', icon: 'rickshaw', isRideService: true, type: 'auto', color: '#F59E0B', eta: '4 mins away', fare: '₹40 - ₹75', desc: 'Convenient and pocket-friendly three-wheeler rides. Ideal for daily commuting.' },
+    { title: 'Car Cab', icon: 'car', isRideService: true, type: 'car', color: '#3B82F6', eta: '5 mins away', fare: '₹90 - ₹180', desc: 'Premium, air-conditioned cabs for comfort-focused and hassle-free travel.' },
+    { title: 'Bus Transit', icon: 'bus', isRideService: true, type: 'bus', color: '#EF4444', eta: '7 mins away', fare: '₹10 - ₹25', desc: 'Feeder and scheduled city buses linking metro stations to major localities.' },
+    { title: 'Boats', icon: 'ferry', isRideService: true, type: 'boat', color: '#008080', eta: '10 mins away', fare: '₹120 - ₹250', desc: 'Book high-speed electric boats or luxury marine EV ferry transits across the coastal and river routes.' },
+    { title: 'Book Tour', icon: 'earth', isRideService: true, type: 'tour', color: '#8B5CF6', eta: 'Instant booking', fare: '₹5,000 - ₹25,000', desc: 'Plan and book global tours, city sightseeing packages, and weekend getaways seamlessly.' },
   ];
 
   const marqueeData = [...verticalsData, ...verticalsData, ...verticalsData];
+
+  const getGradient = (type) => {
+    switch (type) {
+      case 'airplane': return ['#0EA5E9', '#0284C7'];
+      case 'auto': return ['#F59E0B', '#D97706'];
+      case 'car': return ['#3B82F6', '#1D4ED8'];
+      case 'bus': return ['#EF4444', '#B91C1C'];
+      case 'boat': return ['#008080', '#004D40'];
+      case 'tour': return ['#8B5CF6', '#6D28D9'];
+      default: return ['#8B5CF6', '#6D28D9'];
+    }
+  };
 
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
@@ -439,7 +499,13 @@ export default function HomeScreen({ navigation }) {
             <TouchableOpacity
               key={index}
               style={styles.gridItem}
-              onPress={() => navigation.navigate(action.route, action.params)}
+              onPress={() => {
+                if (action.isRideService) {
+                  showRideModal(action);
+                } else {
+                  navigation.navigate(action.route, action.params);
+                }
+              }}
               activeOpacity={0.75}
             >
               <View style={[styles.iconBox, { backgroundColor: action.color + '22' }]}>
@@ -532,6 +598,56 @@ export default function HomeScreen({ navigation }) {
           <Icon name="chevron-right" size={22} color="#888" />
         </TouchableOpacity>
 
+        {/* Dynamic Country Flags Auto-Scrolling Ticker */}
+        <View style={{ marginVertical: 18, backgroundColor: 'transparent' }}>
+          <ScrollView
+            ref={flagsScrollRef}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: 14, paddingHorizontal: 16 }}
+            onContentSizeChange={(w) => {
+              setFlagsContentWidth(w / 3);
+            }}
+            onScroll={(e) => {
+              if (isFlagsDragging.current) {
+                flagsOffsetRef.current = e.nativeEvent.contentOffset.x;
+              }
+            }}
+            scrollEventThrottle={16}
+            onScrollBeginDrag={() => { isFlagsDragging.current = true; }}
+            onScrollEndDrag={() => { isFlagsDragging.current = false; }}
+            onMomentumScrollEnd={(e) => {
+              isFlagsDragging.current = false;
+              flagsOffsetRef.current = e.nativeEvent.contentOffset.x;
+            }}
+          >
+            {[...countriesData, ...countriesData, ...countriesData].map((country, idx) => (
+              <View 
+                key={idx} 
+                style={{ 
+                  flexDirection: 'row', 
+                  alignItems: 'center', 
+                  backgroundColor: COLORS.cardBg, 
+                  borderWidth: 1.2, 
+                  borderColor: COLORS.border, 
+                  borderRadius: 16, 
+                  paddingHorizontal: 14, 
+                  paddingVertical: 8, 
+                  gap: 8,
+                  elevation: 2,
+                  shadowColor: '#000',
+                  shadowOpacity: 0.05,
+                  shadowRadius: 3,
+                  shadowOffset: { width: 0, height: 1 }
+                }}
+              >
+                <Text style={{ fontSize: 20 }}>{country.flag}</Text>
+                <Text style={{ fontSize: 12, fontWeight: '800', color: COLORS.text }}>{country.name}</Text>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+
       </ScrollView>
 
       {/* ── Coming Soon Modal ── */}
@@ -585,6 +701,92 @@ export default function HomeScreen({ navigation }) {
                 </TouchableOpacity>
               </>
             )}
+          </Animated.View>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* ── Ride Booking Modal ── */}
+      <Modal
+        visible={rideModal.visible}
+        transparent
+        animationType="none"
+        onRequestClose={hideRideModal}
+      >
+        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={hideRideModal}>
+          <Animated.View style={[
+            styles.modalContent,
+            {
+              transform: [{ scale: rideModalAnim.interpolate({ inputRange: [0, 1], outputRange: [0.8, 1] }) }],
+              opacity: rideModalAnim,
+            }
+          ]}>
+            {rideModal.service && (() => {
+              const serviceGradient = getGradient(rideModal.service.type);
+              return (
+                <>
+                  <LinearGradient
+                    colors={serviceGradient}
+                    style={styles.modalIconCircle}
+                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                  >
+                    <Icon name={rideModal.service.icon} size={40} color="#fff" />
+                  </LinearGradient>
+
+                  <Text style={[styles.modalTitle, { marginTop: 10 }]}>{rideModal.service.title}</Text>
+                  <Text style={styles.modalTagline}>{rideModal.service.tagline}</Text>
+
+                  <View style={styles.modalDivider} />
+
+                  <Text style={[styles.modalDesc, { marginBottom: 12 }]}>
+                    {rideModal.service.desc}
+                  </Text>
+
+                  <View style={styles.rideDetailsRow}>
+                    <View style={styles.rideDetailCard}>
+                      <Icon name="clock-outline" size={20} color={rideModal.service.color} />
+                      <Text style={styles.rideDetailVal}>{rideModal.service.eta}</Text>
+                      <Text style={styles.rideDetailLabel}>EST. PICKUP</Text>
+                    </View>
+                    
+                    <View style={styles.rideDetailCard}>
+                      <Icon name="cash" size={20} color={rideModal.service.color} />
+                      <Text style={styles.rideDetailVal}>{rideModal.service.fare}</Text>
+                      <Text style={styles.rideDetailLabel}>EST. FARE</Text>
+                    </View>
+                  </View>
+
+                  <TouchableOpacity 
+                    style={styles.modalCloseBtn} 
+                    onPress={() => {
+                      Alert.alert(
+                        "Booking Request Sent!",
+                        `Your ${rideModal.service.title} booking has been successfully initiated. Searching for nearby drivers...`,
+                        [{ text: "Okay", onPress: hideRideModal }]
+                      );
+                    }}
+                  >
+                    <LinearGradient
+                      colors={serviceGradient}
+                      style={styles.modalCloseBtnGrad}
+                      start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                    >
+                      <Text style={styles.modalCloseBtnText}>
+                        {rideModal.service.type === 'airplane' ? 'Book a Flight 🚀' :
+                         rideModal.service.type === 'auto' ? 'Book an Auto 🚀' :
+                         rideModal.service.type === 'car' ? 'Book a Cab 🚀' :
+                         rideModal.service.type === 'bus' ? 'Book a Bus 🚀' :
+                         rideModal.service.type === 'boat' ? 'Book a Boat 🚀' :
+                         rideModal.service.type === 'tour' ? 'Book a Tour 🚀' : 'Book a Ride 🚀'}
+                      </Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity style={styles.modalSecondaryBtn} onPress={hideRideModal}>
+                    <Text style={styles.modalSecondaryBtnText}>Cancel</Text>
+                  </TouchableOpacity>
+                </>
+              );
+            })()}
           </Animated.View>
         </TouchableOpacity>
       </Modal>
@@ -694,4 +896,12 @@ const getStyles = (COLORS) => StyleSheet.create({
   modalCloseBtn: { borderRadius: 16, overflow: 'hidden', width: '100%' },
   modalCloseBtnGrad: { paddingVertical: 14, alignItems: 'center', borderRadius: 16 },
   modalCloseBtnText: { color: '#fff', fontSize: 16, fontWeight: '800' },
+
+  // Ride Modal
+  rideDetailsRow: { flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginVertical: 18 },
+  rideDetailCard: { alignItems: 'center', backgroundColor: COLORS.border + '22', borderRadius: 16, padding: 12, flex: 1, marginHorizontal: 5, borderWidth: 1, borderColor: COLORS.border },
+  rideDetailVal: { fontSize: 13, fontWeight: '800', color: COLORS.text, marginTop: 4 },
+  rideDetailLabel: { fontSize: 10, color: COLORS.textLight, marginTop: 2 },
+  modalSecondaryBtn: { width: '100%', alignItems: 'center', marginTop: 12, paddingVertical: 10 },
+  modalSecondaryBtnText: { color: COLORS.textLight, fontSize: 14, fontWeight: '600' },
 });

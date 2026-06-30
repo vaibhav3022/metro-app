@@ -138,7 +138,7 @@ const addMoney = async (req, res) => {
       userId: req.user.id,
       amount: totalCredit,
       type: 'credit',
-      description: `Wallet Recharge + 5% Oasis Bonus (ID: ${paymentId || 'PAY-' + Date.now()})`,
+      description: `Wallet Recharge + 5% Synergia Bonus (ID: ${paymentId || 'PAY-' + Date.now()})`,
       referenceType: 'WALLET_TOPUP'
     });
 
