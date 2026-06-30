@@ -281,17 +281,6 @@ export default function HomeScreen({ navigation }) {
     { title: 'Gift Cards', icon: 'gift-outline', route: 'GiftCard', color: '#FF6B6B' },
   ];
 
-  const BG_COLORS = [
-    '#D6EAF8', // Soft Sky Blue
-    '#D5F5E3', // Mint Green
-    '#FADBD8', // Soft Coral
-    '#FCF3CF', // Cream Yellow
-    '#EBDEF0', // Lavender
-    '#FDEDEC', // Blush Pink
-    '#E8F8F5', // Aqua Mint
-    '#F4F6F7', // Cool Gray
-  ];
-
   const marqueeData = [...verticalsData, ...verticalsData, ...verticalsData];
 
   return (
@@ -406,7 +395,9 @@ export default function HomeScreen({ navigation }) {
           showsHorizontalScrollIndicator={false} 
           contentContainerStyle={styles.verticalsScroll}
           onScroll={(e) => {
-            verticalsOffsetRef.current = e.nativeEvent.contentOffset.x;
+            if (isDragging.current) {
+              verticalsOffsetRef.current = e.nativeEvent.contentOffset.x;
+            }
           }}
           scrollEventThrottle={16}
           onScrollBeginDrag={() => {
@@ -415,28 +406,28 @@ export default function HomeScreen({ navigation }) {
           onScrollEndDrag={() => {
             isDragging.current = false;
           }}
-          onMomentumScrollEnd={() => {
+          onMomentumScrollEnd={(e) => {
             isDragging.current = false;
+            verticalsOffsetRef.current = e.nativeEvent.contentOffset.x;
           }}
         >
           {marqueeData.map((v, idx) => (
             <TouchableOpacity key={`${v.id}-${idx}`} activeOpacity={0.85} onPress={() => handleVerticalPress(v)}>
               <View style={[styles.verticalCard, { 
-                backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : BG_COLORS[idx % BG_COLORS.length], 
+                backgroundColor: v.color || COLORS.primary, 
                 borderWidth: 1.5, 
-                borderColor: v.gradient ? v.gradient[0] : (isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'),
-                borderRadius: 55,
+                borderColor: v.gradient ? v.gradient[0] : (v.color || COLORS.primary),
                 elevation: 4,
                 shadowOpacity: 0.15,
-                shadowColor: v.gradient ? v.gradient[0] : '#000',
+                shadowColor: v.color || '#000',
                 shadowRadius: 6,
                 shadowOffset: { width: 0, height: 2 }
               }]}>
-                <View style={[styles.verticalCardIcon, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }]}>
-                  <Icon name={v.icon} size={22} color={v.gradient ? v.gradient[0] : COLORS.primary} />
+                <View style={[styles.verticalCardIcon, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
+                  <Icon name={v.icon} size={22} color="#FFFFFF" />
                 </View>
-                <Text style={[styles.verticalCardName, { color: COLORS.text }]} numberOfLines={1}>{v.name}</Text>
-                <Text style={[styles.verticalCardTag, { color: COLORS.textLight }]} numberOfLines={1}>{v.tagline}</Text>
+                <Text style={[styles.verticalCardName, { color: '#FFFFFF' }]} numberOfLines={1}>{v.name}</Text>
+                <Text style={[styles.verticalCardTag, { color: 'rgba(255,255,255,0.9)' }]} numberOfLines={1}>{v.tagline}</Text>
               </View>
             </TouchableOpacity>
           ))}
