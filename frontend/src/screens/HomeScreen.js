@@ -169,13 +169,12 @@ export default function HomeScreen({ navigation }) {
     { id: 'v1', source: require('../assets/slider/energia.png'), title: 'Energia', displayTitle: 'Energia', isVertical: true, vertical: verticalsData[0] },
     { id: 'v2', source: require('../assets/slider/Oasis.jpeg'), title: 'Oasis T-Cafe', isVertical: true, vertical: verticalsData[1] },
     { id: 'v3', source: require('../../assets/slider/ll_beauty.png'), title: 'LL Beauty', isVertical: true, vertical: verticalsData[3] },
-    { id: 'v5', source: require('../../assets/slider/coworking.png'), title: 'Maytriya CoWork', isVertical: true, vertical: verticalsData[4] },
+    { id: 'v5', source: require('../../assets/slider/maitriya.png'), title: 'Maytriya CoWork', isVertical: true, vertical: verticalsData[4] },
     { id: 'v6', source: require('../../assets/slider/eva_salon.png'), title: 'EVA', isVertical: true, vertical: verticalsData[2] },
     { id: 'v_nexus', source: require('../../assets/slider/nexus.jpg'), title: 'Nexus', isVertical: true, vertical: verticalsData[6] },
     { id: 'v7', source: require('../assets/slider/events.jpeg'), title: 'Events', isVertical: true, vertical: verticalsData[5] },
     // Use the provided Cybeorch image in src/assets/slider
     { id: 'v8', source: require('../assets/slider/cybeorch.jpg'), title: 'Cybeorch Labs', isVertical: true, vertical: verticalsData[7] },
-    { id: 's2', source: require('../assets/slider/Maytriya_Logo.jpeg'), title: '', isVertical: false },
     { id: 's3', source: require('../assets/slider/GSA.jpeg'), title: '', isVertical: false, url: 'https://energeia369.com/events/', imageResizeMode: 'contain' },
     { id: 's4', source: require('../assets/slider/metroxia.jpeg'), title: '', isVertical: false },
   ];
