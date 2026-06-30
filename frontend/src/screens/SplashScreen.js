@@ -90,7 +90,7 @@ export default function SplashScreen({ navigation }) {
             <Text style={{color: '#EF4444'}}>METRO</Text><Text style={{color: '#000000'}}>X</Text><Text style={{color: '#EF4444'}}>I</Text><Text style={{color: '#000000'}}>A</Text>
           </Text>
           <Text style={styles.subtitle}>
-            Urban L<Text style={{ color: '#EF4444' }}>i</Text>fest<Text style={{ color: '#EF4444' }}>i</Text>le <Text style={{ color: '#EF4444' }}>!</Text>
+            Urban L<Text style={{ color: '#EF4444' }}>i</Text>fest<Text style={{ color: '#EF4444' }}>i</Text>le
           </Text>
         </View>
       </View>

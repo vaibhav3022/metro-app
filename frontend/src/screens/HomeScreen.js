@@ -77,29 +77,7 @@ export default function HomeScreen({ navigation }) {
       emoji: '☕',
       url: 'https://cybeorch.com/oasisone/index.html'
     },
-    {
-      id: 'llbeauty',
-      name: 'LL Beauty',
-      tagline: 'Quick Grooming & Beauty Services',
-      icon: 'face-woman-shimmer',
-      gradient: ['#F472B6', '#BE185D'],
-      bgColor: '#FCE7F3',
-      color: '#BE185D',
-      emoji: '💄',
-      url: 'https://lalyora.energeia369.com/'
-    },
-    {
-      id: 'coworking',
-      name: 'Maytriya CoWork',
-      tagline: 'Work Pods & Meeting Rooms ',
-      icon: 'laptop',
-      gradient: ['#34D399', '#059669'],
-      bgColor: '#DCFCE7',
-      color: '#059669',
-      emoji: '🏢',
-      url: 'https://cybeorch.com/coworking/index.html'
-    },
-    {
+     {
       id: 'eva',
       name: 'Eva',
       tagline: 'Premium Beauty Salon & Products',
@@ -109,6 +87,39 @@ export default function HomeScreen({ navigation }) {
       color: '#E11D48',
       emoji: '✨',
       url: 'https://cybeorch.com/evaone'
+    },
+    {
+      id: 'llbeauty',
+      name: 'L.L. Beauty',
+      tagline: 'Quick Grooming & Beauty Services',
+      icon: 'face-woman-shimmer',
+      gradient: ['#F472B6', '#BE185D'],
+      bgColor: '#FCE7F3',
+      color: '#BE185D',
+      emoji: '💄',
+      url: 'https://cybeorch.com/lalyoraone/'
+    },
+    {
+      id: 'coworking',
+      name: 'Maytriya CoWork',
+      tagline: 'Work Pods & Meeting Rooms ',
+      icon: 'laptop',
+      gradient: ['#34D399', '#355249ff'],
+      bgColor: '#DCFCE7',
+      color: '#059669',
+      emoji: '🏢',
+      url: 'https://cybeorch.com/coworking/index.html'
+    },
+   {
+      id: 'events',
+      name: 'Events',
+      tagline: 'Explore exciting events ',
+      icon: 'calendar-star',
+      gradient: ['#A78BFA', '#6D28D9'],
+      bgColor: '#EDE9FE',
+      color: '#6D28D9',
+      emoji: '🎟️',
+      url: 'https://cybeorch.com/eventsone/'
     },
     {
       id: 'nexus',
@@ -122,20 +133,9 @@ export default function HomeScreen({ navigation }) {
       url: 'https://cybeorch.com/nexusone'
     },
     {
-      id: 'events',
-      name: 'Events',
-      tagline: 'Explore exciting events ',
-      icon: 'calendar-star',
-      gradient: ['#A78BFA', '#6D28D9'],
-      bgColor: '#EDE9FE',
-      color: '#6D28D9',
-      emoji: '🎟️',
-      url: 'https://cybeorch.com/eventsone/'
-    },
-    {
       id: 'cybeorch',
       name: 'Cybeorch labs',
-      tagline: 'Innovate, Build & Secure ',
+      tagline: 'Software.Solutions. Skills.Startups. ',
       icon: 'shield-check',
       gradient: ['#0EA5E9', '#2563EB'],
       bgColor: '#DBEAFE',
@@ -168,11 +168,11 @@ export default function HomeScreen({ navigation }) {
     { id: 's1', source: require('../../assets/slider/metro_train.png'), title: t('home.slider1'), isVertical: false },
     { id: 'v1', source: require('../assets/slider/energia.png'), title: 'Energia', displayTitle: 'Energia', isVertical: true, vertical: verticalsData[0] },
     { id: 'v2', source: require('../assets/slider/Oasis.jpeg'), title: 'Oasis T-Cafe', isVertical: true, vertical: verticalsData[1] },
-    { id: 'v3', source: require('../../assets/slider/ll_beauty.png'), title: 'LL Beauty', isVertical: true, vertical: verticalsData[2] },
-    { id: 'v5', source: require('../../assets/slider/coworking.png'), title: 'Maytriya CoWork', isVertical: true, vertical: verticalsData[3] },
-    { id: 'v6', source: require('../../assets/slider/eva_salon.png'), title: 'EVA', isVertical: true, vertical: verticalsData[4] },
-    { id: 'v_nexus', source: require('../../assets/slider/nexus.jpg'), title: 'Nexus', isVertical: true, vertical: verticalsData[5] },
-    { id: 'v7', source: require('../assets/slider/events.jpeg'), title: 'Events', isVertical: true, vertical: verticalsData[6] },
+    { id: 'v3', source: require('../../assets/slider/ll_beauty.png'), title: 'LL Beauty', isVertical: true, vertical: verticalsData[3] },
+    { id: 'v5', source: require('../../assets/slider/coworking.png'), title: 'Maytriya CoWork', isVertical: true, vertical: verticalsData[4] },
+    { id: 'v6', source: require('../../assets/slider/eva_salon.png'), title: 'EVA', isVertical: true, vertical: verticalsData[2] },
+    { id: 'v_nexus', source: require('../../assets/slider/nexus.jpg'), title: 'Nexus', isVertical: true, vertical: verticalsData[6] },
+    { id: 'v7', source: require('../assets/slider/events.jpeg'), title: 'Events', isVertical: true, vertical: verticalsData[5] },
     // Use the provided Cybeorch image in src/assets/slider
     { id: 'v8', source: require('../assets/slider/cybeorch.jpg'), title: 'Cybeorch Labs', isVertical: true, vertical: verticalsData[7] },
     { id: 's2', source: require('../assets/slider/Maytriya_Logo.jpeg'), title: '', isVertical: false },
@@ -182,6 +182,9 @@ export default function HomeScreen({ navigation }) {
 
   const flatListRef = useRef(null);
   const currentSlideRef = useRef(0);
+  const verticalsScrollRef = useRef(null);
+  const verticalsOffsetRef = useRef(0);
+  const isDragging = useRef(false);
 
   const onViewableItemsChanged = React.useRef(({ viewableItems }) => {
     if (viewableItems.length > 0) {
@@ -209,6 +212,27 @@ export default function HomeScreen({ navigation }) {
 
     return () => clearInterval(autoScroll);
   }, [t]);
+
+  useEffect(() => {
+    const CARD_WIDTH = 110;
+    const GAP = 10;
+    const ONE_SET_WIDTH = verticalsData.length * (CARD_WIDTH + GAP);
+
+    const scrollInterval = setInterval(() => {
+      if (verticalsScrollRef.current && !isDragging.current) {
+        let nextOffset = verticalsOffsetRef.current + 0.6; // slow and smooth scroll
+        if (nextOffset >= ONE_SET_WIDTH) {
+          nextOffset = 0;
+          verticalsScrollRef.current.scrollTo({ x: 0, animated: false });
+        } else {
+          verticalsScrollRef.current.scrollTo({ x: nextOffset, animated: false });
+        }
+        verticalsOffsetRef.current = nextOffset;
+      }
+    }, 20); // ~50 FPS for buttery smooth movement
+
+    return () => clearInterval(scrollInterval);
+  }, [verticalsData.length]);
 
   useFocusEffect(
     useCallback(() => {
@@ -257,6 +281,19 @@ export default function HomeScreen({ navigation }) {
     { title: 'Gift Cards', icon: 'gift-outline', route: 'GiftCard', color: '#FF6B6B' },
   ];
 
+  const BG_COLORS = [
+    '#D6EAF8', // Soft Sky Blue
+    '#D5F5E3', // Mint Green
+    '#FADBD8', // Soft Coral
+    '#FCF3CF', // Cream Yellow
+    '#EBDEF0', // Lavender
+    '#FDEDEC', // Blush Pink
+    '#E8F8F5', // Aqua Mint
+    '#F4F6F7', // Cool Gray
+  ];
+
+  const marqueeData = [...verticalsData, ...verticalsData, ...verticalsData];
+
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
@@ -291,8 +328,8 @@ export default function HomeScreen({ navigation }) {
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 0 }}>
             <TouchableOpacity onPress={() => navigation.navigate('NXLCredits')} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', minWidth: 90, backgroundColor: '#000000', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 28, borderWidth: 2, borderColor: '#F59E0B' }}>
-              <Animated.View style={{ width: 30, height: 30, borderRadius: 16, backgroundColor: '#EF4444', borderWidth: 2, borderColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center', marginRight: 10 }}>
-                <Text style={{ color: '#FFFFFF', fontWeight: '900', fontSize: 12 }}>NXL</Text>
+              <Animated.View style={{ width: 30, height: 30, borderRadius: 16, backgroundColor: '#FFFFFF', borderWidth: 2, borderColor: '#FF5722', alignItems: 'center', justifyContent: 'center', marginRight: 10 }}>
+                <Text style={{ color: '#FF5722', fontWeight: '900', fontSize: 12 }}>NXL</Text>
               </Animated.View>
               <Text style={{ color: '#FBBF24', fontWeight: '900', fontSize: 16 }}>999 Credits</Text>
             </TouchableOpacity>
@@ -363,13 +400,32 @@ export default function HomeScreen({ navigation }) {
 
         {/* ── Our Verticals ── */}
         <Text style={styles.sectionTitle}>Our Verticals</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.verticalsScroll}>
-          {verticalsData.map((v) => (
-            <TouchableOpacity key={v.id} activeOpacity={0.85} onPress={() => handleVerticalPress(v)}>
+        <ScrollView 
+          ref={verticalsScrollRef}
+          horizontal 
+          showsHorizontalScrollIndicator={false} 
+          contentContainerStyle={styles.verticalsScroll}
+          onScroll={(e) => {
+            verticalsOffsetRef.current = e.nativeEvent.contentOffset.x;
+          }}
+          scrollEventThrottle={16}
+          onScrollBeginDrag={() => {
+            isDragging.current = true;
+          }}
+          onScrollEndDrag={() => {
+            isDragging.current = false;
+          }}
+          onMomentumScrollEnd={() => {
+            isDragging.current = false;
+          }}
+        >
+          {marqueeData.map((v, idx) => (
+            <TouchableOpacity key={`${v.id}-${idx}`} activeOpacity={0.85} onPress={() => handleVerticalPress(v)}>
               <View style={[styles.verticalCard, { 
-                backgroundColor: v.bgColor || (isDark ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,1)'), 
+                backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : BG_COLORS[idx % BG_COLORS.length], 
                 borderWidth: 1.5, 
                 borderColor: v.gradient ? v.gradient[0] : (isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'),
+                borderRadius: 55,
                 elevation: 4,
                 shadowOpacity: 0.15,
                 shadowColor: v.gradient ? v.gradient[0] : '#000',
@@ -377,13 +433,10 @@ export default function HomeScreen({ navigation }) {
                 shadowOffset: { width: 0, height: 2 }
               }]}>
                 <View style={[styles.verticalCardIcon, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }]}>
-                  <Icon name={v.icon} size={30} color={v.gradient ? v.gradient[0] : COLORS.primary} />
+                  <Icon name={v.icon} size={22} color={v.gradient ? v.gradient[0] : COLORS.primary} />
                 </View>
-                <Text style={[styles.verticalCardName, { color: COLORS.text }]}>{v.name}</Text>
-                <Text style={[styles.verticalCardTag, { color: COLORS.textLight }]} numberOfLines={2}>{v.tagline}</Text>
-                <View style={[styles.verticalBadge, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)' }]}>
-                  <Text style={[styles.verticalBadgeText, { color: COLORS.text }]}>Explore ➔</Text>
-                </View>
+                <Text style={[styles.verticalCardName, { color: COLORS.text }]} numberOfLines={1}>{v.name}</Text>
+                <Text style={[styles.verticalCardTag, { color: COLORS.textLight }]} numberOfLines={1}>{v.tagline}</Text>
               </View>
             </TouchableOpacity>
           ))}
@@ -558,7 +611,7 @@ const getStyles = (COLORS) => StyleSheet.create({
     backgroundColor: COLORS.background,
     zIndex: 10,
   },
-  scroll: { paddingTop: 10, paddingBottom: 30 },
+  scroll: { paddingTop: 0, paddingBottom: 30 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, marginBottom: 22 },
   headerLogo: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#F5F5F5', padding: 2 },
   headerTitle: { fontSize: 18, fontWeight: '900', color: COLORS.text, letterSpacing: 0.5 },
@@ -570,39 +623,39 @@ const getStyles = (COLORS) => StyleSheet.create({
   avatarText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
   notifIconHeader: { marginRight: 12, position: 'relative', justifyContent: 'center' },
   notifBadge: { position: 'absolute', top: 0, right: 2, width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#EF4444', borderWidth: 1.5, borderColor: COLORS.cardBg },
-  sliderContainer: { marginHorizontal: 16, height: 190, marginBottom: 24, overflow: 'hidden', backgroundColor: COLORS.cardBg, borderRadius: 20, borderWidth: 2, borderColor: '#D97706', elevation: 8, shadowColor: '#D97706', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8 },
-  slideWrap: { height: 190 },
+  sliderContainer: { marginHorizontal: 16, height: 135, marginBottom: 12, overflow: 'hidden', backgroundColor: COLORS.cardBg, borderRadius: 20, borderWidth: 2, borderColor: '#D97706', elevation: 8, shadowColor: '#D97706', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8 },
+  slideWrap: { height: 135 },
   slideImage: { width: '100%', height: '100%' },
   slideImageContain: { backgroundColor: '#000' },
-  slideOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 100, justifyContent: 'flex-end', padding: 16 },
-  slideTitle: { color: '#fff', fontSize: 18, fontWeight: '900', letterSpacing: 0.5 },
-  slideSubtitle: { color: 'rgba(255,255,255,0.9)', fontSize: 13, marginTop: 4, fontWeight: '500' },
-  exploreBadge: { backgroundColor: 'rgba(255,255,255,0.25)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16, marginLeft: 10 },
-  exploreBadgeText: { color: '#fff', fontSize: 12, fontWeight: '800' },
-  pagination: { position: 'absolute', bottom: 16, right: 16, flexDirection: 'row', gap: 6 },
+  slideOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 80, justifyContent: 'flex-end', padding: 16 },
+  slideTitle: { color: '#fff', fontSize: 16, fontWeight: '900', letterSpacing: 0.5 },
+  slideSubtitle: { color: 'rgba(255,255,255,0.9)', fontSize: 12, marginTop: 2, fontWeight: '500' },
+  exploreBadge: { backgroundColor: 'rgba(255,255,255,0.25)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, marginLeft: 10 },
+  exploreBadgeText: { color: '#fff', fontSize: 11, fontWeight: '800' },
+  pagination: { position: 'absolute', bottom: 12, right: 16, flexDirection: 'row', gap: 6 },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.4)' },
   activeDot: { width: 18, backgroundColor: '#00C9A7' },
 
-  verticalSlideContent: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
-  verticalSlideEmoji: { fontSize: 42, marginBottom: 8 },
-  verticalSlideName: { fontSize: 24, fontWeight: '900', color: '#fff', letterSpacing: 1, textShadowColor: 'rgba(0,0,0,0.3)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 4 },
-  verticalSlideTagline: { fontSize: 13, color: 'rgba(255,255,255,0.9)', marginTop: 4, textAlign: 'center' },
-  tapToExplore: { marginTop: 14, backgroundColor: 'rgba(255,255,255,0.25)', paddingHorizontal: 18, paddingVertical: 8, borderRadius: 20 },
-  tapToExploreText: { color: '#fff', fontWeight: '700', fontSize: 13 },
+  verticalSlideContent: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 15 },
+  verticalSlideEmoji: { fontSize: 36, marginBottom: 6 },
+  verticalSlideName: { fontSize: 20, fontWeight: '900', color: '#fff', letterSpacing: 1, textShadowColor: 'rgba(0,0,0,0.3)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 4 },
+  verticalSlideTagline: { fontSize: 12, color: 'rgba(255,255,255,0.9)', marginTop: 4, textAlign: 'center' },
+  tapToExplore: { marginTop: 10, backgroundColor: 'rgba(255,255,255,0.25)', paddingHorizontal: 16, paddingVertical: 6, borderRadius: 16 },
+  tapToExploreText: { color: '#fff', fontWeight: '700', fontSize: 12 },
 
-  verticalsScroll: { paddingHorizontal: 18, gap: 14, marginBottom: 26 },
-  verticalCard: { width: 150, height: 180, borderRadius: 22, padding: 16, justifyContent: 'space-between', elevation: 6, shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 10, shadowOffset: { width: 0, height: 4 } },
-  verticalCardIcon: { width: 48, height: 48, borderRadius: 14, justifyContent: 'center', alignItems: 'center' },
-  verticalCardName: { fontSize: 15, fontWeight: '900', color: '#fff', marginTop: 8 },
-  verticalCardTag: { fontSize: 12, fontWeight: '600', color: 'rgba(255,255,255,0.95)', lineHeight: 16 },
-  verticalBadge: { backgroundColor: 'rgba(255,255,255,0.25)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, alignSelf: 'flex-start' },
-  verticalBadgeText: { color: '#fff', fontSize: 11, fontWeight: '800' },
+  verticalsScroll: { paddingHorizontal: 18, gap: 10, marginBottom: 18 },
+  verticalCard: { width: 110, height: 105, borderRadius: 16, padding: 10, justifyContent: 'center', alignItems: 'center', elevation: 4, shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 6, shadowOffset: { width: 0, height: 2 } },
+  verticalCardIcon: { width: 40, height: 40, borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginBottom: 4 },
+  verticalCardName: { fontSize: 13, fontWeight: '900', color: '#fff', marginTop: 4, textAlign: 'center' },
+  verticalCardTag: { fontSize: 9, fontWeight: '600', color: 'rgba(255,255,255,0.95)', lineHeight: 11, textAlign: 'center', marginTop: 1 },
+  verticalBadge: { backgroundColor: 'rgba(255,255,255,0.25)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10, alignSelf: 'flex-start' },
+  verticalBadgeText: { color: '#fff', fontSize: 9, fontWeight: '800' },
 
-  sectionTitle: { fontSize: 17, fontWeight: '800', color: COLORS.text, marginHorizontal: 22, marginBottom: 14 },
+  sectionTitle: { fontSize: 16, fontWeight: '800', color: COLORS.text, marginHorizontal: 22, marginBottom: 10 },
   sectionRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 22 },
   viewAll: { color: '#00C9A7', fontWeight: '700', fontSize: 13 },
 
-  grid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 14, marginBottom: 28 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 14, marginBottom: 10 },
   gridItem: { width: '25%', alignItems: 'center', marginBottom: 18, paddingHorizontal: 4 },
   iconBox: { width: 58, height: 58, borderRadius: 16, justifyContent: 'center', alignItems: 'center', marginBottom: 7, borderWidth: 1, borderColor: COLORS.border },
   gridText: { fontSize: 11, color: COLORS.text, textAlign: 'center', fontWeight: '600' },
