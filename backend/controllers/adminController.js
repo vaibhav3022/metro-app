@@ -96,7 +96,14 @@ const changeMerchantStatus = async (req, res, status, actionName) => {
       merchant.approvedAt = new Date();
       if (!merchant.qrCodeToken) {
         merchant.qrCodeToken = crypto.randomBytes(16).toString('hex');
-        const qrData = JSON.stringify({ type: 'merchant_payment', mId: merchant._id.toString(), token: merchant.qrCodeToken });
+        const qrData = JSON.stringify({
+          type: 'merchant_payment',
+          mId: merchant._id.toString(),
+          token: merchant.qrCodeToken,
+          businessName: merchant.businessName,
+          merchantName: merchant.businessName,
+          shopName: merchant.businessName
+        });
         merchant.qrCodeImageUrl = await QRCode.toDataURL(qrData);
       }
     }

@@ -24,7 +24,7 @@ export default function ScanAndPayScreen({ route, navigation }) {
 
   const user = useSelector((state) => state.auth.user);
 
-  const handleBarCodeRead = (e) => {
+  const handleBarCodeRead = async (e) => {
     if (!scanned) {
       setScanned(true);
       console.log('QR RAW DATA:', e.data); // debug log
@@ -44,24 +44,49 @@ export default function ScanAndPayScreen({ route, navigation }) {
 
         console.log('QR PARSED:', JSON.stringify(data)); // debug log
 
-        // Accept QR if type is MERCHANT_PAYMENT OR has merchantId/shopId
-        const resolvedId = data.merchantId || data.shopId;
+        // Resolve ID from any possible fields (mId, merchantId, shopId, _id)
+        const resolvedId = data.mId || data.merchantId || data.shopId || data._id;
+        const typeUpper = data.type ? String(data.type).toUpperCase() : '';
         const isMerchantQR =
           resolvedId ||
-          data.type === 'MERCHANT_PAYMENT';
+          typeUpper === 'MERCHANT_PAYMENT' ||
+          typeUpper === 'MERCHANT';
 
-        if (isMerchantQR) {
+        if (isMerchantQR && resolvedId) {
+          const initialName =
+            data.merchantName ||
+            data.businessName ||
+            data.shopName ||
+            data.name ||
+            'METROXIA Shop';
+
           setMerchantData({
-            shopId: resolvedId || data._id || 'unknown',
-            merchantId: resolvedId || data._id || 'unknown',
-            businessName:
-              data.merchantName ||
-              data.businessName ||
-              data.shopName ||
-              data.name ||
-              'METROXIA Shop',
+            shopId: resolvedId,
+            merchantId: resolvedId,
+            businessName: initialName,
             type: data.type || 'MERCHANT_PAYMENT',
           });
+
+          // Fetch the real-time name from the database to guarantee correct, updated naming
+          try {
+            const response = await shopAPI.getAllShops();
+            if (response && response.success && response.shops) {
+              const matchedShop = response.shops.find(
+                (s) =>
+                  s._id === resolvedId ||
+                  s.merchantId?._id === resolvedId ||
+                  s.merchantId === resolvedId
+              );
+              if (matchedShop) {
+                setMerchantData(prev => ({
+                  ...prev,
+                  businessName: matchedShop.shopName
+                }));
+              }
+            }
+          } catch (fetchErr) {
+            console.log('Error fetching real-time merchant name:', fetchErr);
+          }
         } else {
           Alert.alert(
             t('scan.alert.invalidTitle'),

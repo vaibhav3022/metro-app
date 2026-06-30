@@ -48,21 +48,44 @@ export default function PayMerchant() {
       );
 
       scanner.render(
-        (decodedText) => {
+        async (decodedText) => {
           console.log('QR Scanned:', decodedText);
           try {
             const data = JSON.parse(decodedText);
-            const resolvedId = data.merchantId || data.shopId || data._id;
-            const isMerchantQR = resolvedId || data.type === 'MERCHANT_PAYMENT' || data.type === 'merchant';
+            const resolvedId = data.mId || data.merchantId || data.shopId || data._id;
+            const typeUpper = data.type ? String(data.type).toUpperCase() : '';
+            const isMerchantQR = resolvedId || typeUpper === 'MERCHANT_PAYMENT' || typeUpper === 'MERCHANT';
             
-            if (isMerchantQR) {
+            if (isMerchantQR && resolvedId) {
+              const initialName = data.merchantName || data.businessName || data.shopName || data.name || 'Pune Metro Shop';
               setMerchantData({
-                shopId: resolvedId || 'unknown',
-                businessName: data.merchantName || data.businessName || data.shopName || data.name || 'Pune Metro Shop',
+                shopId: resolvedId,
+                businessName: initialName,
                 type: data.type
               });
               setScanned(true);
-              scanner.clear();
+              scanner.clear().catch(err => console.error("Error clearing scanner", err));
+
+              // Resolve real-time name
+              try {
+                const response = await api.get('/shops');
+                if (response.data && response.data.success && response.data.shops) {
+                  const matchedShop = response.data.shops.find(
+                    (s) =>
+                      s._id === resolvedId ||
+                      s.merchantId?._id === resolvedId ||
+                      s.merchantId === resolvedId
+                  );
+                  if (matchedShop) {
+                    setMerchantData(prev => ({
+                      ...prev,
+                      businessName: matchedShop.shopName
+                    }));
+                  }
+                }
+              } catch (fetchErr) {
+                console.error("Error fetching real-time shop name on web", fetchErr);
+              }
             } else {
               setError("This is not a valid merchant QR code.");
             }

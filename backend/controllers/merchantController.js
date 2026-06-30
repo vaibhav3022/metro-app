@@ -161,6 +161,9 @@ const getShop = async (req, res) => {
 const updateShop = async (req, res) => {
   try {
     const shop = await Shop.findOneAndUpdate({ merchantId: req.merchant._id }, req.body, { new: true });
+    if (shop && req.body.shopName) {
+      await Merchant.findByIdAndUpdate(req.merchant._id, { businessName: req.body.shopName });
+    }
     res.status(200).json({ success: true, shop });
   } catch (err) { res.status(500).json({ success: false }); }
 };
