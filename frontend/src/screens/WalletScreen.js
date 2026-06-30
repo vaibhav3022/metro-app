@@ -44,7 +44,7 @@ export default function WalletScreen({ navigation }) {
         description: t('wallet.topup'),
         image: 'https://cdn.pixabay.com/photo/2021/08/11/11/15/train-6538260_960_720.png',
         currency: orderRes.currency,
-        key: 'rzp_test_St6f7LZjydxbQ0', 
+        key: orderRes.key_id || 'rzp_test_St6f7LZjydxbQ0', 
         amount: orderRes.amount,
         name: t('wallet.brand'),
         order_id: orderRes.orderId,

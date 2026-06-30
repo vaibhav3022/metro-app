@@ -199,6 +199,14 @@ const payShop = async (req, res) => {
     });
     await userWallet.save();
 
+    // Add to user's NXL Credits and Lifetime Cashback
+    const buyer = await require('../models/User').findById(req.user.id);
+    if (buyer) {
+      buyer.nxlCredits = (buyer.nxlCredits || 0) + cashbackAmount;
+      buyer.lifetimeCashback = (buyer.lifetimeCashback || 0) + cashbackAmount;
+      await buyer.save();
+    }
+
     // 2. Process Merchant (receives amount - 2% commission)
     merchantWallet.balance += merchantReceives;
     merchantWallet.transactions.push({

@@ -13,6 +13,7 @@ import api from '../api/axiosConfig';
 import { storage } from '../utils/storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTheme } from '../context/ThemeContext';
+import DatePickerModal from '../components/DatePickerModal';
 
 const getTABS = () => [
   { key: 'user', label: 'User', icon: 'train-car' },
@@ -37,6 +38,7 @@ export default function LoginScreen() {
   const [address, setAddress] = useState('');
   const [gender, setGender] = useState('Male');
   const [dob, setDob] = useState('');
+  const [dobDate, setDobDate] = useState(new Date(2000, 0, 1));
 
   const [showPassword, setShowPassword] = useState(false);
   const [adminModalVisible, setAdminModalVisible] = useState(false);
@@ -61,9 +63,11 @@ export default function LoginScreen() {
   const handleSendOTP = async () => {
     if (!email) return Alert.alert('Error', 'Please enter your email.');
     if (isRegister) {
-      if (activeTab === 'user' && (!name || !phone || !password)) return Alert.alert('Error', 'Please fill all fields (Name, Phone, Password).');
-      if (activeTab === 'merchant' && (!name || !shopName || !phone || !password)) {
-        return Alert.alert('Error', 'Please fill all merchant fields.');
+      if (activeTab === 'user' && (!name || !phone || !password || !gender || !dob)) {
+        return Alert.alert('Error', 'Please fill all fields (Name, Phone, Password, Gender, Date of Birth).');
+      }
+      if (activeTab === 'merchant' && (!name || !shopName || !phone || !password || !address)) {
+        return Alert.alert('Error', 'Please fill all fields (Owner Name, Shop Name, Phone, Password, Address).');
       }
     }
 
@@ -273,16 +277,28 @@ export default function LoginScreen() {
 
                 {/* Date of Birth */}
                 <Text style={styles.label}>Date of Birth</Text>
-                <View style={styles.inputRow}>
-                  <Icon name="calendar-outline" size={20} color="#00C9A7" />
-                  <TextInput
-                    style={styles.input}
-                    placeholder="YYYY-MM-DD"
-                    placeholderTextColor="#AAAAAA"
-                    value={dob}
-                    onChangeText={setDob}
-                    keyboardType="numeric"
-                    maxLength={10}
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                  <View style={[styles.inputRow, { flex: 1, marginBottom: 0 }]}>
+                    <Icon name="calendar-outline" size={20} color="#00C9A7" />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="YYYY-MM-DD"
+                      placeholderTextColor="#AAAAAA"
+                      value={dob}
+                      editable={false}
+                    />
+                  </View>
+                  <DatePickerModal
+                    value={dobDate}
+                    onChange={(picked) => {
+                      setDobDate(picked);
+                      const year = picked.getFullYear();
+                      const month = String(picked.getMonth() + 1).padStart(2, '0');
+                      const day = String(picked.getDate()).padStart(2, '0');
+                      setDob(`${year}-${month}-${day}`);
+                    }}
+                    COLORS={COLORS}
+                    hideText={true}
                   />
                 </View>
               </>

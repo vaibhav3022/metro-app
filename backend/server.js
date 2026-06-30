@@ -37,6 +37,10 @@ applySecurity(app);
 
 // Middlewares
 app.use(cors());
+app.use((req, res, next) => {
+  console.log(`[REQUEST] ${req.method} ${req.originalUrl} - Body:`, JSON.stringify(req.body));
+  next();
+});
 // express.json is already applied in security.js (with limit), but we keep urlencoded
 app.use(express.urlencoded({ extended: true }));
 

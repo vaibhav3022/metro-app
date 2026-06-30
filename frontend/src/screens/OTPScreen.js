@@ -13,7 +13,7 @@ export default function OTPScreen({ route, navigation }) {
   const { theme: COLORS, isDark } = useTheme();
   const styles = React.useMemo(() => getStyles(COLORS), [COLORS]);
   
-  const { email, name, phone, shopName, password, address, role, isRegister } = route.params || {};
+  const { email, name, phone, shopName, password, address, role, isRegister, gender, dob } = route.params || {};
   const [otp, setOtp] = useState('');
   
   useEffect(() => {
@@ -54,7 +54,7 @@ export default function OTPScreen({ route, navigation }) {
     
     dispatch(authStart());
     try {
-      const payload = { email, otp, name, phone, shopName, password, address, role, isRegister };
+      const payload = { email, otp, name, phone, shopName, password, address, role, isRegister, gender, dob };
       const res = await api.post('/auth/verify-otp', payload);
       
       if (res.data.success) {

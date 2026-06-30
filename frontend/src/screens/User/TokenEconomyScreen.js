@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, RefreshControl, TextInput, ActivityIndicator, StatusBar, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -62,7 +62,7 @@ export default function TokenEconomyScreen({ navigation }) {
                 description: `Buy ${baseAmount} Metro Tokens (GST incl.)`,
                 image: 'https://pune-metro-logo.com/logo.png',
                 currency: 'INR',
-                key: 'rzp_test_St6f7LZjydxbQ0',
+                key: orderRes.data.key_id || 'rzp_test_St6f7LZjydxbQ0',
                 amount: orderAmount || totalPayable * 100, // backend returns GST-included paise
                 name: 'METROXIA',
                 order_id: orderId,

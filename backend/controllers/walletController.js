@@ -91,6 +91,7 @@ const createRazorpayOrder = async (req, res) => {
     res.status(200).json({
       success: true,
       orderId: order.id,
+      key_id: process.env.RAZORPAY_KEY_ID,
       amount: order.amount,
       currency: order.currency
     });

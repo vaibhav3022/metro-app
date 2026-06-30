@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView,
@@ -81,7 +81,7 @@ export default function FareScreen() {
         description: 'METROXIA Ticket Booking',
         image: 'https://cdn.pixabay.com/photo/2021/08/11/11/15/train-6538260_960_720.png',
         currency: orderRes.currency,
-        key: 'rzp_test_St6f7LZjydxbQ0', // Using the test key from backend env
+        key: orderRes.key_id || 'rzp_test_St6f7LZjydxbQ0', // Using the test key from backend env
         amount: orderRes.amount,
         name: 'METROXIA',
         order_id: orderRes.orderId,

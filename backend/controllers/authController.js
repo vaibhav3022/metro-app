@@ -72,7 +72,7 @@ const sendOTP = async (req, res) => {
 };
 
 const verifyOTP = async (req, res) => {
-  const { email, otp, name, phone, role, password, shopName, upiId, address, category, isRegister } = req.body;
+  const { email, otp, name, phone, role, password, shopName, upiId, address, category, isRegister, gender, dob } = req.body;
   const normalizedEmail = email.toLowerCase().trim();
   const normalizedOtp = otp ? String(otp).trim() : '';
 
@@ -85,15 +85,19 @@ const verifyOTP = async (req, res) => {
 
     user.isVerified = true;
     user.otp = null; user.otpExpiry = null;
-    if (name) user.name = name;
-    if (phone) user.phone = phone;
+    if (isRegister) {
+      if (name) user.name = name;
+      if (phone) user.phone = phone;
+      if (gender) user.gender = gender;
+      if (dob) user.dob = dob;
+      if (password) {
+        const bcrypt = require('bcryptjs');
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(password, salt);
+      }
+    }
     // Only set role if this is a registration, so we don't accidentally downgrade premium members on login
     if (role && isRegister) user.role = role;
-    if (password) {
-      const bcrypt = require('bcryptjs');
-      const salt = await bcrypt.genSalt(10);
-      user.password = await bcrypt.hash(password, salt);
-    }
     await user.save();
 
     // Auto-create Wallet if it doesn't exist
@@ -181,12 +185,12 @@ const getMe = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    const { name, email, phone } = req.body;
+    const { name, email, phone, gender, dob } = req.body;
     
     // Find the user and update the fields
     const updatedUser = await User.findByIdAndUpdate(
       req.user.id,
-      { $set: { name, email, phone } },
+      { $set: { name, email, phone, gender, dob } },
       { new: true, runValidators: true }
     );
 

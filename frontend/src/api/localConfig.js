@@ -2,6 +2,6 @@
 // Replace the IP below with your machine's LAN IP when testing on a physical device.
 
 export default {
-  // Updated to your current Wi-Fi IP from ipconfig (192.168.32.103)
-  API_BASE_URL: 'http://192.168.32.103:5001/api'
+  // Updated to your current Wi-Fi IP from ipconfig (192.168.32.101)
+  API_BASE_URL: 'http://192.168.32.101:5001/api'
 };

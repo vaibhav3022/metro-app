@@ -59,7 +59,7 @@ const createGiftCardOrder = async (req, res) => {
       order = await razorpayBreaker.fire(options);
     }
 
-    res.status(200).json({ success: true, orderId: order.id, amount: order.amount, currency: order.currency });
+    res.status(200).json({ success: true, orderId: order.id, key_id: process.env.RAZORPAY_KEY_ID, amount: order.amount, currency: order.currency });
   } catch (error) {
     console.error('Gift Card Razorpay Error:', error);
     res.status(500).json({ message: 'Error creating order. Please ensure Razorpay keys are valid.' });

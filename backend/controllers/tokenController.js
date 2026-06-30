@@ -45,7 +45,7 @@ const createOrder = async (req, res) => {
       console.warn('Razorpay create order failed (using fallback mock order):', razorpayErr.message || razorpayErr);
     }
     
-    res.status(200).json({ success: true, orderId, amount: orderAmount, currency: orderCurrency });
+    res.status(200).json({ success: true, orderId, key_id: process.env.RAZORPAY_KEY_ID, amount: orderAmount, currency: orderCurrency });
   } catch (err) { 
     res.status(500).json({ success: false, message: err.message }); 
   }
