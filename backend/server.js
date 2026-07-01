@@ -22,6 +22,7 @@ const metroRoutes = require('./routes/metroRoutes');
 const giftCardRoutes = require('./routes/giftCardRoutes');
 const membershipRoutes = require('./routes/membershipRoutes');
 const healthRoutes = require('./routes/health');
+const enquiryRoutes = require('./routes/enquiryRoutes');
 
 const { applySecurity } = require('./config/security');
 const { apiLimiter, authLimiter, paymentLimiter } = require('./middleware/rateLimiter');
@@ -79,6 +80,7 @@ app.use('/api/webhooks', webhookRoutes);
 app.use('/api/metro', metroRoutes);
 app.use('/api/giftcard', giftCardRoutes);
 app.use('/api/membership', membershipRoutes);
+app.use('/api/enquiries', enquiryRoutes);
 // Fallback error catcher
 app.use(errorHandler);
 

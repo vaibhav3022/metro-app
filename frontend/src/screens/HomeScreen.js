@@ -27,22 +27,76 @@ export default function HomeScreen({ navigation }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [comingSoonModal, setComingSoonModal] = useState({ visible: false, vertical: null });
   const [rideModal, setRideModal] = useState({ visible: false, service: null });
+  const [selectedCountryModal, setSelectedCountryModal] = useState(null);
+  const [imageLoading, setImageLoading] = useState(false);
   const modalAnim = useRef(new Animated.Value(0)).current;
   const rideModalAnim = useRef(new Animated.Value(0)).current;
+  const countryModalAnim = useRef(new Animated.Value(0)).current;
   const logoAnim = useRef(new Animated.Value(0)).current;
 
   const countriesData = [
-    { code: 'IN', flag: '🇮🇳', name: 'India' },
-    { code: 'HK', flag: '🇭🇰', name: 'Hong Kong' },
-    { code: 'SG', flag: '🇸🇬', name: 'Singapore' },
-    { code: 'TH', flag: '🇹🇭', name: 'Thailand' },
-    { code: 'VN', flag: '🇻🇳', name: 'Vietnam' }
+    { 
+      code: 'IN', 
+      flag: '🇮🇳', 
+      name: 'India', 
+      fullName: 'Republic of India',
+      description: 'India is a land of rich cultural heritage, vibrant colors, and rapid technological innovation. From the iconic Taj Mahal to the bustling tech hubs of Bangalore and Pune, it is a key growth region for transit infrastructure and business integration.',
+      image: 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=400&auto=format&fit=crop&q=60'
+    },
+    { 
+      code: 'HK', 
+      flag: '🇭🇰', 
+      name: 'Hong Kong', 
+      fullName: 'Hong Kong S.A.R.',
+      description: 'Hong Kong is a leading global financial center and metropolitan hub, characterized by its iconic skyscraper-studded skyline, deep natural harbor, and seamless integration of traditional Asian heritage with modern international commerce.',
+      image: 'https://images.unsplash.com/photo-1538332576228-eb5b4c4de6f5?w=400&auto=format&fit=crop&q=60'
+    },
+    { 
+      code: 'SG', 
+      flag: '🇸🇬', 
+      name: 'Singapore', 
+      fullName: 'Republic of Singapore',
+      description: 'Singapore is a global hub for education, finance, and transport. Known as the "Garden City", it is famous for its hyper-efficient mass transit systems, pristine urban planning, and futuristic landmarks like the Marina Bay Sands.',
+      image: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=400&auto=format&fit=crop&q=60'
+    },
+    { 
+      code: 'TH', 
+      flag: '🇹🇭', 
+      name: 'Thailand', 
+      fullName: 'Kingdom of Thailand',
+      description: 'Thailand is renowned for its ornate temples, tropical beaches, and world-famous hospitality. As a major tourism and industrial gateway in Southeast Asia, it hosts a fast-growing network of urban transit projects and shopping hubs.',
+      image: 'https://images.unsplash.com/photo-1528181304800-259b08848526?w=400&auto=format&fit=crop&q=60'
+    },
+    { 
+      code: 'VN', 
+      flag: '🇻🇳', 
+      name: 'Vietnam', 
+      fullName: 'Socialist Republic of Vietnam',
+      description: 'Vietnam is a country with rich history, breathtaking natural landscapes, and a fast-developing digital economy. Cities like Hanoi and Ho Chi Minh City are undergoing major urban transit expansions, creating huge business opportunities.',
+      image: 'https://images.unsplash.com/photo-1528127269322-539801943592?w=400&auto=format&fit=crop&q=60'
+    }
   ];
 
   const flagsScrollRef = useRef(null);
   const flagsOffsetRef = useRef(0);
   const isFlagsDragging = useRef(false);
   const [flagsContentWidth, setFlagsContentWidth] = useState(0);
+
+  // Spring animation for Country Modal
+  useEffect(() => {
+    if (selectedCountryModal) {
+      setImageLoading(true);
+      Animated.spring(countryModalAnim, {
+        toValue: 1,
+        tension: 80,
+        friction: 9,
+        useNativeDriver: true
+      }).start();
+    } else {
+      countryModalAnim.setValue(0);
+      setImageLoading(false);
+    }
+  }, [selectedCountryModal]);
 
   // Header logo slow continuous rotation
   useEffect(() => {
@@ -84,7 +138,7 @@ export default function HomeScreen({ navigation }) {
     {
       id: 'oasis',
       name: 'Oasis T-cafe',
-      tagline: 'Premium Tea & Snacks at Every Station',
+      tagline: 'Premium Tea & Snacks',
       icon: 'coffee',
       gradient: ['#D4A574', '#8B5E3C'],
       bgColor: '#ECFCCB',
@@ -622,8 +676,9 @@ export default function HomeScreen({ navigation }) {
             }}
           >
             {[...countriesData, ...countriesData, ...countriesData].map((country, idx) => (
-              <View 
+              <TouchableOpacity 
                 key={idx} 
+                onPress={() => setSelectedCountryModal(country)}
                 style={{ 
                   flexDirection: 'row', 
                   alignItems: 'center', 
@@ -643,7 +698,7 @@ export default function HomeScreen({ navigation }) {
               >
                 <Text style={{ fontSize: 20 }}>{country.flag}</Text>
                 <Text style={{ fontSize: 12, fontWeight: '800', color: COLORS.text }}>{country.name}</Text>
-              </View>
+              </TouchableOpacity>
             ))}
           </ScrollView>
         </View>
@@ -791,6 +846,134 @@ export default function HomeScreen({ navigation }) {
         </TouchableOpacity>
       </Modal>
 
+      {/* ── Country Flag Interaction Modal ── */}
+      <Modal
+        visible={!!selectedCountryModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSelectedCountryModal(null)}
+      >
+        <TouchableOpacity 
+          style={styles.modalOverlay} 
+          activeOpacity={1} 
+          onPress={() => setSelectedCountryModal(null)}
+        >
+          <Animated.View style={[
+            styles.countryModalContent,
+            {
+              transform: [{ scale: countryModalAnim.interpolate({ inputRange: [0, 1], outputRange: [0.85, 1] }) }],
+              opacity: countryModalAnim
+            }
+          ]}>
+            {selectedCountryModal && (
+              <>
+                <View style={styles.countryModalBannerContainer}>
+                  <Image 
+                    source={{ uri: selectedCountryModal.image }} 
+                    style={styles.countryModalBanner} 
+                    resizeMode="cover"
+                    onLoadEnd={() => setImageLoading(false)}
+                  />
+                  {imageLoading && (
+                    <ActivityIndicator 
+                      size="small" 
+                      color="#fff" 
+                      style={StyleSheet.absoluteFill} 
+                    />
+                  )}
+                  {/* Banner overlay gradient */}
+                  <LinearGradient
+                    colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.8)']}
+                    style={StyleSheet.absoluteFill}
+                  />
+
+                  {/* Header text OVER the banner */}
+                  <View style={styles.countryModalHeaderOverlay}>
+                    <Text style={styles.countryModalFlagOverlay}>{selectedCountryModal.flag}</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.countryModalTitleOverlay}>{selectedCountryModal.name}</Text>
+                      <Text style={styles.countryModalSubOverlay}>{selectedCountryModal.fullName}</Text>
+                    </View>
+                  </View>
+
+                  <TouchableOpacity 
+                    style={styles.countryModalCloseIcon} 
+                    onPress={() => setSelectedCountryModal(null)}
+                  >
+                    <Icon name="close" size={18} color="#fff" />
+                  </TouchableOpacity>
+                </View>
+
+                <View style={styles.countryModalBody}>
+                  <Text style={styles.countryModalDesc}>{selectedCountryModal.description}</Text>
+
+                  <View style={styles.countryModalDivider} />
+
+                  {/* Stats details for country */}
+                  <View style={styles.countryModalInfoGrid}>
+                    <View style={styles.countryModalInfoItem}>
+                      <Icon name="city-variant-outline" size={18} color={COLORS.primary} />
+                      <Text style={styles.countryModalInfoValue}>8 Verticals</Text>
+                      <Text style={styles.countryModalInfoLabel}>Services</Text>
+                    </View>
+                    <View style={styles.countryModalInfoItem}>
+                      <Icon name="map-marker-radius-outline" size={18} color={COLORS.primary} />
+                      <Text style={styles.countryModalInfoValue}>5 Cities</Text>
+                      <Text style={styles.countryModalInfoLabel}>Locations</Text>
+                    </View>
+                    <View style={styles.countryModalInfoItem}>
+                      <Icon name="check-circle-outline" size={18} color="#00C9A7" />
+                      <Text style={[styles.countryModalInfoValue, { color: '#00C9A7' }]}>Active</Text>
+                      <Text style={styles.countryModalInfoLabel}>Status</Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.countryModalDivider} />
+
+                  <View style={styles.countryModalButtons}>
+                    <TouchableOpacity 
+                      style={styles.countryBtn} 
+                      onPress={() => {
+                        const country = selectedCountryModal;
+                        setSelectedCountryModal(null);
+                        navigation.navigate('CountryEnquiry', { country });
+                      }}
+                    >
+                      <LinearGradient
+                        colors={[COLORS.primary, '#1976D2']}
+                        style={styles.countryBtnGrad}
+                        start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                      >
+                        <Icon name="email-outline" size={16} color="#fff" />
+                        <Text style={styles.countryBtnText}>Enquiry Now</Text>
+                      </LinearGradient>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity 
+                      style={styles.countryBtn} 
+                      onPress={() => {
+                        const country = selectedCountryModal;
+                        setSelectedCountryModal(null);
+                        navigation.navigate('CountryVerticals', { country });
+                      }}
+                    >
+                      <LinearGradient
+                        colors={[COLORS.secondary, '#E64A19']}
+                        style={styles.countryBtnGrad}
+                        start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                      >
+                        <Icon name="web" size={16} color="#fff" />
+                        <Text style={styles.countryBtnText}>Website</Text>
+                      </LinearGradient>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </>
+            )}
+          </Animated.View>
+        </TouchableOpacity>
+      </Modal>
+
     </LinearGradient>
   );
 }
@@ -836,7 +1019,7 @@ const getStyles = (COLORS) => StyleSheet.create({
   tapToExploreText: { color: '#fff', fontWeight: '700', fontSize: 12 },
 
   verticalsScroll: { paddingHorizontal: 18, gap: 10, marginBottom: 18 },
-  verticalCard: { width: 110, height: 105, borderRadius: 16, padding: 10, justifyContent: 'center', alignItems: 'center', elevation: 4, shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 6, shadowOffset: { width: 0, height: 2 } },
+  verticalCard: { width: 110, height: 120, borderRadius: 16, padding: 10, justifyContent: 'center', alignItems: 'center', elevation: 4, shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 6, shadowOffset: { width: 0, height: 2 } },
   verticalCardIcon: { width: 40, height: 40, borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginBottom: 4 },
   verticalCardName: { fontSize: 13, fontWeight: '900', color: '#fff', marginTop: 4, textAlign: 'center' },
   verticalCardTag: { fontSize: 9, fontWeight: '600', color: 'rgba(255,255,255,0.95)', lineHeight: 11, textAlign: 'center', marginTop: 1 },
@@ -904,4 +1087,141 @@ const getStyles = (COLORS) => StyleSheet.create({
   rideDetailLabel: { fontSize: 10, color: COLORS.textLight, marginTop: 2 },
   modalSecondaryBtn: { width: '100%', alignItems: 'center', marginTop: 12, paddingVertical: 10 },
   modalSecondaryBtnText: { color: COLORS.textLight, fontSize: 14, fontWeight: '600' },
+
+  // Country Modal Styles
+  countryModalContent: {
+    backgroundColor: COLORS.cardBg,
+    borderRadius: 28,
+    width: '90%',
+    maxWidth: 360,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    elevation: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 12 },
+    overflow: 'hidden',
+  },
+  countryModalBannerContainer: {
+    width: '100%',
+    height: 180,
+    position: 'relative',
+  },
+  countryModalBanner: {
+    width: '100%',
+    height: '100%',
+  },
+  countryModalCloseIcon: {
+    position: 'absolute',
+    top: 14,
+    right: 14,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 15,
+  },
+  countryModalHeaderOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 20,
+    paddingBottom: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  countryModalFlagOverlay: {
+    fontSize: 40,
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  countryModalTitleOverlay: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#ffffff',
+    textShadowColor: 'rgba(0,0,0,0.4)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  countryModalSubOverlay: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.85)',
+    fontWeight: '700',
+    textShadowColor: 'rgba(0,0,0,0.4)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+  },
+  countryModalBody: {
+    padding: 20,
+  },
+  countryModalDesc: {
+    fontSize: 13,
+    color: COLORS.textLight,
+    lineHeight: 20,
+    textAlign: 'justify',
+  },
+  countryModalInfoGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 4,
+  },
+  countryModalInfoItem: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 4,
+  },
+  countryModalInfoValue: {
+    fontSize: 13.5,
+    fontWeight: '800',
+    color: COLORS.text,
+    marginTop: 2,
+  },
+  countryModalInfoLabel: {
+    fontSize: 9,
+    color: COLORS.textLight,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  countryModalDivider: {
+    width: '100%',
+    height: 1,
+    backgroundColor: COLORS.border,
+    marginVertical: 14,
+  },
+  countryModalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+    marginTop: 2,
+  },
+  countryBtn: {
+    flex: 1,
+    borderRadius: 16,
+    overflow: 'hidden',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+  },
+  countryBtnGrad: {
+    paddingVertical: 13,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+  },
+  countryBtnText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '800',
+    letterSpacing: 0.3,
+  },
 });

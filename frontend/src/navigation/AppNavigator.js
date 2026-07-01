@@ -24,6 +24,8 @@ import SmartCardScreen from '../screens/SmartCardScreen';
 import GiftCardScreen from '../screens/GiftCardScreen';
 import QRScannerScreen from '../screens/QRScannerScreen';
 import TokenEconomyScreen from '../screens/User/TokenEconomyScreen';
+import CountryEnquiryScreen from '../screens/CountryEnquiryScreen';
+import CountryVerticalsScreen from '../screens/CountryVerticalsScreen';
 import MerchantManagementScreen from '../screens/Admin/MerchantManagementScreen';
 import RevenueAnalyticsScreen from '../screens/Admin/RevenueAnalyticsScreen';
 import UserManagementScreen from '../screens/Admin/UserManagementScreen';
@@ -65,6 +67,8 @@ export function AppNavigator() {
         <Stack.Screen name="GiftCard" component={GiftCardScreen} />
         <Stack.Screen name="QRScanner" component={QRScannerScreen} />
         <Stack.Screen name="TokenEconomy" component={TokenEconomyScreen} />
+        <Stack.Screen name="CountryEnquiry" component={CountryEnquiryScreen} />
+        <Stack.Screen name="CountryVerticals" component={CountryVerticalsScreen} />
 
         {/* Admin Portal */}
         <Stack.Screen name="AdminMain" component={AdminDashboardScreen} />

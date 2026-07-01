@@ -36,6 +36,8 @@ import PlaceDetailsScreen from './screens/PlaceDetailsScreen';
 import SyncService from './services/SyncService';
 import NXLCreditsScreen from './screens/NXLCreditsScreen';
 import GiftCardScreen from './screens/GiftCardScreen';
+import CountryEnquiryScreen from './screens/CountryEnquiryScreen';
+import CountryVerticalsScreen from './screens/CountryVerticalsScreen';
 // User sub-screens
 import TokenEconomyScreen from './screens/User/TokenEconomyScreen';
 import NotificationScreen from './screens/User/NotificationScreen';
@@ -119,6 +121,8 @@ function AppNavigator() {
 
             <Stack.Screen name="NXLCredits" component={NXLCreditsScreen} />
             <Stack.Screen name="GiftCard" component={GiftCardScreen} />
+            <Stack.Screen name="CountryEnquiry" component={CountryEnquiryScreen} />
+            <Stack.Screen name="CountryVerticals" component={CountryVerticalsScreen} />
             {/* User Sub-screens */}
             <Stack.Screen name="Tokens" component={TokenEconomyScreen} />
             <Stack.Screen name="UserNotification" component={NotificationScreen} />
