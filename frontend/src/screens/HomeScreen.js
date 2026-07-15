@@ -129,6 +129,7 @@ export default function HomeScreen({ navigation }) {
       name: 'Energeia',
       tagline: 'EV Car & Auto Charging',
       icon: 'lightning-bolt',
+      image: require('../assets/slider/energia.png'),
       gradient: ['#F59E0B', '#B45309'],
       bgColor: '#FEF3C7',
       color: '#B45309',
@@ -140,6 +141,7 @@ export default function HomeScreen({ navigation }) {
       name: 'Oasis T-cafe',
       tagline: 'Premium Tea & Snacks',
       icon: 'coffee',
+      image: require('../assets/slider/Oasis.jpeg'),
       gradient: ['#D4A574', '#8B5E3C'],
       bgColor: '#ECFCCB',
       color: '#8B5E3C',
@@ -151,6 +153,7 @@ export default function HomeScreen({ navigation }) {
       name: 'Eva',
       tagline: 'Premium Beauty Salon & Products',
       icon: 'spa',
+      image: require('../../assets/slider/eva_salon.png'),
       gradient: ['#FCA5A5', '#E11D48'],
       bgColor: '#FEE2E2',
       color: '#E11D48',
@@ -162,6 +165,7 @@ export default function HomeScreen({ navigation }) {
       name: 'L.L. Beauty',
       tagline: 'Quick Grooming & Beauty Services',
       icon: 'face-woman-shimmer',
+      image: require('../../assets/slider/ll_beauty.png'),
       gradient: ['#F472B6', '#BE185D'],
       bgColor: '#FCE7F3',
       color: '#BE185D',
@@ -173,6 +177,7 @@ export default function HomeScreen({ navigation }) {
       name: 'Maytriya CoWork',
       tagline: 'Work Pods & Meeting Rooms ',
       icon: 'laptop',
+      image: require('../../assets/slider/maitriya.png'),
       gradient: ['#34D399', '#355249ff'],
       bgColor: '#DCFCE7',
       color: '#059669',
@@ -184,6 +189,7 @@ export default function HomeScreen({ navigation }) {
       name: 'Events',
       tagline: 'Explore exciting events ',
       icon: 'calendar-star',
+      image: require('../assets/slider/events.jpeg'),
       gradient: ['#A78BFA', '#6D28D9'],
       bgColor: '#EDE9FE',
       color: '#6D28D9',
@@ -195,6 +201,7 @@ export default function HomeScreen({ navigation }) {
       name: 'Nexus',
       tagline: 'Premium B2B Business Summit',
       icon: 'handshake',
+      image: require('../../assets/slider/nexus.jpg'),
       gradient: ['#DFBA73', '#9F7435'],
       bgColor: '#FDFBF7',
       color: '#9F7435',
@@ -206,6 +213,7 @@ export default function HomeScreen({ navigation }) {
       name: 'Cybeorch labs',
       tagline: 'Software.Solutions. Skills.Startups. ',
       icon: 'shield-check',
+      image: require('../assets/slider/cybeorch.jpg'),
       gradient: ['#0EA5E9', '#2563EB'],
       bgColor: '#DBEAFE',
       color: '#2563EB',
@@ -293,7 +301,7 @@ export default function HomeScreen({ navigation }) {
   }, [t]);
 
   useEffect(() => {
-    const CARD_WIDTH = 110;
+    const CARD_WIDTH = 130;
     const GAP = 10;
     const ONE_SET_WIDTH = verticalsData.length * (CARD_WIDTH + GAP);
 
@@ -527,7 +535,8 @@ export default function HomeScreen({ navigation }) {
           {marqueeData.map((v, idx) => (
             <TouchableOpacity key={`${v.id}-${idx}`} activeOpacity={0.85} onPress={() => handleVerticalPress(v)}>
               <View style={[styles.verticalCard, { 
-                backgroundColor: v.color || COLORS.primary, 
+                padding: 0,
+                overflow: 'hidden',
                 borderWidth: 1.5, 
                 borderColor: v.gradient ? v.gradient[0] : (v.color || COLORS.primary),
                 elevation: 4,
@@ -536,11 +545,18 @@ export default function HomeScreen({ navigation }) {
                 shadowRadius: 6,
                 shadowOffset: { width: 0, height: 2 }
               }]}>
-                <View style={[styles.verticalCardIcon, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
-                  <Icon name={v.icon} size={22} color="#FFFFFF" />
-                </View>
-                <Text style={[styles.verticalCardName, { color: '#FFFFFF' }]} numberOfLines={1}>{v.name}</Text>
-                <Text style={[styles.verticalCardTag, { color: 'rgba(255,255,255,0.9)' }]} numberOfLines={1}>{v.tagline}</Text>
+                <ImageBackground 
+                  source={v.image} 
+                  style={{ width: '100%', height: '100%', justifyContent: 'flex-end', alignItems: 'center', paddingBottom: 10, paddingHorizontal: 6 }}
+                  resizeMode="cover"
+                >
+                  <LinearGradient
+                    colors={['transparent', 'rgba(0,0,0,0.85)']}
+                    style={StyleSheet.absoluteFill}
+                  />
+                  <Text style={[styles.verticalCardName, { color: '#FFFFFF' }]} numberOfLines={1}>{v.name}</Text>
+                  <Text style={[styles.verticalCardTag, { color: 'rgba(255,255,255,0.9)' }]} numberOfLines={1}>{v.tagline}</Text>
+                </ImageBackground>
               </View>
             </TouchableOpacity>
           ))}
@@ -787,7 +803,13 @@ export default function HomeScreen({ navigation }) {
                     <Icon name={rideModal.service.icon} size={40} color="#fff" />
                   </LinearGradient>
 
-                  <Text style={[styles.modalTitle, { marginTop: 10 }]}>{rideModal.service.title}</Text>
+                  <Text style={[styles.modalTitle, { marginTop: 10 }]}>
+                    <Text style={{ color: '#EF4444' }}>METRO</Text>
+                    <Text style={{ color: isDark ? '#FFFFFF' : '#000000' }}>X</Text>
+                    <Text style={{ color: '#EF4444' }}>I</Text>
+                    <Text style={{ color: isDark ? '#FFFFFF' : '#000000' }}>A</Text>
+                    <Text style={{ color: COLORS.text }}>{` ${rideModal.service.title}`}</Text>
+                  </Text>
                   <Text style={styles.modalTagline}>{rideModal.service.tagline}</Text>
 
                   <View style={styles.modalDivider} />
@@ -815,7 +837,7 @@ export default function HomeScreen({ navigation }) {
                     onPress={() => {
                       Alert.alert(
                         "Booking Request Sent!",
-                        `Your ${rideModal.service.title} booking has been successfully initiated. Searching for nearby drivers...`,
+                        `Your METROXIA ${rideModal.service.title} booking has been successfully initiated. Searching for nearby drivers...`,
                         [{ text: "Okay", onPress: hideRideModal }]
                       );
                     }}
@@ -1019,7 +1041,7 @@ const getStyles = (COLORS) => StyleSheet.create({
   tapToExploreText: { color: '#fff', fontWeight: '700', fontSize: 12 },
 
   verticalsScroll: { paddingHorizontal: 18, gap: 10, marginBottom: 18 },
-  verticalCard: { width: 110, height: 120, borderRadius: 16, padding: 10, justifyContent: 'center', alignItems: 'center', elevation: 4, shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 6, shadowOffset: { width: 0, height: 2 } },
+  verticalCard: { width: 130, height: 150, borderRadius: 16, padding: 10, justifyContent: 'center', alignItems: 'center', elevation: 4, shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 6, shadowOffset: { width: 0, height: 2 } },
   verticalCardIcon: { width: 40, height: 40, borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginBottom: 4 },
   verticalCardName: { fontSize: 13, fontWeight: '900', color: '#fff', marginTop: 4, textAlign: 'center' },
   verticalCardTag: { fontSize: 9, fontWeight: '600', color: 'rgba(255,255,255,0.95)', lineHeight: 11, textAlign: 'center', marginTop: 1 },
