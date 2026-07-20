@@ -147,13 +147,28 @@ export default function WalletScreen({ navigation }) {
               />
             </View>
 
-            <View style={styles.chipContainer}>
-              {predefinedAmounts.map((amt) => (
-                <TouchableOpacity key={amt} style={styles.chip} onPress={() => setAmount(amt)}>
-                  <Text style={styles.chipText}>+{amt} Crd</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false} 
+              style={styles.chipContainer}
+              contentContainerStyle={styles.chipScrollContent}
+              nestedScrollEnabled={true}
+            >
+              {predefinedAmounts.map((amt) => {
+                const isSelected = amount === amt;
+                return (
+                  <TouchableOpacity 
+                    key={amt} 
+                    style={[styles.chip, isSelected && styles.selectedChip]} 
+                    onPress={() => setAmount(amt)}
+                  >
+                    <Text style={[styles.chipText, isSelected && styles.selectedChipText]}>
+                      +{amt} Credits
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
 
             <TouchableOpacity 
               style={styles.primaryButton} 
@@ -257,9 +272,28 @@ const getStyles = (COLORS) => StyleSheet.create({
   inputContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.inputBg, borderWidth: 1, borderColor: COLORS.inputBorder, borderRadius: 16, paddingHorizontal: 16, height: 60, marginBottom: 16 },
   currencySymbol: { fontSize: 24, color: COLORS.secondary, fontWeight: '800', marginRight: 10 },
   amountInput: { flex: 1, fontSize: 24, color: COLORS.text, fontWeight: 'bold' },
-  chipContainer: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 22 },
-  chip: { backgroundColor: 'transparent', paddingVertical: 10, paddingHorizontal: 16, borderRadius: 20, borderWidth: 1.5, borderColor: COLORS.primary },
-  chipText: { color: COLORS.primary, fontWeight: '800', fontSize: 13 },
+  chipContainer: { marginBottom: 22 },
+  chipScrollContent: { flexDirection: 'row', paddingVertical: 4 },
+  chip: { 
+    backgroundColor: 'transparent', 
+    paddingVertical: 10, 
+    paddingHorizontal: 18, 
+    borderRadius: 20, 
+    borderWidth: 1.5, 
+    borderColor: COLORS.primary,
+    marginRight: 10,
+  },
+  selectedChip: {
+    backgroundColor: COLORS.primary,
+  },
+  chipText: { 
+    color: COLORS.primary, 
+    fontWeight: '800', 
+    fontSize: 13 
+  },
+  selectedChipText: {
+    color: '#ffffff',
+  },
   primaryButton: { borderRadius: 16, overflow: 'hidden' },
   primaryButtonGrad: { height: 54, justifyContent: 'center', alignItems: 'center' },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: '700', letterSpacing: 0.5 },

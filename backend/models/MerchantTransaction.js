@@ -15,6 +15,12 @@ const MerchantTransactionSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  grossAmount: {
+    type: Number
+  },
+  commissionFee: {
+    type: Number
+  },
   status: {
     type: String,
     enum: ['SUCCESS', 'FAILED', 'PENDING'],
@@ -24,6 +30,11 @@ const MerchantTransactionSchema = new mongoose.Schema({
     type: String,
     enum: ['qr_payment', 'withdrawal', 'refund'],
     default: 'qr_payment'
+  },
+  bankDetails: {
+    bankName: { type: String },
+    accountNumber: { type: String },
+    ifscCode: { type: String }
   }
 }, { timestamps: true });
 

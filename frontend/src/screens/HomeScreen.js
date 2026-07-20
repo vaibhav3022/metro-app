@@ -13,7 +13,7 @@ import { ticketAPI } from '../api/ticketAPI';
 import api from '../api/axiosConfig';
 import { fetchHistorySuccess, setCurrentTicket } from '../redux/slices/ticketSlice';
 import { setNotifications } from '../redux/slices/notificationSlice';
-
+import Svg, { Polygon, Image as SvgImage, Defs, ClipPath, LinearGradient as SvgLinearGradient, Stop, Rect } from 'react-native-svg';
 export default function HomeScreen({ navigation }) {
   const dispatch = useDispatch();
   const { theme: COLORS, isDark, toggleTheme } = useTheme();
@@ -27,10 +27,12 @@ export default function HomeScreen({ navigation }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [comingSoonModal, setComingSoonModal] = useState({ visible: false, vertical: null });
   const [rideModal, setRideModal] = useState({ visible: false, service: null });
+  const [tourismMenuModal, setTourismMenuModal] = useState(false);
   const [selectedCountryModal, setSelectedCountryModal] = useState(null);
   const [imageLoading, setImageLoading] = useState(false);
   const modalAnim = useRef(new Animated.Value(0)).current;
   const rideModalAnim = useRef(new Animated.Value(0)).current;
+  const tourismMenuAnim = useRef(new Animated.Value(0)).current;
   const countryModalAnim = useRef(new Animated.Value(0)).current;
   const logoAnim = useRef(new Animated.Value(0)).current;
 
@@ -220,6 +222,54 @@ export default function HomeScreen({ navigation }) {
       emoji: '🛡️',
       url: 'https://cybeorch.com/'
     },
+    {
+      id: 'tourism',
+      name: 'Tourism',
+      tagline: 'Explore beautiful global destinations',
+      icon: 'airplane',
+      image: { uri: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600&auto=format&fit=crop&q=80' },
+      gradient: ['#2DD4BF', '#0F766E'],
+      bgColor: '#CCFBF1',
+      color: '#0F766E',
+      emoji: '✈️',
+      url: ''
+    },
+    {
+      id: 'matrimonial',
+      name: 'Maytriya Matrimonial',
+      tagline: 'Find your perfect match',
+      icon: 'heart',
+      image: { uri: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&auto=format&fit=crop&q=80' },
+      gradient: ['#F43F5E', '#BE123C'],
+      bgColor: '#FFE4E6',
+      color: '#BE123C',
+      emoji: '💍',
+      url: ''
+    },
+    {
+      id: 'pronexa',
+      name: 'ProNexa',
+      tagline: 'Premium Real Estate Properties',
+      icon: 'office-building',
+      image: { uri: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&auto=format&fit=crop&q=80' },
+      gradient: ['#6366F1', '#4338CA'],
+      bgColor: '#E0E7FF',
+      color: '#4338CA',
+      emoji: '🏢',
+      url: ''
+    },
+    {
+      id: 'fleetx',
+      name: 'FleetX',
+      tagline: 'Smart Fleet Management',
+      icon: 'car-multiple',
+      image: require('../assets/slider/fleetx.jpg'),
+      gradient: ['#F97316', '#C2410C'],
+      bgColor: '#FFEDD5',
+      color: '#C2410C',
+      emoji: '🚚',
+      url: ''
+    },
   ];
 
   const handleVerticalPress = (vertical) => {
@@ -252,6 +302,17 @@ export default function HomeScreen({ navigation }) {
     });
   };
 
+  const showTourismMenu = () => {
+    setTourismMenuModal(true);
+    Animated.spring(tourismMenuAnim, { toValue: 1, useNativeDriver: true, tension: 65, friction: 8 }).start();
+  };
+
+  const hideTourismMenu = () => {
+    Animated.timing(tourismMenuAnim, { toValue: 0, duration: 200, useNativeDriver: true }).start(() => {
+      setTourismMenuModal(false);
+    });
+  };
+
   const sliderImages = [
     { id: 's1', source: require('../../assets/slider/metro_train.png'), title: t('home.slider1'), isVertical: false },
     { id: 'v1', source: require('../assets/slider/energia.png'), title: 'Energia', displayTitle: 'Energia', isVertical: true, vertical: verticalsData[0] },
@@ -263,6 +324,10 @@ export default function HomeScreen({ navigation }) {
     { id: 'v7', source: require('../assets/slider/events.jpeg'), title: 'Events', isVertical: true, vertical: verticalsData[5] },
     // Use the provided Cybeorch image in src/assets/slider
     { id: 'v8', source: require('../assets/slider/cybeorch.jpg'), title: 'Cybeorch Labs', isVertical: true, vertical: verticalsData[7] },
+    { id: 'v9', source: { uri: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600&auto=format&fit=crop&q=80' }, title: 'Tourism', isVertical: true, vertical: verticalsData[8] },
+    { id: 'v10', source: { uri: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&auto=format&fit=crop&q=80' }, title: 'Maytriya Matrimonial', isVertical: true, vertical: verticalsData[9] },
+    { id: 'v11', source: { uri: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&auto=format&fit=crop&q=80' }, title: 'ProNexa', isVertical: true, vertical: verticalsData[10] },
+    { id: 'v12', source: require('../assets/slider/fleetx.jpg'), title: 'FleetX', isVertical: true, vertical: verticalsData[11] },
     { id: 's3', source: require('../assets/slider/GSA.jpeg'), title: '', isVertical: false, url: 'https://energeia369.com/events/', imageResizeMode: 'contain' },
     { id: 's4', source: require('../assets/slider/metroxia.jpeg'), title: '', isVertical: false },
   ];
@@ -381,13 +446,20 @@ export default function HomeScreen({ navigation }) {
     { title: t('home.metroMap'), icon: 'map-outline', route: 'MetroMap', color: '#E64A19' },
     { title: 'Wallet', icon: 'wallet-outline', route: 'Wallet', color: '#00C9A7' },
     { title: 'Gift Cards', icon: 'gift-outline', route: 'GiftCard', color: '#FF6B6B' },
-    // Custom booking/ride services grouped at the end
+    { title: 'Tourism', icon: 'earth', isTourismMenu: true, color: '#8B5CF6' },
     { title: 'Airplane', icon: 'airplane', isRideService: true, type: 'airplane', color: '#0EA5E9', eta: '15 mins to boarding', fare: '₹2,500 - ₹5,000', desc: 'Book direct airport flight transits or helicopter shuttle rides directly from the nearest station terminal.' },
     { title: 'Auto Ride', icon: 'rickshaw', isRideService: true, type: 'auto', color: '#F59E0B', eta: '4 mins away', fare: '₹40 - ₹75', desc: 'Convenient and pocket-friendly three-wheeler rides. Ideal for daily commuting.' },
     { title: 'Car Cab', icon: 'car', isRideService: true, type: 'car', color: '#3B82F6', eta: '5 mins away', fare: '₹90 - ₹180', desc: 'Premium, air-conditioned cabs for comfort-focused and hassle-free travel.' },
     { title: 'Bus Transit', icon: 'bus', isRideService: true, type: 'bus', color: '#EF4444', eta: '7 mins away', fare: '₹10 - ₹25', desc: 'Feeder and scheduled city buses linking metro stations to major localities.' },
     { title: 'Boats', icon: 'ferry', isRideService: true, type: 'boat', color: '#008080', eta: '10 mins away', fare: '₹120 - ₹250', desc: 'Book high-speed electric boats or luxury marine EV ferry transits across the coastal and river routes.' },
-    { title: 'Book Tour', icon: 'earth', isRideService: true, type: 'tour', color: '#8B5CF6', eta: 'Instant booking', fare: '₹5,000 - ₹25,000', desc: 'Plan and book global tours, city sightseeing packages, and weekend getaways seamlessly.' },
+  ];
+
+  const tourismOptions = [
+    { title: 'Airplane', icon: 'airplane', isRideService: true, type: 'airplane', color: '#0EA5E9', eta: '15 mins to boarding', fare: '₹2,500 - ₹5,000', desc: 'Book direct airport flight transits or helicopter shuttle rides directly from the nearest station terminal.' },
+    { title: 'Auto Ride', icon: 'rickshaw', isRideService: true, type: 'auto', color: '#F59E0B', eta: '4 mins away', fare: '₹40 - ₹75', desc: 'Convenient and pocket-friendly three-wheeler rides. Ideal for daily commuting.' },
+    { title: 'Car Cab', icon: 'car', isRideService: true, type: 'car', color: '#3B82F6', eta: '5 mins away', fare: '₹90 - ₹180', desc: 'Premium, air-conditioned cabs for comfort-focused and hassle-free travel.' },
+    { title: 'Bus Transit', icon: 'bus', isRideService: true, type: 'bus', color: '#EF4444', eta: '7 mins away', fare: '₹10 - ₹25', desc: 'Feeder and scheduled city buses linking metro stations to major localities.' },
+    { title: 'Boats', icon: 'ferry', isRideService: true, type: 'boat', color: '#008080', eta: '10 mins away', fare: '₹120 - ₹250', desc: 'Book high-speed electric boats or luxury marine EV ferry transits across the coastal and river routes.' },
   ];
 
   const marqueeData = [...verticalsData, ...verticalsData, ...verticalsData];
@@ -532,34 +604,58 @@ export default function HomeScreen({ navigation }) {
             verticalsOffsetRef.current = e.nativeEvent.contentOffset.x;
           }}
         >
-          {marqueeData.map((v, idx) => (
+          {marqueeData.map((v, idx) => {
+            const hexWidth = 122;
+            const hexHeight = 140;
+            const points = "61,0 122,35 122,105 61,140 0,105 0,35";
+            const imageUrl = v.image?.uri ? v.image.uri : Image.resolveAssetSource(v.image).uri;
+            
+            return (
             <TouchableOpacity key={`${v.id}-${idx}`} activeOpacity={0.85} onPress={() => handleVerticalPress(v)}>
-              <View style={[styles.verticalCard, { 
-                padding: 0,
-                overflow: 'hidden',
-                borderWidth: 1.5, 
-                borderColor: v.gradient ? v.gradient[0] : (v.color || COLORS.primary),
-                elevation: 4,
-                shadowOpacity: 0.15,
-                shadowColor: v.color || '#000',
-                shadowRadius: 6,
-                shadowOffset: { width: 0, height: 2 }
-              }]}>
-                <ImageBackground 
-                  source={v.image} 
-                  style={{ width: '100%', height: '100%', justifyContent: 'flex-end', alignItems: 'center', paddingBottom: 10, paddingHorizontal: 6 }}
-                  resizeMode="cover"
-                >
-                  <LinearGradient
-                    colors={['transparent', 'rgba(0,0,0,0.85)']}
-                    style={StyleSheet.absoluteFill}
+              <View style={{ width: hexWidth, height: hexHeight, marginRight: 15, alignItems: 'center', justifyContent: 'center', overflow: 'visible' }}>
+                <Svg width={hexWidth} height={hexHeight} viewBox={`0 0 ${hexWidth} ${hexHeight}`}>
+                  <Defs>
+                    <ClipPath id={`hexClip-${idx}`}>
+                      <Polygon points={points} />
+                    </ClipPath>
+                    <SvgLinearGradient id={`grad-${idx}`} x1="0" y1="0" x2="0" y2="1">
+                      <Stop offset="0.3" stopColor="transparent" stopOpacity="0" />
+                      <Stop offset="0.7" stopColor="rgba(0,0,0,0.6)" stopOpacity="1" />
+                      <Stop offset="1" stopColor="rgba(0,0,0,1)" stopOpacity="1" />
+                    </SvgLinearGradient>
+                  </Defs>
+                  
+                  <SvgImage 
+                    href={imageUrl} 
+                    width={hexWidth} 
+                    height={hexHeight} 
+                    preserveAspectRatio="xMidYMid slice" 
+                    clipPath={`url(#hexClip-${idx})`}
                   />
-                  <Text style={[styles.verticalCardName, { color: '#FFFFFF' }]} numberOfLines={1}>{v.name}</Text>
-                  <Text style={[styles.verticalCardTag, { color: 'rgba(255,255,255,0.9)' }]} numberOfLines={1}>{v.tagline}</Text>
-                </ImageBackground>
+                  
+                  <Rect 
+                    x="0" y="0" 
+                    width={hexWidth} height={hexHeight} 
+                    fill={`url(#grad-${idx})`} 
+                    clipPath={`url(#hexClip-${idx})`}
+                  />
+
+                  {/* Outer border */}
+                  <Polygon 
+                    points={points} 
+                    fill="none" 
+                    stroke={v.gradient ? v.gradient[0] : (v.color || COLORS.primary)} 
+                    strokeWidth="3.5" 
+                  />
+                </Svg>
+                
+                <View style={{ position: 'absolute', bottom: 38, width: '90%', alignItems: 'center', paddingHorizontal: 2 }}>
+                  <Text style={[styles.verticalCardName, { color: '#FFFFFF', textAlign: 'center', fontSize: 13, fontWeight: '800', letterSpacing: 0.5, textShadowColor: 'rgba(0,0,0,1)', textShadowOffset: {width: 0, height: 1}, textShadowRadius: 4 }]} numberOfLines={1}>{v.name}</Text>
+                  <Text style={[styles.verticalCardTag, { color: '#E2E8F0', textAlign: 'center', fontSize: 9, fontWeight: '600', textShadowColor: 'rgba(0,0,0,1)', textShadowOffset: {width: 0, height: 1}, textShadowRadius: 3, marginTop: 1 }]} numberOfLines={1}>{v.tagline}</Text>
+                </View>
               </View>
             </TouchableOpacity>
-          ))}
+          )})}
         </ScrollView>
 
         {/* Quick Actions */}
@@ -572,6 +668,8 @@ export default function HomeScreen({ navigation }) {
               onPress={() => {
                 if (action.isRideService) {
                   showRideModal(action);
+                } else if (action.isTourismMenu) {
+                  showTourismMenu();
                 } else {
                   navigation.navigate(action.route, action.params);
                 }
@@ -608,7 +706,7 @@ export default function HomeScreen({ navigation }) {
                 <Text style={styles.ticketRoute}>{activeTicket.source} ➔ {activeTicket.destination}</Text>
                 <Text style={styles.ticketStatusText}>{activeTicket.ticketStatus === 'entered' ? t('home.inTransit') : t('home.activeQR')}</Text>
               </View>
-              <Icon name="qrcode-scan" size={28} color="#00C9A7" />
+              <Icon name="qrcode" size={28} color="#00C9A7" />
             </View>
             <View style={styles.ticketFooter}>
               <Text style={styles.ticketDetails}>{activeTicket.passengers} {t('home.passengersCount')}</Text>
@@ -868,6 +966,63 @@ export default function HomeScreen({ navigation }) {
         </TouchableOpacity>
       </Modal>
 
+      {/* ── Tourism Menu Modal ── */}
+      <Modal
+        visible={tourismMenuModal}
+        transparent
+        animationType="none"
+        onRequestClose={hideTourismMenu}
+      >
+        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={hideTourismMenu}>
+          <Animated.View style={[
+            styles.modalContent,
+            {
+              transform: [{ scale: tourismMenuAnim.interpolate({ inputRange: [0, 1], outputRange: [0.8, 1] }) }],
+              opacity: tourismMenuAnim,
+            }
+          ]}>
+            <LinearGradient
+              colors={['#8B5CF6', '#6D28D9']}
+              style={styles.modalIconCircle}
+              start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+            >
+              <Icon name="earth" size={40} color="#fff" />
+            </LinearGradient>
+            
+            <Text style={[styles.modalTitle, { marginTop: 10 }]}>Tourism Services</Text>
+            <Text style={styles.modalTagline}>Select a travel mode to book</Text>
+            
+            <View style={styles.modalDivider} />
+            
+            <ScrollView style={{ width: '100%', maxHeight: 350 }} showsVerticalScrollIndicator={false}>
+              <View style={{ gap: 12, paddingBottom: 10 }}>
+                {tourismOptions.map((opt, idx) => (
+                  <TouchableOpacity 
+                    key={idx} 
+                    style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: opt.color + '15', padding: 12, borderRadius: 12, borderWidth: 1, borderColor: opt.color + '33' }}
+                    onPress={() => {
+                      hideTourismMenu();
+                      setTimeout(() => showRideModal(opt), 300);
+                    }}
+                  >
+                    <Icon name={opt.icon} size={28} color={opt.color} style={{ marginRight: 12 }} />
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 16, fontWeight: '700', color: COLORS.text }}>{opt.title}</Text>
+                      <Text style={{ fontSize: 12, color: COLORS.textLight }}>{opt.eta}</Text>
+                    </View>
+                    <Icon name="chevron-right" size={24} color={opt.color} />
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </ScrollView>
+
+            <TouchableOpacity style={[styles.modalSecondaryBtn, { marginTop: 10 }]} onPress={hideTourismMenu}>
+              <Text style={styles.modalSecondaryBtnText}>Close</Text>
+            </TouchableOpacity>
+          </Animated.View>
+        </TouchableOpacity>
+      </Modal>
+
       {/* ── Country Flag Interaction Modal ── */}
       <Modal
         visible={!!selectedCountryModal}
@@ -935,7 +1090,7 @@ export default function HomeScreen({ navigation }) {
                   <View style={styles.countryModalInfoGrid}>
                     <View style={styles.countryModalInfoItem}>
                       <Icon name="city-variant-outline" size={18} color={COLORS.primary} />
-                      <Text style={styles.countryModalInfoValue}>8 Verticals</Text>
+                      <Text style={styles.countryModalInfoValue}>{verticalsData.length} Verticals</Text>
                       <Text style={styles.countryModalInfoLabel}>Services</Text>
                     </View>
                     <View style={styles.countryModalInfoItem}>

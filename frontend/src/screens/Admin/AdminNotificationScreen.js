@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../../context/ThemeContext';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator, StatusBar, Platform } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator, StatusBar, Platform, BackHandler } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
@@ -28,6 +28,15 @@ export default function AdminNotificationScreen({ navigation }) {
   };
 
   useEffect(() => { fetchNotifications(); }, []);
+
+  useEffect(() => {
+    const onBackPress = () => {
+      navigation.goBack();
+      return true;
+    };
+    const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => subscription.remove();
+  }, [navigation]);
 
   const showToast = (message, type) => setToast({ visible: true, message, type });
 

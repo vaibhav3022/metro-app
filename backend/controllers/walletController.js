@@ -311,19 +311,29 @@ const processQRPayment = async (req, res) => {
       referenceType: 'QR_PAYMENT'
     });
 
-    // Credit to merchant
-    merchant.balance = (merchant.balance || 0) + payAmount;
+    // Fetch settings for commission rate
+    const SystemSettings = require('../models/SystemSettings');
+    const settings = await SystemSettings.findOne();
+    const commissionRate = settings ? settings.commissionRate : 2; // Default to 2%
+    const commissionAmount = payAmount * (commissionRate / 100);
+    const netAmount = payAmount - commissionAmount;
+
+    // Credit to merchant (net amount after commission)
+    merchant.balance = (merchant.balance || 0) + netAmount;
+    merchant.totalEarnings = (merchant.totalEarnings || 0) + netAmount;
     await merchant.save();
 
     await MerchantTransaction.create({
       merchantId: merchant._id,
       userId: req.user.id,
-      amount: payAmount,
+      amount: netAmount,
+      grossAmount: payAmount,
+      commissionFee: commissionAmount,
       type: 'qr_payment',
       status: 'SUCCESS'
     });
 
-    res.status(200).json({ success: true, message: `Payment of ₹${payAmount} successful to ${merchant.businessName}` });
+    res.status(200).json({ success: true, message: `Payment of ₹${payAmount} successful to ${merchant.businessName} (Net: ₹${netAmount.toFixed(2)})` });
   } catch (error) {
     console.error('QR Payment Error:', error);
     res.status(500).json({ message: 'Server error processing QR payment.' });

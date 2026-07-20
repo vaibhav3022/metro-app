@@ -12,10 +12,19 @@ const {
 } = require('../controllers/contentController');
 const { protect } = require('../middleware/authMiddleware');
 const { requireAdmin } = require('../middleware/roleMiddleware');
+const Banner = require('../models/Banner');
 
 // Public endpoints
 router.get('/public/tourist-places', getTouristPlaces);
 router.get('/public/feeder-services', getFeederServices);
+router.get('/public/banners', async (req, res) => {
+  try {
+    const banners = await Banner.find({ isActive: true });
+    res.status(200).json({ success: true, data: banners });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
 
 // Admin CMS endpoints
 router.use('/admin', protect, requireAdmin);

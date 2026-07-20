@@ -3,8 +3,11 @@ import { storage } from '../utils/storage';
 import { updateToken, logout } from '../redux/slices/authSlice';
 
 // Use local backend during development runs and live backend for release APKs
-const LOCAL_API_BASE_URL = 'http://10.0.2.2:5001/api';
+// ADB reverse is active: `adb reverse tcp:5001 tcp:5001` — device accesses backend via USB tunnel
+const LOCAL_API_BASE_URL = 'http://localhost:5001/api';
 const LIVE_API_BASE_URL = 'https://metro-app-1-vt0n.onrender.com/api';
+
+
 
 // Allow an easy local override: create `src/api/localConfig.js` with
 // `export default { API_BASE_URL: 'http://<YOUR_PC_IP>:5001/api' }`

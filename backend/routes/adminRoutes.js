@@ -13,7 +13,18 @@ const {
   getRevenueSummary,
   getRevenueChart,
   getAnalytics,
-  getAuditLogs
+  getAuditLogs,
+  getWithdrawals,
+  updateWithdrawalStatus,
+  getComplaints,
+  updateComplaintStatus,
+  getSystemSettings,
+  updateSystemSettings,
+  getBanners,
+  createBanner,
+  updateBanner,
+  deleteBanner,
+  getDatabaseStats
 } = require('../controllers/adminController');
 const { protect } = require('../middleware/authMiddleware');
 const { requireAdmin } = require('../middleware/roleMiddleware');
@@ -37,5 +48,21 @@ router.get('/revenue/chart', getRevenueChart);
 router.get('/analytics', getAnalytics);
 
 router.get('/audit-logs', getAuditLogs);
+
+router.get('/withdrawals', getWithdrawals);
+router.put('/withdrawals/:id', updateWithdrawalStatus);
+
+router.get('/complaints', getComplaints);
+router.put('/complaints/:id', updateComplaintStatus);
+
+router.get('/settings', getSystemSettings);
+router.put('/settings', updateSystemSettings);
+
+router.get('/banners', getBanners);
+router.post('/banners', createBanner);
+router.put('/banners/:id', updateBanner);
+router.delete('/banners/:id', deleteBanner);
+
+router.get('/db-stats', getDatabaseStats);
 
 module.exports = router;

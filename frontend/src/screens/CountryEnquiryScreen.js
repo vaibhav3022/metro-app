@@ -42,7 +42,11 @@ export default function CountryEnquiryScreen() {
     'Franchise for Maytriya CoWork',
     'Franchise for Events',
     'Franchise for Nexus',
-    'Franchise for Cybeorch Labs'
+    'Franchise for Cybeorch Labs',
+    'Franchise for Tourism',
+    'Franchise for Maytriya Matrimonial',
+    'Franchise for ProNexa',
+    'Franchise for FleetX'
   ];
 
   const [name, setName] = useState('');

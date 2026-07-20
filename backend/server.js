@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
@@ -44,6 +45,7 @@ app.use((req, res, next) => {
 });
 // express.json is already applied in security.js (with limit), but we keep urlencoded
 app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Rate Limiting
 app.use('/api/', apiLimiter);

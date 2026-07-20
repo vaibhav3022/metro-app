@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../../context/ThemeContext';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator, Dimensions, StatusBar, Modal, FlatList, Platform } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator, Dimensions, StatusBar, Modal, FlatList, Platform, BackHandler } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
@@ -91,6 +91,15 @@ export default function RevenueAnalyticsScreen({ navigation }) {
   };
 
   useEffect(() => { fetchData(period); }, []);
+
+  useEffect(() => {
+    const onBackPress = () => {
+      navigation.goBack();
+      return true;
+    };
+    const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => subscription.remove();
+  }, [navigation]);
   
   const handlePeriodChange = (type) => {
     setPeriod(type);
@@ -118,17 +127,11 @@ export default function RevenueAnalyticsScreen({ navigation }) {
   ];
 
   return (
-    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
-      <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor="transparent" translucent />
-      <SafeAreaView style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
         {toast.visible && <ToastMessage message={toast.message} type={toast.type} onHide={() => setToast({ ...toast, visible: false })} />}
         
         <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack?.()}>
-            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
-          </TouchableOpacity>
           <Text style={styles.headerTitle}>Revenue Analytics</Text>
-          <View style={{ width: 44 }} />
         </View>
 
         <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={fetchData} tintColor="#00C9A7" />} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -242,9 +245,7 @@ export default function RevenueAnalyticsScreen({ navigation }) {
             </View>
           </Modal>
         )}
-
-      </SafeAreaView>
-    </LinearGradient>
+    </View>
   );
 }
 

@@ -3,12 +3,22 @@ const Shop = require('../models/Shop');
 const TokenTransaction = require('../models/TokenTransaction');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
+const MerchantTransaction = require('../models/MerchantTransaction');
+const Complaint = require('../models/Complaint');
+const path = require('path');
+const fs = require('fs');
 
 const getStatus = async (req, res) => {
   try {
     const merchant = await Merchant.findOne({ userId: req.user._id });
     if (!merchant) return res.status(404).json({ success: false, message: 'Not found' });
-    res.status(200).json({ success: true, status: merchant.status, rejectionReason: merchant.rejectionReason });
+    res.status(200).json({
+      success: true,
+      status: merchant.status,
+      rejectionReason: merchant.rejectionReason,
+      hasDocuments: !!(merchant.aadharUrl && merchant.panUrl && merchant.photoUrl),
+      merchant
+    });
   } catch (err) { res.status(500).json({ success: false }); }
 };
 
@@ -26,7 +36,16 @@ const getDashboard = async (req, res) => {
     const tokenOrders = tokenAgg[0]?.count || 0;
     const tokenUsers = await TokenTransaction.distinct('userId', { merchantId: merchant._id, type: 'redemption', status: 'success' });
 
-    // 2. Calculate Shop Transactions (Wallet/Razorpay)
+    // 2. Calculate QR Scan Transactions
+    const qrAgg = await MerchantTransaction.aggregate([
+      { $match: { merchantId: merchant._id, type: 'qr_payment', status: 'SUCCESS' } },
+      { $group: { _id: null, total: { $sum: '$grossAmount' }, count: { $sum: 1 } } }
+    ]);
+    const qrSales = qrAgg[0]?.total || 0;
+    const qrOrders = qrAgg[0]?.count || 0;
+    const qrUsers = await MerchantTransaction.distinct('userId', { merchantId: merchant._id, type: 'qr_payment', status: 'SUCCESS' });
+
+    // 3. Calculate Shop Transactions (Wallet/Razorpay)
     let shopSales = 0;
     let shopOrders = 0;
     let shopUsers = [];
@@ -44,11 +63,15 @@ const getDashboard = async (req, res) => {
     }
 
     // Combine stats
-    const totalSales = tokensAccepted + shopSales;
-    const totalOrders = tokenOrders + shopOrders;
+    const totalSales = qrSales + shopSales + tokensAccepted;
+    const totalOrders = qrOrders + shopOrders + tokenOrders;
     
     // Merge distinct users
-    const uniqueUserIds = new Set([...tokenUsers.map(id => id.toString()), ...shopUsers.map(id => id.toString())]);
+    const uniqueUserIds = new Set([
+      ...tokenUsers.map(id => id.toString()), 
+      ...shopUsers.map(id => id.toString()),
+      ...qrUsers.map(id => id.toString())
+    ]);
     const totalCustomers = uniqueUserIds.size;
 
     merchant.totalTokensAccepted = tokensAccepted;
@@ -65,12 +88,14 @@ const getDashboard = async (req, res) => {
         totalSales,
         totalOrders,
         totalCustomers,
-        tokensAccepted,
-        cashbackRedeemed: tokensAccepted
+        qrSales
       },
-      chartData: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], data: [0, 0, 0, tokensAccepted, 0, 0, 0] }
+      chartData: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], data: [0, 0, 0, qrSales || totalSales, 0, 0, 0] }
     });
-  } catch (err) { res.status(500).json({ success: false }); }
+  } catch (err) { 
+    console.error('getDashboard Error:', err);
+    res.status(500).json({ success: false }); 
+  }
 };
 
 const getTransactions = async (req, res) => {
@@ -78,6 +103,11 @@ const getTransactions = async (req, res) => {
     const { page = 1, limit = 50 } = req.query;
     
     const tokenTxsRaw = await TokenTransaction.find({ merchantId: req.merchant._id })
+      .populate('userId', 'name')
+      .sort({ createdAt: -1 })
+      .limit(parseInt(limit));
+
+    const qrTxsRaw = await MerchantTransaction.find({ merchantId: req.merchant._id, type: 'qr_payment' })
       .populate('userId', 'name')
       .sort({ createdAt: -1 })
       .limit(parseInt(limit));
@@ -98,6 +128,12 @@ const getTransactions = async (req, res) => {
       createdAt: tx.createdAt
     }));
 
+    const formattedQrTxs = qrTxsRaw.map(tx => ({
+      ...tx.toObject(),
+      paymentMethod: 'QR Scan',
+      createdAt: tx.createdAt
+    }));
+
     const formattedShopTxs = shopTxsRaw.map(tx => ({
       ...tx.toObject(),
       type: 'purchase',
@@ -105,7 +141,7 @@ const getTransactions = async (req, res) => {
       createdAt: tx.timestamp
     }));
 
-    const allTxs = [...formattedTokenTxs, ...formattedShopTxs]
+    const allTxs = [...formattedTokenTxs, ...formattedShopTxs, ...formattedQrTxs]
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .slice((page - 1) * parseInt(limit), page * parseInt(limit));
       
@@ -171,7 +207,16 @@ const updateShop = async (req, res) => {
 const addProduct = async (req, res) => {
   try {
     const shop = await Shop.findOne({ merchantId: req.merchant._id });
-    shop.products.push(req.body);
+    
+    const productData = { ...req.body };
+    if (productData.isAvailable === 'true') productData.isAvailable = true;
+    if (productData.isAvailable === 'false') productData.isAvailable = false;
+    
+    if (req.file) {
+      productData.imageUrl = `/uploads/shop/${req.file.filename}`;
+    }
+
+    shop.products.push(productData);
     await shop.save();
     res.status(200).json({ success: true, shop });
   } catch (err) { res.status(500).json({ success: false }); }
@@ -181,8 +226,17 @@ const editProduct = async (req, res) => {
   try {
     const shop = await Shop.findOne({ merchantId: req.merchant._id });
     const pIndex = shop.products.findIndex(p => p._id.toString() === req.params.id);
+    
     if (pIndex > -1) {
-      shop.products[pIndex] = { ...shop.products[pIndex].toObject(), ...req.body };
+      const productData = { ...req.body };
+      if (productData.isAvailable === 'true') productData.isAvailable = true;
+      if (productData.isAvailable === 'false') productData.isAvailable = false;
+      
+      if (req.file) {
+        productData.imageUrl = `/uploads/shop/${req.file.filename}`;
+      }
+      
+      shop.products[pIndex] = { ...shop.products[pIndex].toObject(), ...productData };
       await shop.save();
     }
     res.status(200).json({ success: true, shop });
@@ -201,10 +255,46 @@ const deleteProduct = async (req, res) => {
 const addOffer = async (req, res) => {
   try {
     const shop = await Shop.findOne({ merchantId: req.merchant._id });
-    shop.offers.push(req.body);
+    const offerData = { ...req.body };
+    
+    // Parse applicableProducts if it's sent as stringified JSON array
+    if (typeof offerData.applicableProducts === 'string') {
+      try {
+        offerData.applicableProducts = JSON.parse(offerData.applicableProducts);
+      } catch (e) {
+        offerData.applicableProducts = [];
+      }
+    }
+
+    // Safely parse validUntil - support DD/MM/YYYY, YYYY-MM-DD, or any parseable format
+    if (offerData.validUntil) {
+      let parsedDate = null;
+      const raw = offerData.validUntil.trim();
+      
+      // Try DD/MM/YYYY format
+      const ddmmyyyy = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if (ddmmyyyy) {
+        parsedDate = new Date(`${ddmmyyyy[3]}-${ddmmyyyy[2].padStart(2,'0')}-${ddmmyyyy[1].padStart(2,'0')}`);
+      } else {
+        // Try standard formats (YYYY-MM-DD etc)
+        parsedDate = new Date(raw);
+      }
+      
+      // Only set if valid date
+      if (parsedDate && !isNaN(parsedDate.getTime())) {
+        offerData.validUntil = parsedDate;
+      } else {
+        delete offerData.validUntil; // skip invalid date
+      }
+    }
+    
+    shop.offers.push(offerData);
     await shop.save();
     res.status(200).json({ success: true, shop });
-  } catch (err) { res.status(500).json({ success: false }); }
+  } catch (err) {
+    console.error('addOffer Error:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
 };
 
 const getNotifications = async (req, res) => {
@@ -254,6 +344,151 @@ const registerMerchant = async (req, res) => {
   }
 };
 
+const deleteOffer = async (req, res) => {
+  try {
+    const shop = await Shop.findOne({ merchantId: req.merchant._id });
+    shop.offers = shop.offers.filter(o => o._id.toString() !== req.params.id);
+    await shop.save();
+    res.status(200).json({ success: true, shop });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const createWithdrawalRequest = async (req, res) => {
+  try {
+    const { amount, bankDetails } = req.body;
+    const merchant = req.merchant;
+
+    if (!amount || amount <= 0) {
+      return res.status(400).json({ success: false, message: 'Invalid withdrawal amount.' });
+    }
+
+    if (merchant.balance < amount) {
+      return res.status(400).json({ success: false, message: 'Insufficient balance.' });
+    }
+
+    // Deduct balance immediately
+    merchant.balance -= amount;
+    await merchant.save();
+
+    // Create pending MerchantTransaction
+    const transaction = await MerchantTransaction.create({
+      merchantId: merchant._id,
+      userId: req.user._id,
+      amount: amount,
+      type: 'withdrawal',
+      status: 'PENDING',
+      bankDetails: bankDetails
+    });
+
+    res.status(201).json({ success: true, message: 'Withdrawal request submitted.', transaction });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const getWithdrawals = async (req, res) => {
+  try {
+    const withdrawals = await MerchantTransaction.find({
+      merchantId: req.merchant._id,
+      type: 'withdrawal'
+    }).sort({ createdAt: -1 });
+    res.status(200).json({ success: true, data: withdrawals });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const submitSupportTicket = async (req, res) => {
+  try {
+    const { subject, description, category } = req.body;
+    const complaint = await Complaint.create({
+      userId: req.user._id,
+      subject: subject || 'Support Ticket',
+      description,
+      category: category || 'Merchant Support',
+      status: 'Pending'
+    });
+    res.status(201).json({ success: true, message: 'Support ticket submitted.', complaint });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const getSupportTickets = async (req, res) => {
+  try {
+    const complaints = await Complaint.find({ userId: req.user._id }).sort({ createdAt: -1 });
+    res.status(200).json({ success: true, data: complaints });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const uploadKyc = async (req, res) => {
+  try {
+    if (!req.files || !req.files.aadhar || !req.files.pan || !req.files.photo) {
+      return res.status(400).json({ success: false, message: 'All KYC documents are required (aadhar, pan, photo)' });
+    }
+
+    const merchant = await Merchant.findOne({ userId: req.user._id });
+    if (!merchant) {
+      return res.status(404).json({ success: false, message: 'Merchant profile not found' });
+    }
+
+    merchant.aadharUrl = req.files.aadhar[0].filename;
+    merchant.panUrl = req.files.pan[0].filename;
+    merchant.photoUrl = req.files.photo[0].filename;
+    merchant.status = 'pending'; // Reset status to pending when files are uploaded
+    await merchant.save();
+
+    res.status(200).json({ success: true, message: 'KYC documents uploaded successfully', data: merchant });
+  } catch (error) {
+    console.error('KYC Upload Error:', error);
+    res.status(500).json({ success: false, message: 'Server error during KYC upload' });
+  }
+};
+
+const uploadShopImage = async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ success: false, message: 'No image file provided.' });
+
+    // Build the publicly accessible URL path
+    const imageUrl = `/uploads/shop/${req.file.filename}`;
+
+    // Update the shop's imageUrl in DB
+    const shop = await Shop.findOneAndUpdate(
+      { merchantId: req.merchant._id },
+      { imageUrl },
+      { new: true }
+    );
+
+    res.status(200).json({ success: true, imageUrl, shop });
+  } catch (err) {
+    console.error('Shop Image Upload Error:', err);
+    res.status(500).json({ success: false, message: 'Failed to upload shop image.' });
+  }
+};
+
 module.exports = {
-  getStatus, getDashboard, getTransactions, scanToken, getShop, updateShop, addProduct, editProduct, deleteProduct, addOffer, getNotifications, markNotificationRead, registerMerchant
+  getStatus,
+  getDashboard,
+  getTransactions,
+  scanToken,
+  getShop,
+  updateShop,
+  addProduct,
+  editProduct,
+  deleteProduct,
+  addOffer,
+  deleteOffer,
+  getNotifications,
+  markNotificationRead,
+  registerMerchant,
+  createWithdrawalRequest,
+  getWithdrawals,
+  submitSupportTicket,
+  getSupportTickets,
+  uploadKyc,
+  uploadShopImage
 };

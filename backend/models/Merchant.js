@@ -49,6 +49,10 @@ const MerchantSchema = new mongoose.Schema({
     enum: ['pending', 'approved', 'suspended', 'rejected'],
     default: 'pending'
   },
+  balance: {
+    type: Number,
+    default: 0
+  },
   totalEarnings: {
     type: Number,
     default: 0

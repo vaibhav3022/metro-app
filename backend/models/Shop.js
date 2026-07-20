@@ -29,12 +29,14 @@ const ShopSchema = new mongoose.Schema({
     name: { type: String, required: true },
     price: { type: Number, required: true },
     description: { type: String },
+    imageUrl: { type: String },
     isAvailable: { type: Boolean, default: true }
   }],
   offers: [{
     title: { type: String, required: true },
     discount: { type: String, required: true },
-    validUntil: { type: Date }
+    validUntil: { type: Date },
+    applicableProducts: [{ type: String }]
   }],
   totalSales: {
     type: Number,

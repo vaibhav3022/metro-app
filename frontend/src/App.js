@@ -56,6 +56,10 @@ import MerchantManagementScreen from './screens/Admin/MerchantManagementScreen';
 import RevenueAnalyticsScreen from './screens/Admin/RevenueAnalyticsScreen';
 import StationManagementScreen from './screens/Admin/StationManagementScreen';
 import UserManagementScreen from './screens/Admin/UserManagementScreen';
+import AdminContentManagementScreen from './screens/Admin/AdminContentManagementScreen';
+import AdminWithdrawalManagementScreen from './screens/Admin/AdminWithdrawalManagementScreen';
+import AdminComplaintManagementScreen from './screens/Admin/AdminComplaintManagementScreen';
+import AdminSystemSettingsScreen from './screens/Admin/AdminSystemSettingsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -139,6 +143,10 @@ function AppNavigator() {
             <Stack.Screen name="RevenueAnalytics" component={RevenueAnalyticsScreen} />
             <Stack.Screen name="StationManagement" component={StationManagementScreen} />
             <Stack.Screen name="UserManagement" component={UserManagementScreen} />
+            <Stack.Screen name="AdminWithdrawal" component={AdminWithdrawalManagementScreen} />
+            <Stack.Screen name="AdminComplaint" component={AdminComplaintManagementScreen} />
+            <Stack.Screen name="AdminContent" component={AdminContentManagementScreen} />
+            <Stack.Screen name="AdminSystemSettings" component={AdminSystemSettingsScreen} />
           </>
         )}
       </Stack.Navigator>

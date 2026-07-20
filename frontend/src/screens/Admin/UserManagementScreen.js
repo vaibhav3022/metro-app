@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, RefreshControl, TextInput, ActivityIndicator, Alert, StatusBar, Platform } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, RefreshControl, TextInput, ActivityIndicator, Alert, StatusBar, Platform, BackHandler } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
@@ -43,6 +43,15 @@ export default function UserManagementScreen({ navigation }) {
   };
 
   useEffect(() => { fetchUsers(1, false); }, []);
+
+  useEffect(() => {
+    const onBackPress = () => {
+      navigation.goBack();
+      return true;
+    };
+    const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => subscription.remove();
+  }, [navigation]);
 
   const showToast = (message, type) => setToast({ visible: true, message, type });
 

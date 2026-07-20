@@ -10,10 +10,17 @@ const {
   editProduct,
   deleteProduct,
   addOffer,
+  deleteOffer,
   getNotifications,
   markNotificationRead,
   getStatus,
-  registerMerchant
+  registerMerchant,
+  createWithdrawalRequest,
+  getWithdrawals,
+  submitSupportTicket,
+  getSupportTickets,
+  uploadKyc,
+  uploadShopImage
 } = require('../controllers/merchantController');
 const { protect } = require('../middleware/authMiddleware');
 const { requireMerchant } = require('../middleware/roleMiddleware');
@@ -27,6 +34,11 @@ router.post('/register', upload.fields([
   { name: 'pan', maxCount: 1 },
   { name: 'photo', maxCount: 1 }
 ]), registerMerchant);
+router.post('/upload-kyc', upload.fields([
+  { name: 'aadhar', maxCount: 1 },
+  { name: 'pan', maxCount: 1 },
+  { name: 'photo', maxCount: 1 }
+]), uploadKyc);
 
 // Require Approved Merchant Status for below routes
 router.use(requireMerchant); 
@@ -37,10 +49,17 @@ router.post('/scan-token', scanToken);
 
 router.get('/shop', getShop);
 router.put('/shop', updateShop);
-router.post('/shop/product', addProduct);
-router.put('/shop/product/:id', editProduct);
+router.post('/shop/image', upload.single('shopImage'), uploadShopImage);
+router.post('/shop/product', upload.single('productImage'), addProduct);
+router.put('/shop/product/:id', upload.single('productImage'), editProduct);
 router.delete('/shop/product/:id', deleteProduct);
 router.post('/shop/offer', addOffer);
+router.delete('/shop/offer/:id', deleteOffer);
+
+router.post('/withdrawals', createWithdrawalRequest);
+router.get('/withdrawals', getWithdrawals);
+router.post('/support', submitSupportTicket);
+router.get('/support', getSupportTickets);
 
 router.get('/notifications', getNotifications);
 router.put('/notifications/:id/read', markNotificationRead);

@@ -1,7 +1,5 @@
-// Local development overrides - keep this file local and do NOT commit to repo.
-// Replace the IP below with your machine's LAN IP when testing on a physical device.
-
+// ADB reverse tunnel active: adb reverse tcp:5001 tcp:5001
+// Device connects to backend via USB — no WiFi needed
 export default {
-  // Updated to your current Wi-Fi IP from ipconfig (10.167.97.96)
-  API_BASE_URL: 'http://10.167.97.96:5001/api'
+  API_BASE_URL: 'http://localhost:5001/api',
 };

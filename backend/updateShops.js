@@ -144,6 +144,7 @@ async function run() {
     { 
       $set: { 
         shopName: 'Energia',
+        
         category: 'Services',
         description: 'Convenient electric vehicle charging services and accessories.',
         imageUrl: 'https://images.unsplash.com/photo-1563720223185-11003d516935?w=500&q=80',

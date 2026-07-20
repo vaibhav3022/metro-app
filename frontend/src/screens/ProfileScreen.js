@@ -109,7 +109,7 @@ export default function ProfileScreen() {
 
   const menuItems = [
     { icon: 'ticket-confirmation-outline', title: t('profile.myTickets'), subtitle: t('profile.myTicketsSub'), screen: 'TicketsTab' },
-    { icon: 'wallet-outline', title: t('profile.wallet'), subtitle: t('profile.walletSub'), screen: 'WalletTab' },
+    { icon: 'wallet-outline', title: t('profile.wallet'), subtitle: t('profile.walletSub'), screen: 'Wallet' },
     { icon: 'bell-outline', title: t('profile.notifications'), subtitle: t('profile.notificationsSub'), screen: 'Notifications' },
     { icon: 'help-circle-outline', title: t('profile.helpSupport'), subtitle: t('profile.helpSupportSub'), screen: 'HelpSupport' },
   ];
@@ -118,11 +118,7 @@ export default function ProfileScreen() {
     ? user.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
     : 'MT';
 
-  const genderOptions = [
-    { key: 'Male', label: t('profile.male'), icon: 'gender-male' },
-    { key: 'Female', label: t('profile.female'), icon: 'gender-female' },
-    { key: 'Other', label: t('profile.other'), icon: 'gender-non-binary' },
-  ];
+
 
   const languageOptions = [
     { key: 'mr', label: 'मराठी', nativeLabel: 'Marathi', icon: 'translate' },
@@ -223,34 +219,7 @@ export default function ProfileScreen() {
                 placeholderTextColor="#AAAAAA"
               />
 
-              {/* Gender — Radio Checkbox Style */}
-              <Text style={styles.fieldLabel}>{t('profile.gender')}</Text>
-              <View style={styles.optionRow}>
-                {genderOptions.map(g => {
-                  const active = gender === g.key;
-                  return (
-                    <TouchableOpacity
-                      key={g.key}
-                      style={[styles.optionBox, active && styles.optionBoxActive]}
-                      onPress={() => setGender(g.key)}
-                      activeOpacity={0.8}
-                    >
-                      <View style={[styles.checkBoxSquare, active && styles.radioCircleActive]}>
-                        {active && <View style={styles.checkIconWrapper}><Icon name="check" size={14} color={COLORS.primary} /></View>}
-                      </View>
-                      <Icon
-                        name={g.icon}
-                        size={18}
-                        color={active ? COLORS.primary : COLORS.textLight}
-                        style={{ marginBottom: 4 }}
-                      />
-                      <Text style={[styles.optionLabel, active && styles.optionLabelActive]}>
-                        {g.label}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
+
 
               {/* Language Selection */}
               <Text style={styles.fieldLabel}>{t('profile.language')}</Text>

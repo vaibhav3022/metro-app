@@ -8,6 +8,10 @@ const Notification = require('../models/Notification');
 const AuditLog = require('../models/AuditLog');
 const QRCode = require('qrcode');
 const crypto = require('crypto');
+const MerchantTransaction = require('../models/MerchantTransaction');
+const Complaint = require('../models/Complaint');
+const SystemSettings = require('../models/SystemSettings');
+const Banner = require('../models/Banner');
 
 const logAction = async (action, performedBy, targetId, targetModel, details) => {
   await AuditLog.create({ action, performedBy, targetId, targetModel, details });
@@ -194,8 +198,250 @@ const getAuditLogs = async (req, res) => {
   } catch (err) { res.status(500).json({ success: false }); }
 };
 
+// Admin Withdrawals Management
+const getWithdrawals = async (req, res) => {
+  try {
+    const withdrawals = await MerchantTransaction.find({ type: 'withdrawal' })
+      .populate('merchantId', 'businessName ownerName phone balance')
+      .populate('userId', 'name email')
+      .sort({ createdAt: -1 });
+    res.status(200).json({ success: true, data: withdrawals });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const updateWithdrawalStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, rejectionReason } = req.body; // 'SUCCESS' or 'FAILED'
+
+    if (!['SUCCESS', 'FAILED'].includes(status)) {
+      return res.status(400).json({ success: false, message: 'Invalid status' });
+    }
+
+    const transaction = await MerchantTransaction.findById(id);
+    if (!transaction) {
+      return res.status(404).json({ success: false, message: 'Transaction not found' });
+    }
+
+    if (transaction.status !== 'PENDING') {
+      return res.status(400).json({ success: false, message: 'Transaction is already processed' });
+    }
+
+    transaction.status = status;
+    if (rejectionReason) transaction.rejectionReason = rejectionReason;
+    await transaction.save();
+
+    const merchant = await Merchant.findById(transaction.merchantId);
+    if (status === 'FAILED' && merchant) {
+      // Refund back to merchant balance
+      merchant.balance += transaction.amount;
+      await merchant.save();
+    }
+
+    await logAction(`WITHDRAWAL_${status}`, req.user._id, transaction._id, 'MerchantTransaction', { amount: transaction.amount });
+
+    res.status(200).json({ success: true, data: transaction });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// Admin Support Complaints Management
+const getComplaints = async (req, res) => {
+  try {
+    const complaints = await Complaint.find()
+      .populate('userId', 'name email role phone')
+      .sort({ createdAt: -1 });
+    res.status(200).json({ success: true, data: complaints });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const updateComplaintStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, adminReply } = req.body;
+
+    const complaint = await Complaint.findById(id);
+    if (!complaint) {
+      return res.status(404).json({ success: false, message: 'Complaint not found' });
+    }
+
+    if (status) complaint.status = status;
+    if (adminReply !== undefined) complaint.adminReply = adminReply;
+    await complaint.save();
+
+    await logAction('RESOLVE_COMPLAINT', req.user._id, complaint._id, 'Complaint', { status });
+
+    res.status(200).json({ success: true, data: complaint });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// Admin System Settings Management
+const getSystemSettings = async (req, res) => {
+  try {
+    let settings = await SystemSettings.findOne();
+    if (!settings) {
+      settings = await SystemSettings.create({});
+    }
+    res.status(200).json({ success: true, data: settings });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const updateSystemSettings = async (req, res) => {
+  try {
+    const { commissionRate, cashbackRate, ticketValidityMins, journeyValidityMins } = req.body;
+
+    let settings = await SystemSettings.findOne();
+    if (!settings) {
+      settings = new SystemSettings();
+    }
+
+    if (commissionRate !== undefined) settings.commissionRate = commissionRate;
+    if (cashbackRate !== undefined) settings.cashbackRate = cashbackRate;
+    if (ticketValidityMins !== undefined) settings.ticketValidityMins = ticketValidityMins;
+    if (journeyValidityMins !== undefined) settings.journeyValidityMins = journeyValidityMins;
+
+    await settings.save();
+    await logAction('UPDATE_SETTINGS', req.user._id, settings._id, 'SystemSettings', req.body);
+
+    res.status(200).json({ success: true, data: settings });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// Admin Banners Management
+const getBanners = async (req, res) => {
+  try {
+    const banners = await Banner.find().sort({ createdAt: -1 });
+    res.status(200).json({ success: true, data: banners });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const createBanner = async (req, res) => {
+  try {
+    const { title, imageUrl, linkUrl, isActive } = req.body;
+    const banner = await Banner.create({ title, imageUrl, linkUrl, isActive });
+    await logAction('CREATE_BANNER', req.user._id, banner._id, 'Banner', { title });
+    res.status(201).json({ success: true, data: banner });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const updateBanner = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, imageUrl, linkUrl, isActive } = req.body;
+
+    const banner = await Banner.findById(id);
+    if (!banner) {
+      return res.status(404).json({ success: false, message: 'Banner not found' });
+    }
+
+    if (title !== undefined) banner.title = title;
+    if (imageUrl !== undefined) banner.imageUrl = imageUrl;
+    if (linkUrl !== undefined) banner.linkUrl = linkUrl;
+    if (isActive !== undefined) banner.isActive = isActive;
+
+    await banner.save();
+    await logAction('UPDATE_BANNER', req.user._id, banner._id, 'Banner', { title });
+
+    res.status(200).json({ success: true, data: banner });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const deleteBanner = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const banner = await Banner.findByIdAndDelete(id);
+    if (!banner) {
+      return res.status(404).json({ success: false, message: 'Banner not found' });
+    }
+    await logAction('DELETE_BANNER', req.user._id, id, 'Banner', { title: banner.title });
+    res.status(200).json({ success: true, message: 'Banner deleted' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// Admin Database Stats
+const getDatabaseStats = async (req, res) => {
+  try {
+    const ShopTransaction = require('../models/ShopTransaction');
+    const Station = require('../models/Station');
+    const [
+      users,
+      merchants,
+      shops,
+      tickets,
+      transactions,
+      complaints,
+      banners,
+      stations
+    ] = await Promise.all([
+      User.countDocuments(),
+      Merchant.countDocuments(),
+      Shop.countDocuments(),
+      Ticket.countDocuments(),
+      ShopTransaction.countDocuments(),
+      Complaint.countDocuments(),
+      Banner.countDocuments(),
+      Station.countDocuments()
+    ]);
+    res.status(200).json({
+      success: true,
+      data: {
+        users,
+        merchants,
+        shops,
+        tickets,
+        transactions,
+        complaints,
+        banners,
+        stations
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 module.exports = {
-  getDashboardStats, getMerchants, approveMerchant, rejectMerchant, suspendMerchant,
-  reactivateMerchant, deleteMerchant, getUsers, deleteUser,
-  getRevenueSummary, getRevenueChart, getAnalytics, getAuditLogs
+  getDashboardStats,
+  getMerchants,
+  approveMerchant,
+  rejectMerchant,
+  suspendMerchant,
+  reactivateMerchant,
+  deleteMerchant,
+  getUsers,
+  deleteUser,
+  getRevenueSummary,
+  getRevenueChart,
+  getAnalytics,
+  getAuditLogs,
+  getWithdrawals,
+  updateWithdrawalStatus,
+  getComplaints,
+  updateComplaintStatus,
+  getSystemSettings,
+  updateSystemSettings,
+  getBanners,
+  createBanner,
+  updateBanner,
+  deleteBanner,
+  getDatabaseStats
 };

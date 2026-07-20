@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, RefreshControl, TextInput, ActivityIndicator, Alert, Modal, StatusBar, Platform } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, RefreshControl, TextInput, ActivityIndicator, Alert, Modal, StatusBar, Platform, Image, BackHandler } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
@@ -7,6 +7,7 @@ import api from '../../api/axiosConfig';
 import EmptyState from '../../components/EmptyState';
 import ToastMessage from '../../components/ToastMessage';
 import { useTheme } from '../../context/ThemeContext';
+import localConfig from '../../api/localConfig';
 
 export default function MerchantManagementScreen({ route, navigation }) {
   const { theme: COLORS, isDark } = useTheme();
@@ -35,6 +36,15 @@ export default function MerchantManagementScreen({ route, navigation }) {
   };
 
   useEffect(() => { fetchMerchants(); }, []);
+
+  useEffect(() => {
+    const onBackPress = () => {
+      navigation.goBack();
+      return true;
+    };
+    const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => subscription.remove();
+  }, [navigation]);
 
   const showToast = (message, type) => setToast({ visible: true, message, type });
 
@@ -88,17 +98,11 @@ export default function MerchantManagementScreen({ route, navigation }) {
   };
 
   return (
-    <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.container}>
-      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
-      <SafeAreaView style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
         {toast.visible && <ToastMessage message={toast.message} type={toast.type} onHide={() => setToast({ ...toast, visible: false })} />}
         
         <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack?.()}>
-            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
-          </TouchableOpacity>
           <Text style={styles.headerTitle}>Merchant Config</Text>
-          <View style={{ width: 44 }} />
         </View>
 
         <View style={styles.searchContainer}>
@@ -229,6 +233,43 @@ export default function MerchantManagementScreen({ route, navigation }) {
                       <Text style={[styles.badgeText, { color: getStatusColor(selectedMerchantDetails.status) }]}>{selectedMerchantDetails.status}</Text>
                     </View>
                   </View>
+                  
+                  <View style={styles.kycSection}>
+                    <Text style={styles.kycSectionTitle}>KYC Verification Proofs</Text>
+                    
+                    {selectedMerchantDetails.aadharUrl ? (
+                      <View style={styles.kycItem}>
+                        <Text style={styles.kycLabel}>Aadhar Card:</Text>
+                        <Image
+                          source={{ uri: `${localConfig.API_BASE_URL.replace('/api', '/uploads/kyc')}/${selectedMerchantDetails.aadharUrl}` }}
+                          style={styles.kycImage}
+                          resizeMode="contain"
+                        />
+                      </View>
+                    ) : <Text style={styles.noDocText}>Aadhar Card: Not Uploaded</Text>}
+
+                    {selectedMerchantDetails.panUrl ? (
+                      <View style={styles.kycItem}>
+                        <Text style={styles.kycLabel}>PAN Card:</Text>
+                        <Image
+                          source={{ uri: `${localConfig.API_BASE_URL.replace('/api', '/uploads/kyc')}/${selectedMerchantDetails.panUrl}` }}
+                          style={styles.kycImage}
+                          resizeMode="contain"
+                        />
+                      </View>
+                    ) : <Text style={styles.noDocText}>PAN Card: Not Uploaded</Text>}
+
+                    {selectedMerchantDetails.photoUrl ? (
+                      <View style={styles.kycItem}>
+                        <Text style={styles.kycLabel}>Storefront / Owner Image:</Text>
+                        <Image
+                          source={{ uri: `${localConfig.API_BASE_URL.replace('/api', '/uploads/kyc')}/${selectedMerchantDetails.photoUrl}` }}
+                          style={styles.kycImage}
+                          resizeMode="contain"
+                        />
+                      </View>
+                    ) : <Text style={styles.noDocText}>Shop Image: Not Uploaded</Text>}
+                  </View>
                 </ScrollView>
               )}
             </View>
@@ -265,8 +306,7 @@ export default function MerchantManagementScreen({ route, navigation }) {
           </View>
         </Modal>
 
-      </SafeAreaView>
-    </LinearGradient>
+    </View>
   );
 }
 
@@ -315,6 +355,12 @@ const getStyles = (COLORS) => StyleSheet.create({
   modalCancelText: { color: COLORS.text, fontWeight: '700' },
   modalSubmit: { backgroundColor: '#EF4444', paddingVertical: 12, paddingHorizontal: 20, borderRadius: 12 },
   modalSubmitText: { color: '#fff', fontWeight: '800' },
+  kycSection: { marginTop: 24, paddingTop: 20, borderTopWidth: 1, borderTopColor: COLORS.border },
+  kycSectionTitle: { fontSize: 16, fontWeight: '900', color: COLORS.text, marginBottom: 16 },
+  kycItem: { marginBottom: 18 },
+  kycLabel: { fontSize: 13, color: COLORS.textLight, fontWeight: '700', marginBottom: 8 },
+  kycImage: { width: '100%', height: 200, borderRadius: 12, backgroundColor: COLORS.background, borderWidth: 1, borderColor: COLORS.border },
+  noDocText: { fontSize: 13, color: COLORS.textLight, fontStyle: 'italic', marginBottom: 14 },
   
   emptyContainer: { alignItems: 'center', justifyContent: 'center', marginTop: 40 },
   iconCircle: { width: 100, height: 100, borderRadius: 50, backgroundColor: 'rgba(0,201,167,0.1)', alignItems: 'center', justifyContent: 'center', marginBottom: 20, borderWidth: 1, borderColor: 'rgba(0,201,167,0.3)' },

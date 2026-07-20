@@ -1,8 +1,8 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView,
-  ActivityIndicator, Alert, Modal, Image, SafeAreaView, RefreshControl, StatusBar
+  ActivityIndicator, Alert, Modal, SafeAreaView, RefreshControl, StatusBar, Platform, BackHandler
 } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
@@ -11,6 +11,12 @@ import LinearGradient from 'react-native-linear-gradient';
 import { logout } from '../redux/slices/authSlice';
 import api from '../api/axiosConfig';
 import { storage } from '../utils/storage';
+
+// Import Admin Sub-Screens to render as Tab Views
+import MerchantManagementScreen from './Admin/MerchantManagementScreen';
+import RevenueAnalyticsScreen from './Admin/RevenueAnalyticsScreen';
+import AdminComplaintManagementScreen from './Admin/AdminComplaintManagementScreen';
+import AdminSystemSettingsScreen from './Admin/AdminSystemSettingsScreen';
 
 const StatCard = ({ title, value, iconName, iconColor, bgColor, onPress, styles }) => (
   <TouchableOpacity style={styles.statCard} onPress={onPress}>
@@ -35,6 +41,9 @@ export default function AdminDashboardScreen() {
   const [recentTransactions, setRecentTransactions] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
 
+  // Tab state: 'overview' | 'merchants' | 'revenue' | 'complaints' | 'settings'
+  const [activeTab, setActiveTab] = useState('overview');
+
   const fetchData = async () => {
     try {
       const res = await api.get('/admin/dashboard');
@@ -55,6 +64,19 @@ export default function AdminDashboardScreen() {
   };
 
   useEffect(() => { fetchData(); }, []);
+
+  // Back button handler for tabs
+  useEffect(() => {
+    const onBackPress = () => {
+      if (activeTab !== 'overview') {
+        setActiveTab('overview');
+        return true;
+      }
+      return false; // Exit app
+    };
+    const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => subscription.remove();
+  }, [activeTab]);
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -77,8 +99,11 @@ export default function AdminDashboardScreen() {
     );
   };
 
-  const NavCard = ({ title, iconName, iconColor, screen }) => (
-    <TouchableOpacity style={styles.navCard} onPress={() => navigation.navigate(screen)}>
+  const NavCard = ({ title, iconName, iconColor, screen, tab }) => (
+    <TouchableOpacity 
+      style={styles.navCard} 
+      onPress={() => tab ? setActiveTab(tab) : navigation.navigate(screen)}
+    >
       <View style={[styles.navIconWrap, { backgroundColor: iconColor + '20' }]}>
         <Icon name={iconName} size={26} color={iconColor} />
       </View>
@@ -86,98 +111,172 @@ export default function AdminDashboardScreen() {
         <Text style={styles.navCardTitle}>{title}</Text>
         <Text style={styles.navCardSubtitle}>Manage & view details</Text>
       </View>
-      <Icon name="chevron-right" size={24} color="rgba(255,255,255,0.3)" />
+      <Icon name="chevron-right" size={24} color="rgba(128,128,128,0.3)" />
     </TouchableOpacity>
   );
+
+  const renderOverview = () => {
+    if (loading) {
+      return (
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color="#00C9A7" />
+        </View>
+      );
+    }
+
+    return (
+      <ScrollView
+        contentContainerStyle={styles.container}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#00C9A7" colors={['#00C9A7']} />}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Stats */}
+        <Text style={styles.sectionTitle}>Overview</Text>
+        <View style={styles.statsGrid}>
+          <StatCard styles={styles} title="Total Revenue" value={`₹${dashboardData?.totalRevenue?.toLocaleString() || 0}`} iconName="currency-inr" iconColor="#00C9A7" bgColor="rgba(0,201,167,0.15)" onPress={() => setActiveTab('revenue')} />
+          <StatCard styles={styles} title="Active Users" value={dashboardData?.activeUsers?.toLocaleString() || 0} iconName="account-group-outline" iconColor="#9B59B6" bgColor="rgba(155,89,182,0.15)" onPress={() => setActiveTab('overview')} />
+        </View>
+        <View style={styles.statsGrid}>
+          <StatCard styles={styles} title="Merchants" value={dashboardData?.totalMerchants || 0} iconName="storefront-outline" iconColor="#3498DB" bgColor="rgba(52,152,219,0.15)" onPress={() => setActiveTab('merchants')} />
+          <StatCard styles={styles} title="Pending Shops" value={dashboardData?.pendingMerchantRequests || 0} iconName="clock-outline" iconColor="#F39C12" bgColor="rgba(243,156,18,0.15)" onPress={() => setActiveTab('merchants')} />
+        </View>
+
+        {/* Management Modules */}
+        <Text style={styles.sectionTitle}>Management Modules</Text>
+        <NavCard title="Revenue Analytics" iconName="chart-line" iconColor="#00C9A7" tab="revenue" />
+        <NavCard title="Merchant Management" iconName="storefront-outline" iconColor="#9B59B6" tab="merchants" />
+        <NavCard title="Support Moderation" iconName="comment-question-outline" iconColor="#1ABC9C" tab="complaints" />
+        <NavCard title="System Configurations" iconName="cog-outline" iconColor="#2C3E50" tab="settings" />
+        
+        {/* Sub-screens accessed via Stack Navigator */}
+        <NavCard title="User Management" iconName="account-group-outline" iconColor="#3498DB" screen="UserManagement" />
+        <NavCard title="Station Management" iconName="train-variant" iconColor="#F39C12" screen="StationManagement" />
+        <NavCard title="Payout Approvals" iconName="wallet-giftcard" iconColor="#EF4444" screen="AdminWithdrawal" />
+        <NavCard title="Dynamic Banner CMS" iconName="image-multiple-outline" iconColor="#34495E" screen="AdminContent" />
+
+        {/* Recent Bookings */}
+        <Text style={styles.sectionTitle}>Recent Ticket Bookings</Text>
+        {recentBookings.length === 0 ? (
+          <View style={styles.emptyBox}><Text style={styles.emptyBoxText}>No recent bookings found.</Text></View>
+        ) : recentBookings.map((bk, i) => (
+          <TouchableOpacity key={bk._id || i} style={styles.listItem} onPress={() => setSelectedItem({ type: 'booking', data: bk })}>
+            <View style={styles.listItemIcon}>
+              <Icon name="ticket-confirmation-outline" size={24} color="#00C9A7" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.listItemTitle}>{bk.userId?.name || 'Unknown User'}</Text>
+              <Text style={styles.listItemSub}>{(bk.source || bk.sourceStation)} → {(bk.destination || bk.destinationStation)}</Text>
+            </View>
+            <Text style={styles.listItemAmount}>₹{bk.fare}</Text>
+          </TouchableOpacity>
+        ))}
+
+        {/* Recent Transactions */}
+        <Text style={styles.sectionTitle}>Recent Shop Payments</Text>
+        {recentTransactions.length === 0 ? (
+          <View style={styles.emptyBox}><Text style={styles.emptyBoxText}>No recent transactions found.</Text></View>
+        ) : recentTransactions.map((tx, i) => (
+          <TouchableOpacity key={tx._id || i} style={styles.listItem} onPress={() => setSelectedItem({ type: 'transaction', data: tx })}>
+            <View style={[styles.listItemIcon, { backgroundColor: 'rgba(155,89,182,0.15)' }]}>
+              <Icon name="swap-horizontal" size={24} color="#9B59B6" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.listItemTitle}>{tx.userId?.name || 'User'} at {tx.merchantId?.businessName || 'Shop'}</Text>
+              <Text style={styles.listItemSub}>{new Date(tx.createdAt).toLocaleDateString()} • {tx.paymentMethod}</Text>
+            </View>
+            <Text style={[styles.listItemAmount, { color: '#00C9A7' }]}>
+              +{tx.paymentMethod === 'Token' ? `Rs. ${tx.amount}` : `₹${tx.amount}`}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    );
+  };
+
+  const renderTabContent = () => {
+    // Return to dashboard overview if back press happens
+    const dummyNavigation = {
+      goBack: () => setActiveTab('overview'),
+      navigate: navigation.navigate,
+      push: navigation.push
+    };
+
+    switch (activeTab) {
+      case 'overview':
+        return renderOverview();
+      case 'merchants':
+        return <MerchantManagementScreen navigation={dummyNavigation} route={{ params: {} }} />;
+      case 'revenue':
+        return <RevenueAnalyticsScreen navigation={dummyNavigation} route={{ params: {} }} />;
+      case 'complaints':
+        return <AdminComplaintManagementScreen navigation={dummyNavigation} route={{ params: {} }} />;
+      case 'settings':
+        return <AdminSystemSettingsScreen navigation={dummyNavigation} route={{ params: {} }} />;
+      default:
+        return renderOverview();
+    }
+  };
 
   return (
     <LinearGradient colors={[COLORS.background, COLORS.background]} style={styles.safeArea}>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
       <SafeAreaView style={{ flex: 1 }}>
-        {/* Header */}
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.headerTitle}>Admin Panel</Text>
-            <Text style={styles.headerSubtitle}>METROXIA Control Center</Text>
+        {/* Header - Only visible on Overview tab */}
+        {activeTab === 'overview' && (
+          <View style={styles.header}>
+            <View>
+              <Text style={styles.headerTitle}>Admin Panel</Text>
+              <Text style={styles.headerSubtitle}>METROXIA Control Center</Text>
+            </View>
+            <View style={styles.headerActions}>
+              <TouchableOpacity style={styles.headerBtn} onPress={onRefresh}>
+                <Icon name="refresh" size={22} color={COLORS.text} />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.headerBtn} onPress={() => navigation.navigate('AdminNotifications')}>
+                <Icon name="bell-outline" size={22} color={COLORS.text} />
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.headerBtn, { backgroundColor: 'rgba(239,68,68,0.2)' }]} onPress={handleLogout}>
+                <Icon name="logout" size={22} color="#EF4444" />
+              </TouchableOpacity>
+            </View>
           </View>
-          <View style={styles.headerActions}>
-            <TouchableOpacity style={styles.headerBtn} onPress={onRefresh}>
-              <Icon name="refresh" size={22} color={COLORS.text} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.headerBtn} onPress={() => navigation.navigate('AdminNotifications')}>
-              <Icon name="bell-outline" size={22} color={COLORS.text} />
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.headerBtn, { backgroundColor: 'rgba(239,68,68,0.2)' }]} onPress={handleLogout}>
-              <Icon name="logout" size={22} color="#EF4444" />
-            </TouchableOpacity>
-          </View>
+        )}
+
+        {/* Tab / Main Content */}
+        <View style={{ flex: 1 }}>
+          {renderTabContent()}
         </View>
 
-        {loading ? (
-          <View style={styles.centered}>
-            <ActivityIndicator size="large" color="#00C9A7" />
-          </View>
-        ) : (
-          <ScrollView
-            contentContainerStyle={styles.container}
-            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#00C9A7" colors={['#00C9A7']} />}
-            showsVerticalScrollIndicator={false}
-          >
-            {/* Stats */}
-            <Text style={styles.sectionTitle}>Overview</Text>
-            <View style={styles.statsGrid}>
-              <StatCard styles={styles} title="Total Revenue" value={`₹${dashboardData?.totalRevenue?.toLocaleString() || 0}`} iconName="currency-inr" iconColor="#00C9A7" bgColor="rgba(0,201,167,0.15)" onPress={() => navigation.navigate('RevenueAnalytics')} />
-              <StatCard styles={styles} title="Active Users" value={dashboardData?.activeUsers?.toLocaleString() || 0} iconName="account-group-outline" iconColor="#9B59B6" bgColor="rgba(155,89,182,0.15)" onPress={() => navigation.navigate('UserManagement')} />
-            </View>
-            <View style={styles.statsGrid}>
-              <StatCard styles={styles} title="Merchants" value={dashboardData?.totalMerchants || 0} iconName="storefront-outline" iconColor="#3498DB" bgColor="rgba(52,152,219,0.15)" onPress={() => navigation.navigate('MerchantManagement')} />
-              <StatCard styles={styles} title="Pending Shops" value={dashboardData?.pendingMerchantRequests || 0} iconName="clock-outline" iconColor="#F39C12" bgColor="rgba(243,156,18,0.15)" onPress={() => navigation.navigate('MerchantManagement')} />
-            </View>
-
-            {/* Management Modules */}
-            <Text style={styles.sectionTitle}>Management Modules</Text>
-            <NavCard title="Revenue Analytics" iconName="chart-line" iconColor="#00C9A7" screen="RevenueAnalytics" />
-            <NavCard title="Merchant Management" iconName="storefront-outline" iconColor="#9B59B6" screen="MerchantManagement" />
-            <NavCard title="User Management" iconName="account-group-outline" iconColor="#3498DB" screen="UserManagement" />
-            <NavCard title="Station Management" iconName="train-variant" iconColor="#F39C12" screen="StationManagement" />
-
-            {/* Recent Bookings */}
-            <Text style={styles.sectionTitle}>Recent Ticket Bookings</Text>
-            {recentBookings.length === 0 ? (
-              <View style={styles.emptyBox}><Text style={styles.emptyBoxText}>No recent bookings found.</Text></View>
-            ) : recentBookings.map((bk, i) => (
-              <TouchableOpacity key={bk._id || i} style={styles.listItem} onPress={() => setSelectedItem({ type: 'booking', data: bk })}>
-                <View style={styles.listItemIcon}>
-                  <Icon name="ticket-confirmation-outline" size={24} color="#00C9A7" />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.listItemTitle}>{bk.userId?.name || 'Unknown User'}</Text>
-                  <Text style={styles.listItemSub}>{(bk.source || bk.sourceStation)} → {(bk.destination || bk.destinationStation)}</Text>
-                </View>
-                <Text style={styles.listItemAmount}>₹{bk.fare}</Text>
-              </TouchableOpacity>
-            ))}
-
-            {/* Recent Transactions */}
-            <Text style={styles.sectionTitle}>Recent Shop Payments</Text>
-            {recentTransactions.length === 0 ? (
-              <View style={styles.emptyBox}><Text style={styles.emptyBoxText}>No recent transactions found.</Text></View>
-            ) : recentTransactions.map((tx, i) => (
-              <TouchableOpacity key={tx._id || i} style={styles.listItem} onPress={() => setSelectedItem({ type: 'transaction', data: tx })}>
-                <View style={[styles.listItemIcon, { backgroundColor: 'rgba(155,89,182,0.15)' }]}>
-                  <Icon name="swap-horizontal" size={24} color="#9B59B6" />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.listItemTitle}>{tx.userId?.name || 'User'} at {tx.merchantId?.businessName || 'Shop'}</Text>
-                  <Text style={styles.listItemSub}>{new Date(tx.createdAt).toLocaleDateString()} • {tx.paymentMethod}</Text>
-                </View>
-                <Text style={[styles.listItemAmount, { color: '#00C9A7' }]}>
-                  +{tx.paymentMethod === 'Token' ? `Rs. ${tx.amount}` : `₹${tx.amount}`}
+        {/* ====== BOTTOM NAV BAR ====== */}
+        <View style={styles.bottomNav}>
+          {[
+            { id: 'overview',    label: 'Home',       icon: 'home',                iconOutline: 'home-outline' },
+            { id: 'merchants',   label: 'Merchants',  icon: 'storefront',          iconOutline: 'storefront-outline' },
+            { id: 'revenue',     label: 'Revenue',    icon: 'chart-box',           iconOutline: 'chart-box-outline' },
+            { id: 'complaints',  label: 'Complaints', icon: 'comment-question',   iconOutline: 'comment-question-outline' },
+            { id: 'settings',    label: 'Settings',   icon: 'cog',                 iconOutline: 'cog-outline' },
+          ].map(tab => {
+            const active = activeTab === tab.id;
+            return (
+              <TouchableOpacity
+                key={tab.id}
+                style={styles.bottomNavItem}
+                onPress={() => setActiveTab(tab.id)}
+                activeOpacity={0.8}
+              >
+                <Icon
+                  name={active ? tab.icon : tab.iconOutline}
+                  size={24}
+                  color={active ? COLORS.secondary : COLORS.textLight}
+                />
+                <Text style={[styles.bottomNavLabel, active && styles.bottomNavLabelActive]}>
+                  {tab.label}
                 </Text>
               </TouchableOpacity>
-            ))}
-          </ScrollView>
-        )}
+            );
+          })}
+        </View>
+
 
         {/* Detail Modal */}
         <Modal visible={!!selectedItem} transparent animationType="fade" onRequestClose={() => setSelectedItem(null)}>
@@ -249,7 +348,7 @@ const getStyles = (COLORS) => StyleSheet.create({
   headerActions: { flexDirection: 'row', gap: 10 },
   headerBtn: { backgroundColor: COLORS.cardBg, padding: 10, borderRadius: 12, borderWidth: 1, borderColor: COLORS.border },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  container: { padding: 20, paddingBottom: 40 },
+  container: { padding: 20, paddingBottom: 100 },
   sectionTitle: { fontSize: 16, fontWeight: '800', color: COLORS.textLight, marginTop: 20, marginBottom: 14, textTransform: 'uppercase', letterSpacing: 1 },
   statsGrid: { flexDirection: 'row', marginHorizontal: -6, marginBottom: 12 },
   statCard: { flex: 1, marginHorizontal: 6, backgroundColor: COLORS.cardBg, borderRadius: 24, padding: 20, borderWidth: 1, borderColor: COLORS.border, alignItems: 'flex-start' },
@@ -276,4 +375,36 @@ const getStyles = (COLORS) => StyleSheet.create({
   modalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: COLORS.border },
   modalLabel: { fontSize: 14, color: COLORS.textLight, fontWeight: '600' },
   modalValue: { fontSize: 14, fontWeight: '800', color: COLORS.text, maxWidth: '60%', textAlign: 'right' },
+
+  // Floating Bottom Navigation Bar (matches Merchant & User styling)
+  // Bottom Navigation Bar (Matches User portal MainTabNavigator style)
+  bottomNav: {
+    flexDirection: 'row',
+    backgroundColor: COLORS.cardBg,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+    paddingBottom: Platform.OS === 'android' ? 8 : 12,
+    paddingTop: 8,
+    height: 65,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  bottomNavItem: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bottomNavLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: COLORS.textLight,
+    marginTop: 2,
+  },
+  bottomNavLabelActive: {
+    color: COLORS.secondary,
+    fontWeight: '800',
+  },
 });

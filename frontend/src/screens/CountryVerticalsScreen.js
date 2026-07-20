@@ -116,6 +116,50 @@ export default function CountryVerticalsScreen() {
       color: '#2563EB',
       emoji: '🛡️',
       url: 'https://cybeorch.com/'
+    },
+    {
+      id: 'tourism',
+      name: 'Tourism',
+      tagline: 'Explore beautiful global destinations',
+      icon: 'airplane',
+      gradient: ['#2DD4BF', '#0F766E'],
+      bgColor: '#CCFBF1',
+      color: '#0F766E',
+      emoji: '✈️',
+      url: ''
+    },
+    {
+      id: 'matrimonial',
+      name: 'Maytriya Matrimonial',
+      tagline: 'Find your perfect match',
+      icon: 'heart',
+      gradient: ['#F43F5E', '#BE123C'],
+      bgColor: '#FFE4E6',
+      color: '#BE123C',
+      emoji: '💍',
+      url: ''
+    },
+    {
+      id: 'pronexa',
+      name: 'ProNexa',
+      tagline: 'Premium Real Estate Properties',
+      icon: 'office-building',
+      gradient: ['#6366F1', '#4338CA'],
+      bgColor: '#E0E7FF',
+      color: '#4338CA',
+      emoji: '🏢',
+      url: ''
+    },
+    {
+      id: 'fleetx',
+      name: 'FleetX',
+      tagline: 'Smart Fleet Management',
+      icon: 'car-multiple',
+      gradient: ['#F97316', '#C2410C'],
+      bgColor: '#FFEDD5',
+      color: '#C2410C',
+      emoji: '🚚',
+      url: ''
     }
   ];
 
